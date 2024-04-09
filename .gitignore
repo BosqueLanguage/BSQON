@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# allow bin lib
+!build/include/brex/libbrex.a
+
