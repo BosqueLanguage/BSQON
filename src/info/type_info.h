@@ -10,36 +10,33 @@ namespace bsqon
     //
     using TypeKey = std::string;
 
+    using FullyQualifiedNamespace = std::vector<std::string>;
+
     enum class TypeTag
     {
         TYPE_UNRESOLVED = 0x0,
-        TYPE_TUPLE,
-        TYPE_RECORD,
+        TYPE_ELIST,
         TYPE_STD_ENTITY,
         TYPE_STD_CONCEPT,
         TYPE_PRIMITIVE,
         TYPE_ENUM,
         TYPE_TYPE_DECL,
-        TYPE_VALIDATOR_RE,
-        TYPE_VALIDATOR_PTH,
-        TYPE_STRING_OF,
-        TYPE_ASCII_STRING_OF,
-        TYPE_SOMETHING,
+        TYPE_SOME,
         TYPE_OPTION,
         TYPE_OK,
         TYPE_ERROR,
         TYPE_RESULT,
-        TYPE_PATH,
-        TYPE_PATH_FRAGMENT,
-        TYPE_PATH_GLOB,
+        TYPE_APIREJECTED,
+        TYPE_APIFAILED,
+        TYPE_APIERROR,
+        TYPE_APISUCCESS,
+        TYPE_APIRESULT,
         TYPE_LIST,
         TYPE_STACK,
         TYPE_QUEUE,
         TYPE_SET,
         TYPE_MAP_ENTRY,
-        TYPE_MAP,
-        TYPE_CONCEPT_SET,
-        TYPE_UNION
+        TYPE_MAP
     };
 
     class TypeAnnotationInfo
@@ -108,20 +105,21 @@ namespace bsqon
         TypeTag tag;
         TypeKey tkey;
 
+        std::vector<TypeKey> supertypes;
+
         TypeAnnotationInfo annotations;
 
-        Type(TypeTag tag, TypeKey tkey, TypeAnnotationInfo annotations) : tag(tag), tkey(tkey), annotations(annotations) { ; }
+        Type(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : tag(tag), tkey(tkey), supertypes(supertypes), annotations(annotations) 
+        {
+            std::sort(this->supertypes.begin(), this->supertypes.end());
+        }
+
         virtual ~Type() = default;
 
         static const int64_t MIN_SAFE_INT = -9223372036854775807ll;
         static const int64_t MAX_SAFE_INT = 9223372036854775807ll;
 
         static const int64_t MAX_SAFE_NAT = 9223372036854775807ll;
-
-        virtual const std::vector<TypeKey>* getPossibleSubtypeKeys() const
-        {
-            return nullptr;
-        }
 
         static Type* parse(json j);
 
@@ -134,51 +132,32 @@ namespace bsqon
         {
             return !(this->tag == TypeTag::TYPE_UNRESOLVED 
                 || this->tag == TypeTag::TYPE_OPTION || this->tag == TypeTag::TYPE_RESULT
-                || this->tag == TypeTag::TYPE_STD_CONCEPT || this->tag == TypeTag::TYPE_CONCEPT_SET 
-                || this->tag == TypeTag::TYPE_UNION);
+                || this->tag == TypeTag::TYPE_STD_CONCEPT || this->tag == TypeTag::TYPE_APIRESULT);
         }
     };
 
     class UnresolvedType : public Type
     {
     public:
-        UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {false, "[UNRESOLVED]", std::nullopt}) { ; }
+        UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {}, {false, "[UNRESOLVED]", std::nullopt}) { ; }
         virtual ~UnresolvedType() = default;
 
         static UnresolvedType* singleton;
     };
 
-    class TupleType : public Type
+    class EListType : public Type
     {
     public:
         std::vector<TypeKey> entries;
 
-        TupleType(TypeAnnotationInfo annotations, std::vector<TypeKey> entries) : Type(TypeTag::TYPE_TUPLE, "[" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) + "]", annotations), entries(entries) { ; }
-        virtual ~TupleType() = default;
-    };
-
-    class RecordTypeEntry
-    {
-    public:
-        std::string pname;
-        TypeKey ptype;
-
-        RecordTypeEntry(std::string pname, TypeKey ptype) : pname(pname), ptype(ptype) { ; }
-    };
-
-    class RecordType : public Type
-    {
-    public:
-        std::vector<RecordTypeEntry> entries;
-
-        RecordType(TypeAnnotationInfo annotations, std::vector<RecordTypeEntry> entries) : Type(TypeTag::TYPE_RECORD, "{" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, RecordTypeEntry& b) { return (a == "" ? "" : std::move(a) + ", ") + b.pname + ": " + b.ptype; }) + "}", annotations), entries(entries) { ; }
-        virtual ~RecordType() = default;
+        EListType(std::vector<TypeKey> entries) : Type(TypeTag::TYPE_ELIST, "(|" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) + "|)", {}, {false, "", {}}), entries(entries) { ; }
+        virtual ~EListType() = default;
     };
 
     class EntityType : public Type
     {
     public:
-        EntityType(TypeTag tag, TypeKey tkey, TypeAnnotationInfo annotations) : Type(tag, tkey, annotations) { ; }
+        EntityType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : Type(tag, tkey, supertypes, annotations) { ; }
         virtual ~EntityType() = default;
     };
 
@@ -187,17 +166,8 @@ namespace bsqon
     public:
         std::vector<TypeKey> subtypes;
 
-        ConceptType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> subtypes, TypeAnnotationInfo annotations) : Type(tag, tkey, annotations), subtypes(subtypes)
-        {
-            std::sort(this->subtypes.begin(), this->subtypes.end());
-        }
-
+        ConceptType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : Type(tag, tkey, supertypes, annotations), subtypes(subtypes) { ; }
         virtual ~ConceptType() = default;
-
-        virtual const std::vector<TypeKey>* getPossibleSubtypeKeys() const override final
-        {
-            return &this->subtypes;
-        }
     };
 
     class EntityTypeFieldEntry
@@ -217,21 +187,21 @@ namespace bsqon
         std::vector<EntityTypeFieldEntry> fields;
         bool hasvalidations;
 
-        StdEntityType(TypeKey tkey, TypeAnnotationInfo annotations, std::vector<EntityTypeFieldEntry> fields, bool hasvalidations) : EntityType(TypeTag::TYPE_STD_ENTITY, tkey, annotations), fields(fields), hasvalidations(hasvalidations) { ; }
+        StdEntityType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, std::vector<EntityTypeFieldEntry> fields, bool hasvalidations) : EntityType(TypeTag::TYPE_STD_ENTITY, tkey, supertypes, annotations), fields(fields), hasvalidations(hasvalidations) { ; }
         virtual ~StdEntityType() = default;
     };
 
     class StdConceptType : public ConceptType
     {
     public:
-        StdConceptType(TypeKey tkey, std::vector<TypeKey> subtypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_STD_CONCEPT, tkey, subtypes, annotations) { ; }
+        StdConceptType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_STD_CONCEPT, tkey, supertypes, annotations) { ; }
         virtual ~StdConceptType() = default;
     };
 
     class PrimitiveType : public EntityType
     {
     public:
-        PrimitiveType(TypeKey tkey, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PRIMITIVE, tkey, annotations) { ; }
+        PrimitiveType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PRIMITIVE, tkey, supertypes, annotations) { ; }
         virtual ~PrimitiveType() = default;
     };
 
@@ -240,63 +210,29 @@ namespace bsqon
     public:
         std::vector<std::string> variants;
 
-        EnumType(TypeKey tkey, TypeAnnotationInfo annotations, std::vector<std::string> variants) : EntityType(TypeTag::TYPE_ENUM, tkey, annotations), variants(variants) { ; }
+        EnumType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, std::vector<std::string> variants) : EntityType(TypeTag::TYPE_ENUM, tkey, supertypes, annotations), variants(variants) { ; }
         virtual ~EnumType() = default;
     };
 
     class TypedeclType : public EntityType
     {
     public:
-        TypeKey basetype;
-        TypeKey oftype;
+        TypeKey primitivetype;
 
-        std::optional<TypeKey> optStringOfValidator;
-        std::optional<TypeKey> optPathOfValidator;
+        std::optional<std::vector<std::string>> optOfValidators;
         bool hasvalidations;
 
-        TypedeclType(TypeKey tkey, TypeAnnotationInfo annotations, TypeKey basetype, TypeKey oftype, std::optional<TypeKey> optStringOfValidator, std::optional<TypeKey> optPathOfValidator, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, annotations), basetype(basetype), oftype(oftype), optStringOfValidator(optStringOfValidator), optPathOfValidator(optPathOfValidator), hasvalidations(hasvalidations) { ; }
+        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, TypeKey primitivetype, std::optional<std::vector<std::string>> optOfValidators, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype), optOfValidators(optOfValidators), hasvalidations(hasvalidations) { ; }
         virtual ~TypedeclType() = default;
     };
 
-    class ValidatorREType : public EntityType
-    {
-    public:
-        ValidatorREType(TypeKey tkey, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_VALIDATOR_RE, tkey, annotations) { ; }
-        virtual ~ValidatorREType() = default;
-    };
-
-    class ValidatorPthType : public EntityType
-    {
-    public: 
-        ValidatorPthType(TypeKey tkey, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_VALIDATOR_PTH, tkey, annotations) { ; }
-        virtual ~ValidatorPthType() = default;
-    };
-
-    class StringOfType : public EntityType
+    class SomeType : public EntityType
     {
     public:
         TypeKey oftype;
 
-        StringOfType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_STRING_OF, "StringOf<" + oftype + ">", annotations), oftype(oftype) { ; }
-        virtual ~StringOfType() = default;
-    };
-
-    class ASCIIStringOfType : public EntityType
-    {
-    public:
-        TypeKey oftype;
-
-        ASCIIStringOfType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ASCII_STRING_OF, "ASCIIStringOf<" + oftype + ">", annotations), oftype(oftype) { ; }
-        virtual ~ASCIIStringOfType() = default;
-    };
-
-    class SomethingType : public EntityType
-    {
-    public:
-        TypeKey oftype;
-
-        SomethingType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_SOMETHING, "Something<" + oftype + ">", annotations), oftype(oftype) { ; }
-        virtual ~SomethingType() = default;
+        SomeType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_SOME, "Some<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
+        virtual ~SomeType() = default;
     };
 
     class OptionType : public ConceptType
@@ -304,7 +240,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        OptionType(TypeKey oftype, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_OPTION, "Option<" + oftype + ">", { "Nothing", "Something<" + oftype + ">" }, annotations), oftype(oftype) { ; }
+        OptionType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_OPTION, "Option<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~OptionType() = default;
     };
 
@@ -314,7 +250,7 @@ namespace bsqon
         TypeKey ttype;
         TypeKey etype;
 
-        OkType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_OK, "Result<" + ttype + ", " + etype + ">::Ok", annotations), ttype(ttype), etype(etype) { ; }
+        OkType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_OK, "Result<" + ttype + ", " + etype + ">::Ok", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~OkType() = default;
     };
 
@@ -324,7 +260,7 @@ namespace bsqon
         TypeKey ttype;
         TypeKey etype;
 
-        ErrorType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Err", annotations), ttype(ttype), etype(etype) { ; }
+        ErrorType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Err", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ErrorType() = default;
     };
 
@@ -334,35 +270,53 @@ namespace bsqon
         TypeKey ttype;
         TypeKey etype;
 
-        ResultType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_RESULT, "Result<" + ttype + ", " + etype + ">", { "Result<" + ttype + ", " + etype + ">::Ok", "Result<" + ttype + ", " + etype + ">::Err" }, annotations), ttype(ttype), etype(etype) { ; }
+        ResultType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_RESULT, "Result<" + ttype + ", " + etype + ">", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ResultType() = default;
     };
 
-    class PathType : public EntityType
+    class APIRejectedType : public EntityType
     {
     public:
-        TypeKey oftype;
+        TypeKey ttype;
 
-        PathType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH, "Path<" + oftype + ">", annotations), oftype(oftype) { ; }
-        virtual ~PathType() = default;
+        APIRejectedType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APIREJECTED, "APIResult<" + ttype + ">::Rejected", supertypes, annotations), ttype(ttype) { ; }
+        virtual ~APIRejectedType() = default;
     };
 
-    class PathFragmentType : public EntityType
+    class APIFailedType : public EntityType
     {
     public:
-        TypeKey oftype;
+        TypeKey ttype;
 
-        PathFragmentType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH_FRAGMENT, "PathFragment<" + oftype + ">", annotations), oftype(oftype) { ; }
-        virtual ~PathFragmentType() = default;
+        APIFailedType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APIFAILED, "APIResult<" + ttype + ">::Failed", supertypes, annotations), ttype(ttype) { ; }
+        virtual ~APIFailedType() = default;
     };
 
-    class PathGlobType : public EntityType
+    class APIErrorType : public EntityType
     {
     public:
-        TypeKey oftype;
+        TypeKey ttype;
 
-        PathGlobType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH_GLOB, "PathGlob<" + oftype + ">", annotations), oftype(oftype) { ; }
-        virtual ~PathGlobType() = default;
+        APIErrorType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APIERROR, "APIResult<" + ttype + ">::Error", supertypes, annotations), ttype(ttype) { ; }
+        virtual ~APIErrorType() = default;
+    };
+
+    class APISuccessType : public EntityType
+    {
+    public:
+        TypeKey ttype;
+
+        APISuccessType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APISUCCESS, "APIResult<" + ttype + ">::Success", supertypes, annotations), ttype(ttype) { ; }
+        virtual ~APISuccessType() = default;
+    };
+
+    class APIResultType : public ConceptType
+    {
+    public:
+        TypeKey ttype;
+
+        APIResultType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_APIRESULT, "APIResult<" + ttype + ">", supertypes, annotations), ttype(ttype) { ; }
+        virtual ~APIResultType() = default;
     };
 
     class ListType : public EntityType
@@ -370,7 +324,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        ListType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_LIST, "List<" + oftype + ">", annotations), oftype(oftype) { ; }
+        ListType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_LIST, "List<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~ListType() = default;
     };
 
@@ -379,7 +333,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        StackType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_STACK, "Stack<" + oftype + ">", annotations), oftype(oftype) { ; }
+        StackType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_STACK, "Stack<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~StackType() = default;
     };
 
@@ -388,7 +342,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        QueueType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_QUEUE, "Queue<" + oftype + ">", annotations), oftype(oftype) { ; }
+        QueueType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_QUEUE, "Queue<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~QueueType() = default;
     };
 
@@ -397,7 +351,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        SetType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_SET, "Set<" + oftype + ">", annotations), oftype(oftype) { ; }
+        SetType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_SET, "Set<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~SetType() = default;
     };
 
@@ -407,7 +361,7 @@ namespace bsqon
         TypeKey ktype;
         TypeKey vtype;
 
-        MapEntryType(TypeKey ktype, TypeKey vtype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_MAP_ENTRY, "MapEntry<" + ktype + ", " + vtype + ">", annotations), ktype(ktype), vtype(vtype) { ; }
+        MapEntryType(TypeKey ktype, TypeKey vtype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_MAP_ENTRY, "MapEntry<" + ktype + ", " + vtype + ">", supertypes, annotations), ktype(ktype), vtype(vtype) { ; }
         virtual ~MapEntryType() = default;
     };
 
@@ -417,40 +371,36 @@ namespace bsqon
         TypeKey ktype;
         TypeKey vtype;
 
-        MapType(TypeKey ktype, TypeKey vtype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_MAP, "Map<" + ktype + ", " + vtype + ">", annotations), ktype(ktype), vtype(vtype) { ; }
+        MapType(TypeKey ktype, TypeKey vtype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_MAP, "Map<" + ktype + ", " + vtype + ">", supertypes, annotations), ktype(ktype), vtype(vtype) { ; }
         virtual ~MapType() = default;
-    };
-
-    class ConceptSetType : public Type
-    {
-    public:
-        std::vector<TypeKey> concepts;
-
-        ConceptSetType(TypeAnnotationInfo annotations, std::vector<TypeKey> concepts) : Type(TypeTag::TYPE_CONCEPT_SET, std::accumulate(concepts.begin(), concepts.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + "&") + b; }), annotations), concepts(concepts) { ; }
-        virtual ~ConceptSetType() = default;
-    };
-
-    class UnionType : public Type
-    {
-    public:
-        std::vector<TypeKey> types;
-
-        UnionType(TypeAnnotationInfo annotations, std::vector<TypeKey> types) : Type(TypeTag::TYPE_UNION, std::accumulate(types.begin(), types.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + " | ") + b; }), annotations), types(types) { ; }
-        virtual ~UnionType() = default;
     };
 
     class NamespaceDecl
     {
     public:
+        bool istoplevel;
+        std::map<std::string, std::string> imports; //copy over if not top-level
+
+        FullyQualifiedNamespace fullns;
         std::string ns;
-        std::vector<TypeKey> typenames;
 
-        NamespaceDecl(std::string ns, std::vector<TypeKey> typenames) : ns(ns), typenames(typenames)
-        {
-            ;
-        }
+        std::map<std::string, NamespaceDecl*> subns;
+        std::map<std::string, Type*> types;
 
+        NamespaceDecl(bool istoplevel, std::map<std::string, std::string> imports, FullyQualifiedNamespace fullns, std::string ns, std::map<std::string, NamespaceDecl*> subns, std::map<std::string, Type*> types) : istoplevel(istoplevel), imports(imports), fullns(fullns), ns(ns), subns(subns), types(types) { ; }
         static NamespaceDecl* parse(json j);
+
+        bool lookupNSReference(const std::string& name, std::string& out) const
+        {
+            auto ii = this->imports.find(name);
+            if(ii == this->imports.end()) {
+                return false;
+            }
+            else {
+                out = ii->second;
+                return true;
+            }
+        }
 
         bool hasTypenameDecl(const std::string& name) const
         {
@@ -461,14 +411,11 @@ namespace bsqon
     class AssemblyInfo
     {
     public:
-        std::map<TypeKey, Type*> aliasmap;
         std::map<std::string, NamespaceDecl*> namespaces;
         std::map<TypeKey, Type*> typerefs;
         std::vector<std::set<TypeKey>> recursiveSets;
-        std::map<TypeKey, brex::Regex*> bsqonRegexValidators;
-        std::map<TypeKey, bpath::PathGlob*> bsqonPathValidators;
 
-        AssemblyInfo() : aliasmap(), namespaces(), typerefs(), recursiveSets(), bsqonRegexValidators(), bsqonPathValidators()
+        AssemblyInfo() : namespaces(), typerefs(), recursiveSets(), bsqonRegexValidators(), bsqonPathValidators()
         { 
             ; 
         }
@@ -510,13 +457,6 @@ namespace bsqon
                 return true;
             }
 
-            if (oftype->tag == TypeTag::TYPE_UNION) {
-                return std::any_of(static_cast<const UnionType*>(oftype)->types.begin(), static_cast<const UnionType*>(oftype)->types.end(), [this, t](const TypeKey& tt) { return this->checkConcreteSubtype(t, this->resolveType(tt)); });
-            }
-            else if (oftype->tag == TypeTag::TYPE_CONCEPT_SET) {
-                return std::all_of(static_cast<const ConceptSetType*>(oftype)->concepts.begin(), static_cast<const ConceptSetType*>(oftype)->concepts.end(), [this, t](const TypeKey& tt) { return this->checkConcreteSubtype(t, this->resolveType(tt)); });
-            }
-            else {
                 auto psubtypes = oftype->getPossibleSubtypeKeys();
                 if(psubtypes == nullptr) {
                     return false;
@@ -524,7 +464,6 @@ namespace bsqon
                 else {
                     return std::binary_search(psubtypes->begin(), psubtypes->end(), t->tkey);
                 }
-            }
         }
 
         bool isKeyType(TypeKey tkey) const;
