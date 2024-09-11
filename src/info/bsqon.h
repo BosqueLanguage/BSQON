@@ -210,11 +210,6 @@ namespace bsqon
     public:
         PrimtitiveValue(ValueKind kind, const Type* vtype, SourcePos spos) : Value(kind, vtype, spos) { ; }
         virtual ~PrimtitiveValue() = default;
-
-        const PrimitiveType* getPrimitiveType() const
-        {
-            return (const PrimitiveType*)this->vtype;
-        }
     };
 
     class NoneValue : public PrimtitiveValue 
@@ -865,7 +860,13 @@ namespace bsqon
             return true;
         }
 
-        xxxx;
+        static int keyCompare(const ISOTimeStampValue* v1, const ISOTimeStampValue* v2)
+        {
+            uint16_t v1vs[6] = {v1->tv.year, v1->tv.month, v1->tv.day, v1->tv.hour, v1->tv.min, v1->tv.sec};
+            uint16_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
+
+            return Value::keyCompareImplArray(v1vs, v2vs, 6);
+        }
     };
 
     class DeltaSecondsValue : public PrimtitiveValue 
@@ -890,7 +891,10 @@ namespace bsqon
             return true;
         }
 
-        xxxx;
+        static int keyCompare(const DeltaSecondsValue* v1, const DeltaSecondsValue* v2)
+        {
+            return Value::keyCompareImplScalars(v1->tv, v2->tv);
+        }
     };
 
     class DeltaLogicalValue : public PrimtitiveValue 
@@ -915,7 +919,10 @@ namespace bsqon
             return true;
         }
 
-        xxxx;
+        static int keyCompare(const DeltaLogicalValue* v1, const DeltaLogicalValue* v2)
+        {
+            return Value::keyCompareImplScalars(v1->tv, v2->tv);
+        }
     };
 
     class DeltaISOTimeStampValue : public PrimtitiveValue 
@@ -939,7 +946,13 @@ namespace bsqon
             return true;
         }
 
-        xxxx;
+        static int keyCompare(const DeltaISOTimeStampValue* v1, const DeltaISOTimeStampValue* v2)
+        {
+            uint16_t v1vs[6] = {v1->tv.year, v1->tv.month, v1->tv.day, v1->tv.hour, v1->tv.min, v1->tv.sec};
+            uint16_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
+
+            return Value::keyCompareImplArray(v1vs, v2vs, 6);
+        }
     };
 
     class UnicodeRegexValue : public PrimtitiveValue 
@@ -1042,25 +1055,76 @@ namespace bsqon
         }
     };
 
+    class APIRejectedValue : public Value
+    {
+    public:
+        const Value* v;
+
+        APIRejectedValue(const Type* vtype, SourcePos spos, const Value* v) : Value(ValueKind::APIRejectedValueKind, vtype, spos), v(v) { ; }
+        virtual ~APIRejectedValue() = default;
+
+        virtual std::u8string toString() const override
+        {
+            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+    };
+
+    class APIFailedValue : public Value
+    {
+    public:
+        const Value* v;
+
+        APIFailedValue(const Type* vtype, SourcePos spos, const Value* v) : Value(ValueKind::APIFailedValueKind, vtype, spos), v(v) { ; }
+        virtual ~APIFailedValue() = default;
+
+        virtual std::u8string toString() const override
+        {
+            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+    };
+
+    class APIErrorValue : public Value
+    {
+    public:
+        const Value* v;
+
+        APIErrorValue(const Type* vtype, SourcePos spos, const Value* v) : Value(ValueKind::APIErrorValueKind, vtype, spos), v(v) { ; }
+        virtual ~APIErrorValue() = default;
+
+        virtual std::u8string toString() const override
+        {
+            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+    };
+
+    class APISuccessValue : public Value
+    {
+    public:
+        const Value* v;
+
+        APISuccessValue(const Type* vtype, SourcePos spos, const Value* v) : Value(ValueKind::APISuccessValueKind, vtype, spos), v(v) { ; }
+        virtual ~APISuccessValue() = default;
+
+        virtual std::u8string toString() const override
+        {
+            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+    };
+
     class PathValue : public Value
     {
     public:
         const bpath::Path* path;
-        const brex::UnicodeString normalizedpth;
+        const std::u8string normalizedpth;
 
         virtual ~PathValue() = default;
 
-        //null if validator fails
-        static PathValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length, const bpath::PathGlob* validator);
+        //null if it fails
+        static PathValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
 
         virtual std::u8string toString() const override
         {
-            return this->normalizedpth + std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
-        }
-
-        const PathType* getPathType() const
-        {
-            return (const PathType*)this->vtype;
+            return this->normalizedpth;
         }
 
         virtual bool isValidForTypedecl() const override
@@ -1074,28 +1138,23 @@ namespace bsqon
         }
 
     private:
-        PathValue(const Type* vtype, SourcePos spos, bpath::Path* path, brex::UnicodeString normalizedpth) : Value(ValueKind::PathValueKind, vtype, spos), path(path), normalizedpth(normalizedpth) { ; }
+        PathValue(const Type* vtype, SourcePos spos, bpath::Path* path, std::u8string normalizedpth) : Value(ValueKind::PathValueKind, vtype, spos), path(path), normalizedpth(normalizedpth) { ; }
     };
 
     class PathFragmentValue : public Value
     {
     public:
         const bpath::PathFragment* fragment;
-        const brex::UnicodeString normalizedfrag;
+        const std::u8string normalizedfrag;
 
         virtual ~PathFragmentValue() = default;
 
-        //null if validator fails
-        static PathFragmentValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length, const bpath::PathGlob* validator);
+        //null if it fails
+        static PathFragmentValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
 
         virtual std::u8string toString() const override
         {
-            return this->normalizedfrag + std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
-        }
-
-        const PathFragmentType* getPathFragmentType() const
-        {
-            return (const PathFragmentType*)this->vtype;
+            return this->normalizedfrag;
         }
 
         virtual bool isValidForTypedecl() const override
@@ -1109,28 +1168,23 @@ namespace bsqon
         }
 
     private:
-        PathFragmentValue(const Type* vtype, SourcePos spos, bpath::PathFragment* fragment, brex::UnicodeString normalizedfrag) : Value(ValueKind::PathFragmentValueKind, vtype, spos), fragment(fragment), normalizedfrag(normalizedfrag) { ; }
+        PathFragmentValue(const Type* vtype, SourcePos spos, bpath::PathFragment* fragment, std::u8string normalizedfrag) : Value(ValueKind::PathFragmentValueKind, vtype, spos), fragment(fragment), normalizedfrag(normalizedfrag) { ; }
     };
 
     class PathGlobValue : public Value
     {
     public:
         const bpath::PathGlob* glob;
-        const brex::UnicodeString normalizedglob;
+        const std::u8string normalizedglob;
 
         virtual ~PathGlobValue() = default;
 
-        //null if validator fails
-        static PathGlobValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length, const bpath::PathGlob* validator);
+        //null if it fails
+        static PathGlobValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
 
         virtual std::u8string toString() const override
         {
-            return this->normalizedglob + std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
-        }
-
-        const PathGlobType* getPathGlobType() const
-        {
-            return (const PathGlobType*)this->vtype;
+            return this->normalizedglob;
         }
 
         virtual bool isValidForTypedecl() const override
@@ -1144,7 +1198,7 @@ namespace bsqon
         }
 
     private:
-        PathGlobValue(const Type* vtype, SourcePos spos, bpath::PathGlob* glob, brex::UnicodeString normalizedglob) : Value(ValueKind::PathGlobValueKind, vtype, spos), glob(glob), normalizedglob(normalizedglob) { ; }
+        PathGlobValue(const Type* vtype, SourcePos spos, bpath::PathGlob* glob, std::u8string normalizedglob) : Value(ValueKind::PathGlobValueKind, vtype, spos), glob(glob), normalizedglob(normalizedglob) { ; }
     };
 
     class ListValue : public Value
@@ -1163,11 +1217,6 @@ namespace bsqon
             });
 
             return ltype + u8'{' + lvalues + u8'}';
-        }
-
-        const ListType* getListType() const
-        {
-            return (const ListType*)this->vtype;
         }
     };
 
@@ -1188,11 +1237,6 @@ namespace bsqon
 
             return stype + u8'{' + svalues + u8'}';
         }
-
-        const StackType* getStackType() const
-        {
-            return (const StackType*)this->vtype;
-        }
     };
 
     class QueueValue : public Value
@@ -1211,11 +1255,6 @@ namespace bsqon
             });
 
             return qtype + u8'{' + qvalues + u8'}';
-        }
-
-        const QueueType* getQueueType() const
-        {
-            return (const QueueType*)this->vtype;
         }
     };
 
@@ -1236,11 +1275,6 @@ namespace bsqon
 
             return stype + u8'{' + svalues + u8'}';
         }
-
-        const SetType* getSetType() const
-        {
-            return (const SetType*)this->vtype;
-        }
     };
 
     class MapEntryValue : public Value
@@ -1256,11 +1290,6 @@ namespace bsqon
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->key->toString() + u8", " + this->val->toString() + u8'}';
         }
-
-        const MapEntryType* getMapEntryType() const
-        {
-            return (const MapEntryType*)this->vtype;
-        }
     };
 
     class MapValue : public Value
@@ -1274,16 +1303,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             auto mtype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
-            auto mvalues = std::accumulate(this->vals.cbegin(), this->vals.cend(), std::u8string{}, [](std::u8string&& a, const Value* v) { 
-                return (a.empty() ? u8"" : std::move(a) + u8", ") + v->toString(); 
+            auto mvalues = std::accumulate(this->vals.cbegin(), this->vals.cend(), std::u8string{}, [](std::u8string&& a, const MapEntryValue* v) { 
+                return (a.empty() ? u8"" : std::move(a) + u8", ") + v->key->toString() + u8" => " + v->val->toString(); 
             });
 
             return mtype + u8'{' + mvalues + u8'}';
-        }
-
-        const MapType* getMapType() const
-        {
-            return (const MapType*)this->vtype;
         }
     };
 
@@ -1301,11 +1325,6 @@ namespace bsqon
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8"::" + std::u8string(this->evname.cbegin(), this->evname.cend());
         }
 
-        const EnumType* getEnumType() const
-        {
-            return (const EnumType*)this->vtype;
-        }
-
         virtual bool isValidForTypedecl() const override
         {
             return true;
@@ -1320,19 +1339,14 @@ namespace bsqon
     class TypedeclValue : public Value
     {
     public:
-        const Value* basevalue;
+        const Value* pvalue;
 
-        TypedeclValue(const Type* vtype, SourcePos spos, const Value* basevalue) : Value(ValueKind::TypedeclValueKind, vtype, spos), basevalue(basevalue) { ; }
+        TypedeclValue(const Type* vtype, SourcePos spos, const Value* pvalue) : Value(ValueKind::TypedeclValueKind, vtype, spos), pvalue(pvalue) { ; }
         virtual ~TypedeclValue() = default;
         
         virtual std::u8string toString() const override
         {
-            return this->basevalue->toString() + u8'_' + std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
-        }
-
-        const TypedeclType* getTypedeclType() const
-        {
-            return (const TypedeclType*)this->vtype;
+            return this->pvalue->toString() + u8'<' + std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'>';
         }
     };
 
@@ -1349,29 +1363,35 @@ namespace bsqon
         {
             auto etype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
 
-            std::vector<Value*> ifields;
-            std::copy_if(this->fieldvalues.cbegin(), this->fieldvalues.cend(), std::back_inserter(ifields), [](const Value* v) { return v != nullptr; });
+            std::u8string efields = u8"";
+            auto isSimplePositional = std::all_of(this->fieldvalues.cbegin(), this->fieldvalues.cend(), [](const Value* v) { return v != nullptr; });
+            if(isSimplePositional) {
+                for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
+                    efields += (efields == u8"" ? u8"" : u8", ") + this->fieldvalues[i]->toString();
+                }
+            }
+            else {
+                const std::vector<EntityTypeFieldEntry>& fields = static_cast<const StdEntityType*>(this->vtype)->fields;
 
-            auto efields = std::accumulate(ifields.cbegin(), ifields.cend(), std::u8string{}, [](std::u8string&& a, const Value* v) { 
-                return (a.empty() ? u8"" : std::move(a) + u8", ") + v->toString(); 
-            });
+                for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
+                    if(this->fieldvalues[i] != nullptr) {
+                        auto fstr = std::u8string(fields[i].fname.cbegin(), fields[i].fname.cend());
+                        efields += (efields == u8"" ? u8"" : u8", ") + (fstr + u8"=" + this->fieldvalues[i]->toString());
+                    }
+                }
+            }
 
             return etype + u8'{' + efields + u8'}';
         }
-
-        const EntityType* getEntityType() const
-        {
-            return (const EntityType*)this->vtype;
-        }
     };
 
-    class TupleValue : public Value
+    class EListValue : public Value
     {
     public:
         const std::vector<Value*> values;
 
-        TupleValue(const Type* vtype, SourcePos spos, const std::vector<Value*>&& values) : Value(ValueKind::TupleValueKind, vtype, spos), values(std::move(values)) { ; }
-        virtual ~TupleValue() = default;
+        EListValue(const Type* vtype, SourcePos spos, const std::vector<Value*>&& values) : Value(ValueKind::EListValueKind, vtype, spos), values(std::move(values)) { ; }
+        virtual ~EListValue() = default;
         
         virtual std::u8string toString() const override
         {
@@ -1380,36 +1400,7 @@ namespace bsqon
                 return (a.empty() ? u8"" : std::move(a) + u8", ") + v->toString(); 
             });
 
-            return u8'<' + ttype + u8">[" + tvalues + u8']';
-        }
-
-        const TupleType* getTupleType() const
-        {
-            return (const TupleType*)this->vtype;
-        }
-    };
-
-    class RecordValue : public Value
-    {
-    public:
-        const std::vector<Value*> values;
-
-        RecordValue(const Type* vtype, SourcePos spos, const std::vector<Value*>&& values) : Value(ValueKind::RecordValueKind, vtype, spos), values(std::move(values)) { ; }
-        virtual ~RecordValue() = default;
-        
-        virtual std::u8string toString() const override
-        {
-            auto rtype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
-            auto rvalues = std::accumulate(this->values.cbegin(), this->values.cend(), std::u8string{}, [](std::u8string&& a, const Value* v) { 
-                return (a.empty() ? u8"" : std::move(a) + u8", ") + v->toString(); 
-            });
-
-            return u8'<' + rtype + u8">{" + rvalues + u8'}';
-        }
-
-        const RecordType* getRecordType() const
-        {
-            return (const RecordType*)this->vtype;
+            return u8'<' + ttype + u8">(|" + tvalues + u8"|)";
         }
     };
 
@@ -1436,7 +1427,7 @@ namespace bsqon
                     return u8"." + xstr;
                 }
                 case SymbolicOffsetTag::IndexOffset: {
-                    return u8"." + xstr;
+                    return u8"[" + xstr + u8"]";
                 }
                 case SymbolicOffsetTag::KeyOffset: {
                     return u8"[" + xstr + u8"]";
