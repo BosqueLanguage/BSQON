@@ -384,10 +384,10 @@ namespace bsqon
         FullyQualifiedNamespace fullns;
         std::string ns;
 
-        std::map<std::string, NamespaceDecl*> subns;
-        std::map<std::string, Type*> types;
+        std::map<std::string, FullyQualifiedNamespace> subns;
+        std::map<std::string, TypeKey> types;
 
-        NamespaceDecl(bool istoplevel, std::map<std::string, std::string> imports, FullyQualifiedNamespace fullns, std::string ns, std::map<std::string, NamespaceDecl*> subns, std::map<std::string, Type*> types) : istoplevel(istoplevel), imports(imports), fullns(fullns), ns(ns), subns(subns), types(types) { ; }
+        NamespaceDecl(bool istoplevel, std::map<std::string, std::string> imports, FullyQualifiedNamespace fullns, std::string ns, std::map<std::string, FullyQualifiedNamespace> subns, std::map<std::string, TypeKey> types) : istoplevel(istoplevel), imports(imports), fullns(fullns), ns(ns), subns(subns), types(types) { ; }
         static NamespaceDecl* parse(json j);
 
         bool lookupNSReference(const std::string& name, std::string& out) const
@@ -401,11 +401,6 @@ namespace bsqon
                 return true;
             }
         }
-
-        bool hasTypenameDecl(const std::string& name) const
-        {
-            return std::binary_search(this->typenames.cbegin(), this->typenames.cend(), name);
-        }
     };
 
     class AssemblyInfo
@@ -413,9 +408,10 @@ namespace bsqon
     public:
         std::map<std::string, NamespaceDecl*> namespaces;
         std::map<TypeKey, Type*> typerefs;
+
         std::vector<std::set<TypeKey>> recursiveSets;
 
-        AssemblyInfo() : namespaces(), typerefs(), recursiveSets(), bsqonRegexValidators(), bsqonPathValidators()
+        AssemblyInfo() : namespaces(), typerefs(), recursiveSets()
         { 
             ; 
         }
@@ -429,7 +425,7 @@ namespace bsqon
 
         static void parse(json j, AssemblyInfo& assembly);
 
-        Type* resolveType(TypeKey tkey)
+        Type* lookupTypeKey(TypeKey tkey)
         {
             auto tt = this->typerefs.find(tkey);
             if(tt != this->typerefs.end()) {
@@ -440,7 +436,7 @@ namespace bsqon
             }
         }
 
-        const Type* resolveType(TypeKey tkey) const
+        const Type* lookupTypeKey(TypeKey tkey) const
         {
             auto tt = this->typerefs.find(tkey);
             if(tt != this->typerefs.end()) {
@@ -451,19 +447,14 @@ namespace bsqon
             }
         }
 
-        bool checkConcreteSubtype(const Type* t, const Type* oftype) const
+        bool checkSubtype(const Type* t, const Type* oftype) const
         {
             if (t->tkey == oftype->tkey) {
                 return true;
             }
-
-                auto psubtypes = oftype->getPossibleSubtypeKeys();
-                if(psubtypes == nullptr) {
-                    return false;
-                }
-                else {
-                    return std::binary_search(psubtypes->begin(), psubtypes->end(), t->tkey);
-                }
+            else {
+                return std::binary_search(t->supertypes.cbegin(), t->supertypes.cend(), oftype->tkey);
+            }
         }
 
         bool isKeyType(TypeKey tkey) const;

@@ -194,10 +194,27 @@ namespace bsqon
 
     NamespaceDecl* NamespaceDecl::parse(json j)
     {
-        std::vector<TypeKey> typenames;
-        std::transform(j["typenames"].begin(), j["typenames"].end(), std::back_inserter(typenames), [](const json& jv) { return jv.get<TypeKey>(); });
+        bool istoplevel = j["istoplevel"].get<bool>();
 
-        return new NamespaceDecl(j["ns"].get<std::string>(), typenames);
+        std::map<std::string, std::string> imports;
+        std::transform(j["imports"].begin(), j["imports"].end(), std::inserter(imports, imports.end()), [](const json& jv) { return std::make_pair(jv[0].get<std::string>(), jv[1].get<std::string>()); });
+
+        FullyQualifiedNamespace fullns;
+        std::transform(j["fullns"].begin(), j["fullns"].end(), std::back_inserter(fullns), [](const json& jv) { return jv.get<std::string>(); });
+
+        std::string ns = j["ns"].get<std::string>();
+
+        std::map<std::string, FullyQualifiedNamespace> subns;
+        std::transform(j["subns"].begin(), j["subns"].end(), std::inserter(subns, subns.end()), [](const json& jv) { 
+            FullyQualifiedNamespace fqn;
+            std::transform(jv[1].begin(), jv[1].end(), std::back_inserter(fqn), [](const json& jv) { return jv.get<std::string>(); });
+            return std::make_pair(jv[0].get<std::string>(), fqn);
+        });
+
+        std::map<std::string, TypeKey> types;
+        std::transform(j["types"].begin(), j["types"].end(), std::inserter(types, types.end()), [](const json& jv) { return std::make_pair(jv[0].get<std::string>(), jv[1].get<TypeKey>()); });
+        
+        return new NamespaceDecl(istoplevel, imports, fullns, ns, subns, types);
     }
 
     void AssemblyInfo::parse(json j, AssemblyInfo& assembly)
@@ -210,27 +227,6 @@ namespace bsqon
         std::for_each(j["typerefs"].begin(), j["typerefs"].end(), [&assembly](const json &tr) { 
             auto t = Type::parse(tr);
             assembly.typerefs[t->tkey] = t; 
-        });
-
-        std::for_each(j["aliasmap"].begin(), j["aliasmap"].end(), [&assembly](const json &a) { 
-            assembly.aliasmap[a[0].get<std::string>()] = assembly.typerefs[a[1].get<TypeKey>()];
-        });
-
-        std::for_each(j["revalidators"].begin(), j["revalidators"].end(), [&assembly](const json &rv) {
-            std::string ss = rv[1].get<std::string>();
-            bool isascii = ss.ends_with("a");
-            if(isascii) {
-                ss.pop_back();
-            }
-
-            auto bre = brex::RegexParser::parseRegex((uint8_t*)ss.c_str(), ss.size(), !isascii, false, false, false);
-            assembly.bsqonRegexValidators[rv[0].get<TypeKey>()] = bre.first.value();
-        });
-
-        std::for_each(j["pthvalidators"].begin(), j["pthvalidators"].end(), [&assembly](const json &pv) {
-            //
-            //TODO: need to implement path parser
-            //
         });
 
         std::for_each(j["recursiveSets"].begin(), j["recursiveSets"].end(), [&assembly](const json &rs) { 
@@ -266,7 +262,7 @@ namespace bsqon
 
     bool AssemblyInfo::isKeyType(TypeKey tkey) const
     {
-        auto ttype = this->resolveType(tkey);
+        auto ttype = this->lookupTypeKey(tkey);
 
         if(ttype->tag == TypeTag::TYPE_PRIMITIVE) {
             return std::find(g_primitiveKeyTypes.begin(), g_primitiveKeyTypes.end(), tkey) != g_primitiveKeyTypes.end();
@@ -274,11 +270,8 @@ namespace bsqon
         else if(ttype->tag == TypeTag::TYPE_ENUM) {
             return true;
         }
-        else if(ttype->tag == TypeTag::TYPE_STRING_OF || ttype->tag == TypeTag::TYPE_ASCII_STRING_OF) {
-            return true;
-        }
         else if(ttype->tag == TypeTag::TYPE_TYPE_DECL) {
-            return this->isKeyType(static_cast<const TypedeclType*>(ttype)->oftype);
+            return this->isKeyType(static_cast<const TypedeclType*>(ttype)->primitivetype);
         }
         else {
             return false;
@@ -295,6 +288,6 @@ namespace bsqon
         auto t = g_assembly.typerefs[tkey];
         auto uu = g_assembly.typerefs[oftype];
 
-        return g_assembly.checkConcreteSubtype(t, uu);
+        return g_assembly.checkSubtype(t, uu);
     }
 }
