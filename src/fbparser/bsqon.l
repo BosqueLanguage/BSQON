@@ -34,7 +34,7 @@ void yyerror(const char* s, ...);
 %}
 
 %x STRING
-%x ASCII_STRING
+%x CSTRING
 %x REGEX
 %x PATH_ITEM
 %x SHEBANG_LINE
@@ -63,7 +63,11 @@ TYPE_IDENTIFIER ([A-Z][a-zA-Z0-9_]*)
 "{" |
 "}" |
 "[" |
-"]" | 
+"]" |
+"(|" |
+"|)" |
+"[|" |
+"|]" | 
 "<" |
 ">"         { return yytext[0]; }
 
@@ -73,29 +77,22 @@ TYPE_IDENTIFIER ([A-Z][a-zA-Z0-9_]*)
 
 ":"         { return SYM_COLON; }
 ","         { return SYM_COMMA; }
-"&"         { return SYM_AMP; }
-"|"         { return SYM_BAR; }
 "="         { return SYM_EQUALS; }
 "."         { return SYM_DOT; }
-"_"         { return SYM_UNDERSCORE; }
 
  /* keywords */
-"something" { return KW_SOMETHING; }
-
-"nothing"   { return KW_NOTHING; }
-
-"false"     { return KW_FALSE; }
 
 "$npos"     { return KW_NPOS; }
 "$src"      { return KW_SRC; }
 "none"      { return KW_NONE; }
 "true"      { return KW_TRUE; } 
+"false"     { return KW_FALSE; }
 
+"some"      { return KW_SOME; }
+"ok"        { return KW_OK; }
 "err"       { return KW_ERR; }
 "let"       { return KW_LET; }
-
 "in"        { return KW_IN; }
-"ok"        { return KW_OK; }
 
 "env"        { return KW_ENV; }
 

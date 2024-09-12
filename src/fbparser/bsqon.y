@@ -52,15 +52,12 @@ int errorcount = 0;
 %locations
 
 /* declare tokens */
-%left SYM_BAR "|"
-%left SYM_AMP "&"
 
-%token KW_NONE "none"
-%token KW_NOTHING "nothing"
 %token KW_TRUE "true"
 %token KW_FALSE "false"
 
-%token KW_SOMETHING "something"
+%token KW_NONE "none"
+%token KW_SOME "some"
 %token KW_OK "ok"
 %token KW_ERR "err"
 
@@ -78,7 +75,6 @@ int errorcount = 0;
 %token SYM_COLON ":"
 %token SYM_COMMA ","
 %token SYM_EQUALS "="
-%token SYM_UNDERSCORE "_"
 
 %token <str> TOKEN_NAT "nat literal"
 %token <str> TOKEN_INT "int literal"
@@ -100,27 +96,21 @@ int errorcount = 0;
 %token <str> TOKEN_SHA_HASH "sha3 hashcode (512 bits)"
 
 %token <bstr> TOKEN_STRING "string"
-%token <bstr> TOKEN_ASCII_STRING "ascii string"
+%token <bstr> TOKEN_CSTRING "cstring"
 %token <bstr> TOKEN_REGEX "regular expression"
 %token <bstr> TOKEN_PATH_ITEM "path item"
 
-%token <str> TOKEN_DATE_TIME "date & time with timezone"
-%token <str> TOKEN_UTC_DATE_TIME "date & time in UTC"
+%token <str> TOKEN_TZ_DATE_TIME "date & time with timezone"
+%token <str> TOKEN_TIA_TIME "date & time in TIA"
 %token <str> TOKEN_PLAIN_DATE "plain date"
 %token <str> TOKEN_PLAIN_TIME "plain time"
-
-%token <str> TOKEN_DELTA_DATE_TIME "date & time delta"
-%token <str> TOKEN_DELTA_PLAIN_DATE "plain date delta"
-%token <str> TOKEN_DELTA_PLAIN_TIME "plain time delta"
-
 %token <str> TOKEN_LOGICAL_TIME "logical time"
-%token <str> TOKEN_TICK_TIME "tick time"
 %token <str> TOKEN_TIMESTAMP "ISO timestamp"
 
-%token <str> TOKEN_DELTA_ISOTIMESTAMP "timestamp delta"
+%token <str> TOKEN_DELTA_DATE_TIME "date & time delta"
 %token <str> TOKEN_DELTA_SECONDS "delta in seconds"
-%token <str> TOKEN_DELTA_TICK "tick delta"
 %token <str> TOKEN_DELTA_LOGICAL "logical time delta"
+%token <str> TOKEN_DELTA_ISOTIMESTAMP "timestamp delta"
 
 %token <str> TOKEN_IDENTIFIER "identifier"
 %token <str> TOKEN_TYPE_COMPONENT "type name"
