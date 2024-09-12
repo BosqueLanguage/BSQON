@@ -75,6 +75,7 @@ int errorcount = 0;
 %token SYM_COLON ":"
 %token SYM_COMMA ","
 %token SYM_EQUALS "="
+%token SYM_DOT "."
 
 %token <str> TOKEN_NAT "nat literal"
 %token <str> TOKEN_INT "int literal"
@@ -117,8 +118,6 @@ int errorcount = 0;
 %token <str> TOKEN_UNSPEC_IDENTIFIER "unspec identifier"
 
 %token <str> TOKEN_SHEBANG_LINE "shebang line"
-
-%token SYM_DOT "."
  
 %type <bsqon_type_node> bsqontypel_entry bsqonnominaltype bsqontupletype bsqonrecordtype bsqontype bsqontspec
 %type <bsqon_type_list> bsqontypel bsqontermslist
