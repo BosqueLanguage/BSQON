@@ -34,22 +34,22 @@ entity DaySalesSummary {
 %%%%
 %% Literal
 DaySalesSummary{
-    available: 800N_Quantity,
-    startAvailable: 1000N_Quantity,
+    available: 800N<Quantity>,
+    startAvailable: 1000N<Quantity>,
     orders: [
-        SaleOrder{ 'A1'Identifier, '123456789'CUSIP, 100N_Quantity },
-        SaleOrder{ 'A2'Identifier, '123456789'CUSIP, 100N_Quantity }
+        SaleOrder{ 'A1'<Identifier>, '123456789'<CUSIP>, 100N<Quantity> },
+        SaleOrder{ 'A2'<Identifier>, '123456789'<CUSIP>, 100N<Quantity> }
     ]
 }
 
 %%%%
 %% Literal (with errors)
 DaySalesSummary{
-    available: 900N_Quantity,                                         %% fails startAvailable - orders check
+    available: 900N<Quantity>,                                        %% fails startAvailable - orders check
     startAvailable: 1000.5,                                           %% fails type check
     orders: [
-        SaleOrder{ 'A1'Identifier, '123$56789'CUSIP, 100N_Quantity }, %% fails CUSIP format check
-        SaleOrder{ 'A1'Identifier, '123456789'CUSIP, 100N_Quantity }  %% fails invariant on unique id
+        SaleOrder{ 'A1'<Identifier>, '123$56789'<CUSIP>, 100N<Quantity> }, %% fails CUSIP format check
+        SaleOrder{ 'A1'<Identifier>, '123456789'<CUSIP>, 100N<Quantity> }  %% fails invariant on unique id
     ]
 }
 ```
