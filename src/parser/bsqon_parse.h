@@ -56,7 +56,7 @@ namespace bsqon
         static bool isValidWCDelta(const std::string nv, int64_t& vv);
 
         static bool processDateInfo(const std::string& ds, uint16_t& yy, uint8_t& mm, uint8_t& dd);
-        static bool processTimeInfo(const std::string& ds, uint8_t& hh, uint8_t& mm, uint8_t& ss);
+        static bool processTimeInfo(const std::string& ds, uint8_t& hh, uint8_t& mm, uint8_t& ss, bool allow60sec);
         static bool processMillisInfo(const std::string& ds, uint16_t& millis);
 
         bool processTZInfo(const std::string& ds, const char** tz);
@@ -65,8 +65,7 @@ namespace bsqon
         bool processDeltaTimeInfo(const std::string& ds, uint32_t& hh, uint32_t& mm, uint32_t& ss);
         bool processDeltaMillisInfo(const std::string& ds, uint32_t& millis);
 
-        std::optional<std::vector<Value*>> processEntriesForTuple(const TupleType* ttype, const BSQON_AST_NODE(BracketValue)* node);
-        std::optional<std::vector<std::pair<std::string, Value*>>> processPropertiesForRecord(const RecordType* ttype, const BSQON_AST_NODE(BraceValue)* node);
+        std::optional<std::vector<Value*>> processEntriesForEList(const EListType* ttype, const BSQON_AST_NODE(BracketValue)* node);
         std::optional<std::vector<Value*>> processPropertiesForEntity(const StdEntityType* ttype, const BSQON_AST_NODE(BraceValue)* node);
 
         std::optional<Value*> processPropertiesForSpecialCons(const Type* etype, const BSQON_AST_NODE(BraceValue)* node);
@@ -85,11 +84,6 @@ namespace bsqon
 
         std::map<std::string, Value*> envbinds;
         std::map<std::string, Value*> vbinds;
-
-        std::map<std::string, const brex::RegexOpt*> namedRegexes;
-
-        std::map<TypeKey, brex::UnicodeRegexExecutor*> reunicodebinds;
-        std::map<TypeKey, brex::ASCIIRegexExecutor*> reasciibinds;
 
         std::list<ContainerParseStackEntry> containerstack;
 
@@ -111,18 +105,9 @@ namespace bsqon
         const Type* parseTemplateTypeHelper_Two(std::string sname, SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist);
 
         const Type* parseTemplateTypeHelper_OkErr(const Type* tresult, std::string sname, SourcePos spos);
+        const Type* parseTemplateTypeHelper_API(const Type* tresult, std::string sname, SourcePos spos);
 
-        const Type* parseStringOfType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
-        {
-            return this->parseTemplateTypeHelper_One("StringOf", spos, tlist);
-        }
-
-        const Type* parseASCIIStringOfType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
-        {
-            return this->parseTemplateTypeHelper_One("ASCIIStringOf", spos, tlist);
-        }
-
-        const Type* parseSomethingType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
+        const Type* parseSomeType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
         {
             return this->parseTemplateTypeHelper_One("Something", spos, tlist);
         }
@@ -135,21 +120,6 @@ namespace bsqon
         const Type* parseResultType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
         {
             return this->parseTemplateTypeHelper_Two("Result", spos, tlist);
-        }
-
-        const Type* parsePathType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
-        {
-            return this->parseTemplateTypeHelper_One("Path", spos, tlist);
-        }
-
-        const Type* parsePathFragmentType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
-        {
-            return this->parseTemplateTypeHelper_One("PathFragment", spos, tlist);
-        }
-
-        const Type* parsePathGlobType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
-        {
-            return this->parseTemplateTypeHelper_One("PathGlob", spos, tlist);
         }
 
         const Type* parseListType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
@@ -184,18 +154,12 @@ namespace bsqon
 
         const Type* parseNominalType(const BSQON_AST_NODE(NominalType)* node);
         const Type* parseNominalTemplateType(const BSQON_AST_NODE(NominalScopedType)* node);
-        const Type* parseTupleType(const BSQON_AST_NODE(TupleType)* node);
-        const Type* parseRecordType(const BSQON_AST_NODE(RecordType)* node);
-        void parseConceptSetType_Helper(const BSQON_AST_Node* node, std::vector<const Type*>& tlist);
-        const Type* parseConceptSetType(const BSQON_AST_NODE(ConjunctionType)* node);
-        void parseUnionType_Helper(const BSQON_AST_Node* node, std::vector<const Type*>& tlist);
-        const Type* parseUnionType(const BSQON_AST_NODE(UnionType)* node);
+        const Type* parseEListType(const BSQON_AST_NODE(EListType)* node);
         const Type* parseType(const BSQON_AST_Node* node);
 
         const Type* parseTypeRoot(const BSQON_AST_Node* node);
 
         Value* parseNone(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseNothing(const PrimitiveType* t, const BSQON_AST_Node* node);
 
         Value* parseBool(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseNat(const PrimitiveType* t, const BSQON_AST_Node* node);
@@ -211,51 +175,38 @@ namespace bsqon
         Value* parseComplex(const PrimitiveType* t, const BSQON_AST_Node* node);
 
         Value* parseString(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseASCIIString(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseStringSlice(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseASCIIStringSlice(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parseCString(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseByteBuffer(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseUUIDv4(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseUUIDv7(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseSHAHashcode(const PrimitiveType* t, const BSQON_AST_Node* node);
 
-        Value* parseDateTime(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseUTCDateTime(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parseTZDateTime(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parseTIATime(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parsePlainDate(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parsePlainTime(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseTickTime(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseLogicalTime(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseISOTimeStamp(const PrimitiveType* t, const BSQON_AST_Node* node);
 
         Value* parseDeltaDateTime(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseDeltaPlainDate(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseDeltaPlainTime(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseDeltaISOTimeStamp(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseDeltaSeconds(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseDeltaTick(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parseDeltaLogical(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parseDeltaISOTimeStamp(const PrimitiveType* t, const BSQON_AST_Node* node);
 
         Value* parseUnicodeRegex(const PrimitiveType* t, const BSQON_AST_Node* node);
-        Value* parseASCIIRegex(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parseCRegex(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parsePathRegex(const PrimitiveType* t, const BSQON_AST_Node* node);
 
-        Value* parseStringOf(const StringOfType* t, const BSQON_AST_Node* node);
-        Value* parseASCIIStringOf(const ASCIIStringOfType* t, const BSQON_AST_Node* node);
+        Value* parsePath(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node);
+        Value* parsePathFragment(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node);
+        Value* parsePathGlob(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node);
 
-        Value* parsePathNaked(const PathType* t, SourcePos spos, const BSQON_AST_NODE(LiteralStringValue)* node);
-        Value* parsePath(const PathType* t, const BSQON_AST_Node* node);
-        Value* parsePathFragmentNaked(const PathFragmentType* t, SourcePos spos, const BSQON_AST_NODE(LiteralStringValue)* node);
-        Value* parsePathFragment(const PathFragmentType* t, const BSQON_AST_Node* node);
-        Value* parsePathGlobNaked(const PathGlobType* t, SourcePos spos, const BSQON_AST_NODE(LiteralStringValue)* node);
-        Value* parsePathGlob(const PathGlobType* t, const BSQON_AST_Node* node);
-
-        Value* parseSomething(const SomethingType* t, const BSQON_AST_Node* node);
+        Value* parseSome(const SomeType* t, const BSQON_AST_Node* node);
         Value* parseOk(const OkType* t, const BSQON_AST_Node* node);
         Value* parseErr(const ErrorType* t, const BSQON_AST_Node* node);
         Value* parseMapEntry(const MapEntryType* t, const BSQON_AST_Node* node, bool implicitkey);
         
-        Value* parseTuple(const TupleType* t, const BSQON_AST_Node* node);
-        Value* parseRecord(const RecordType* t, const BSQON_AST_Node* node);
+        Value* parseEList(const EListType* t, const BSQON_AST_Node* node);
 
         Value* parseEnum(const EnumType* t, const BSQON_AST_Node* node);
         Value* parseTypeDecl(const TypedeclType* t, const BSQON_AST_Node* node);

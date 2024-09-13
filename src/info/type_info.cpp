@@ -234,6 +234,9 @@ namespace bsqon
             std::transform(rs.begin(), rs.end(), std::inserter(rset, rset.end()), [](const json& jv) { return jv.get<TypeKey>(); });
             assembly.recursiveSets.push_back(rset);
         });
+
+        auto resystem = j["resystem"];
+        xxxx;
     }
 
     std::vector<TypeKey> g_primitiveTypes = {

@@ -272,11 +272,11 @@ bsqonl_entry:
 ;
 
 bsqonbracketvalue:
-   '[' ']' { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @2), NULL); }
-   | '[' bsqonval ']' { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_VALUES_Singleton($2)); }
-   | '[' bsqonvall bsqonval ']' { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_VALUES_Reverse(BSQON_AST_LIST_OF_VALUES_Push($3, $2))); }
-   | '[' error ']' { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_VALUES_Singleton(BSQON_AST_ERROR(MK_SPOS_S(@2)))); yyerrok; }
-   | '[' bsqonvall error ']' { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_VALUES_Reverse(BSQON_AST_LIST_OF_VALUES_Push(BSQON_AST_ERROR(MK_SPOS_S(@3)), $2))); yyerrok; }
+   SYM_ELIST_LEFT SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @2), NULL); }
+   | SYM_ELIST_LEFT bsqonval SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_VALUES_Singleton($2)); }
+   | SYM_ELIST_LEFT bsqonvall bsqonval SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_VALUES_Reverse(BSQON_AST_LIST_OF_VALUES_Push($3, $2))); }
+   | SYM_ELIST_LEFT error SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_VALUES_Singleton(BSQON_AST_ERROR(MK_SPOS_S(@2)))); yyerrok; }
+   | SYM_ELIST_LEFT bsqonvall error SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_VALUES_Reverse(BSQON_AST_LIST_OF_VALUES_Push(BSQON_AST_ERROR(MK_SPOS_S(@3)), $2))); yyerrok; }
 ;
 
 bsqonnamevall:

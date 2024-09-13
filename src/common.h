@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <list>
 
 #include "json.hpp"
 typedef nlohmann::json json;
