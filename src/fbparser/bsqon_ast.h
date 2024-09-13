@@ -36,6 +36,7 @@ enum BSQON_AST_TAG
     BSQON_AST_TAG_SHAHashcodeValue,
     BSQON_AST_TAG_StringValue,
     BSQON_AST_TAG_CStringValue,
+    BSQON_AST_TAG_PathValue,
     BSQON_AST_TAG_RegexValue,
     BSQON_AST_TAG_TZDateTimeValue,
     BSQON_AST_TAG_TIATimeValue,
@@ -48,8 +49,6 @@ enum BSQON_AST_TAG
     BSQON_AST_TAG_DeltaSecondsValue,
     BSQON_AST_TAG_DeltaLogicalValue,
     BSQON_AST_TAG_DeltaISOTimeStampValue,
-
-    BSQON_AST_TAG_LiteralPathValue,
 
     BSQON_AST_TAG_IdentifierValue,
     BSQON_AST_TAG_UnspecIdentifierValue,

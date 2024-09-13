@@ -48,7 +48,7 @@ const char* BSQON_AST_getTagName(const struct BSQON_AST_Node* node)
         case BSQON_AST_TAG_NominalType: return "NominalType";
         case BSQON_AST_TAG_NominalScopedType: return "NominalScopedType";
         case BSQON_AST_TAG_EListType: return "EListType";
-        
+
         case BSQON_AST_TAG_NoneValue: return "NoneValue";
         case BSQON_AST_TAG_TrueValue: return "TrueValue";
         case BSQON_AST_TAG_FalseValue: return "FalseValue";
@@ -70,6 +70,7 @@ const char* BSQON_AST_getTagName(const struct BSQON_AST_Node* node)
         case BSQON_AST_TAG_StringValue: return "StringValue";
         case BSQON_AST_TAG_CStringValue: return "CStringValue";
         case BSQON_AST_TAG_RegexValue: return "RegexValue";
+        case BSQON_AST_TAG_PathValue: return "PathValue";
         case BSQON_AST_TAG_TZDateTimeValue: return "TZDateTimeValue";
         case BSQON_AST_TAG_TIATimeValue: return "TIATimeValue";
         case BSQON_AST_TAG_PlainDateValue: return "PlainDateValue";
@@ -80,7 +81,6 @@ const char* BSQON_AST_getTagName(const struct BSQON_AST_Node* node)
         case BSQON_AST_TAG_DeltaSecondsValue: return "DeltaSecondsValue";
         case BSQON_AST_TAG_DeltaLogicalValue: return "DeltaLogicalValue";
         case BSQON_AST_TAG_DeltaISOTimeStampValue: return "DeltaISOTimeStampValue";
-        case BSQON_AST_TAG_LiteralPathValue: return "LiteralPathValue";
         case BSQON_AST_TAG_IdentifierValue: return "IdentifierValue";
         case BSQON_AST_TAG_UnspecIdentifierValue: return "UnspecIdentifierValue";
         case BSQON_AST_TAG_TypedLiteralValue: return "TypedLiteralValue";
@@ -166,6 +166,11 @@ void BSQON_AST_print(const struct BSQON_AST_Node* node)
         printf("%s", nn->data->bytes);
         break;
     }
+    case BSQON_AST_TAG_PathValue: {
+        const struct BSQON_AST_NODE(LiteralPathValue)* nn = BSQON_AST_NODE_AS(LiteralPathValue, node);
+        printf("%s", nn->data->bytes);
+        break;
+    }
     case BSQON_AST_TAG_TZDateTimeValue:
     case BSQON_AST_TAG_TIATimeValue:
     case BSQON_AST_TAG_PlainDateValue:
@@ -178,11 +183,6 @@ void BSQON_AST_print(const struct BSQON_AST_Node* node)
     case BSQON_AST_TAG_DeltaISOTimeStampValue: {
         const struct BSQON_AST_NODE(LiteralStandardValue)* nn = BSQON_AST_NODE_AS(LiteralStandardValue, node);
         printf("%s", nn->data);
-        break;
-    }
-    case BSQON_AST_TAG_LiteralPathValue: {
-        const struct BSQON_AST_NODE(LiteralPathValue)* nn = BSQON_AST_NODE_AS(LiteralPathValue, node);
-        printf("%s", nn->data->bytes);
         break;
     }
     case BSQON_AST_TAG_IdentifierValue:

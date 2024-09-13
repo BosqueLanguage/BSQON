@@ -113,7 +113,7 @@ $(OUT_OBJ)bsqon.tab.h $(OUT_OBJ)bsqon.tab.c &: $(CFG_HEADERS) $(CFG_SOURCES)
 
 $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 	@mkdir -p $(OUT_OBJ)
-	flex -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
+	flex --warn -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
 
 clean:
 	rm -rf $(OUT_EXE)* $(OUT_OBJ)*.o $(BIN_DIR)*

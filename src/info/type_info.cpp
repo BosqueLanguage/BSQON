@@ -128,7 +128,7 @@ namespace bsqon
             case TypeTag::TYPE_TYPE_DECL: {
                 std::optional<std::vector<std::string>> optOfValidators = std::nullopt;
                 if(j.contains("ofvalidators") && !j["ofvalidators"].is_null()) {
-                    const std::vector<std::string> ovv;
+                    std::vector<std::string> ovv;
                     std::transform(j["ofvalidators"].begin(), j["ofvalidators"].end(), std::back_inserter(ovv), [](const json& jv) { return jv.get<std::string>(); });
                     optOfValidators = std::make_optional(ovv);
                 }

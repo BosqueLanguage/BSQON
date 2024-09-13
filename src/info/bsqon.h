@@ -156,7 +156,8 @@ namespace bsqon
             }
         }
 
-        static int keyCompareImplArray(uint16_t* v1, uint16_t* v2, size_t length)
+        template <typename T>
+        static int keyCompareImplArray(T* v1, T* v2, size_t length)
         {
             auto mmi = std::mismatch(v1, v1 + length, v2, v2 + length);
             if(mmi.first == v1 + length && mmi.second == v2 + length) {
@@ -860,10 +861,10 @@ namespace bsqon
             return true;
         }
 
-        static int keyCompare(const ISOTimeStampValue* v1, const ISOTimeStampValue* v2)
+        static int keyCompare(const DeltaDateTimeValue* v1, const DeltaDateTimeValue* v2)
         {
-            uint16_t v1vs[6] = {v1->tv.year, v1->tv.month, v1->tv.day, v1->tv.hour, v1->tv.min, v1->tv.sec};
-            uint16_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
+            uint32_t v1vs[6] = {v1->tv.year, v1->tv.month, v1->tv.day, v1->tv.hour, v1->tv.min, v1->tv.sec};
+            uint32_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
 
             return Value::keyCompareImplArray(v1vs, v2vs, 6);
         }
@@ -897,13 +898,13 @@ namespace bsqon
         }
     };
 
-    class DeltaLogicalValue : public PrimtitiveValue 
+    class DeltaLogicalTimeValue : public PrimtitiveValue 
     {
     public:
         const int64_t tv;
     
-        DeltaLogicalValue(const Type* vtype, SourcePos spos, int64_t tv) : PrimtitiveValue(ValueKind::DeltaLogicalValueKind, vtype, spos), tv(tv) { ; }
-        virtual ~DeltaLogicalValue() = default;
+        DeltaLogicalTimeValue(const Type* vtype, SourcePos spos, int64_t tv) : PrimtitiveValue(ValueKind::DeltaLogicalValueKind, vtype, spos), tv(tv) { ; }
+        virtual ~DeltaLogicalTimeValue() = default;
 
         virtual std::u8string toString() const override
         {
@@ -919,7 +920,7 @@ namespace bsqon
             return true;
         }
 
-        static int keyCompare(const DeltaLogicalValue* v1, const DeltaLogicalValue* v2)
+        static int keyCompare(const DeltaLogicalTimeValue* v1, const DeltaLogicalTimeValue* v2)
         {
             return Value::keyCompareImplScalars(v1->tv, v2->tv);
         }
@@ -948,8 +949,8 @@ namespace bsqon
 
         static int keyCompare(const DeltaISOTimeStampValue* v1, const DeltaISOTimeStampValue* v2)
         {
-            uint16_t v1vs[6] = {v1->tv.year, v1->tv.month, v1->tv.day, v1->tv.hour, v1->tv.min, v1->tv.sec};
-            uint16_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
+            uint32_t v1vs[6] = {v1->tv.year, v1->tv.month, v1->tv.day, v1->tv.hour, v1->tv.min, v1->tv.sec};
+            uint32_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
 
             return Value::keyCompareImplArray(v1vs, v2vs, 6);
         }

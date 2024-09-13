@@ -164,9 +164,7 @@ namespace bsqon
     class ConceptType : public Type
     {
     public:
-        std::vector<TypeKey> subtypes;
-
-        ConceptType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : Type(tag, tkey, supertypes, annotations), subtypes(subtypes) { ; }
+        ConceptType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : Type(tag, tkey, supertypes, annotations) { ; }
         virtual ~ConceptType() = default;
     };
 
