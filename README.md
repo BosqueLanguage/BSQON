@@ -11,14 +11,14 @@ The literal format language is designed to be easily human, AI, and machine proc
 ```
 %%%%
 %% Data Specification
-typedecl Identifier = "[A-Za-z][A-Za-z0-9_]{0-9}";
-typedecl CUSIP = "[0-9]{6}[0-9A-Z]{3}";
+type Identifier = CString of /[A-Za -z][A-Za -z0 -9_ ]{0 -9}/ a;
+type CUSIP = CString of /[0 -9]{6}[0 -9A-Z ]{3}/ a;
 
-typedecl Quantity = BigNat;
+type Quantity = BigNat;
     
 entity SaleOrder {
-    field id: ASCIIStringOf<Identifier>;
-    field instrument: ASCIIStringOf<CUSIP>;
+    field id: Identifier;
+    field instrument: CUSIP;
     field quantity: Quantity;
 }
         
