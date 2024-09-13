@@ -77,6 +77,9 @@ int errorcount = 0;
 %token SYM_EQUALS "="
 %token SYM_DOT "."
 
+%token SYM_ELIST_LEFT "(|"
+%token SYM_ELIST_RIGHT "|)"
+
 %token <str> TOKEN_NAT "nat literal"
 %token <str> TOKEN_INT "int literal"
 %token <str> TOKEN_BIG_NAT "big nat literal" 
@@ -119,7 +122,7 @@ int errorcount = 0;
 
 %token <str> TOKEN_SHEBANG_LINE "shebang line"
  
-%type <bsqon_type_node> bsqontypel_entry bsqonnominaltype bsqontupletype bsqonrecordtype bsqontype bsqontspec
+%type <bsqon_type_node> bsqontypel_entry bsqonnominaltype bsqonelisttype bsqontype
 %type <bsqon_type_list> bsqontypel bsqontermslist
 
 %type <bsqon_named_type_list_entry> bsqonnametypel_entry
@@ -171,41 +174,23 @@ bsqontermslist:
    | '<' bsqontypel error '>' { $$ = BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push(BSQON_AST_ERROR(MK_SPOS_S(@3)), $2)); yyerrok; }
 ;
 
-bsqontupletype:
-   '[' ']' { $$ = BSQON_AST_NODE_CONS(TupleType, BSQON_AST_TAG_TupleType, MK_SPOS_R(@1, @2), NULL); }
-   | '[' bsqontype ']' { $$ = BSQON_AST_NODE_CONS(TupleType, BSQON_AST_TAG_TupleType, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_TYPES_Singleton($2)); }
-   | '[' bsqontypel bsqontype ']' { $$ = BSQON_AST_NODE_CONS(TupleType, BSQON_AST_TAG_TupleType, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push($3, $2))); }
-   | '[' error ']' { $$ = BSQON_AST_NODE_CONS(TupleType, BSQON_AST_TAG_TupleType, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_TYPES_Singleton(BSQON_AST_ERROR(MK_SPOS_S(@1)))); yyerrok; }
-   | '[' bsqontypel error ']' { $$ = BSQON_AST_NODE_CONS(TupleType, BSQON_AST_TAG_TupleType, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push(BSQON_AST_ERROR(MK_SPOS_S(@3)), $2))); yyerrok; }
-;
-
-bsqonrecordtype:
-   '{' '}' { $$ = BSQON_AST_NODE_CONS(RecordType, BSQON_AST_TAG_RecordType, MK_SPOS_R(@1, @2), NULL); }
-   | '{' TOKEN_IDENTIFIER SYM_COLON bsqontype '}' { $$ = BSQON_AST_NODE_CONS(RecordType, BSQON_AST_TAG_RecordType, MK_SPOS_R(@1, @5), BSQON_AST_NLIST_OF_TYPES_Singleton(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create($2, $4))); }
-   | '{' bsqonnametypel TOKEN_IDENTIFIER SYM_COLON bsqontype '}' { $$ = BSQON_AST_NODE_CONS(RecordType, BSQON_AST_TAG_RecordType, MK_SPOS_R(@1, @6), BSQON_AST_NLIST_OF_TYPES_Reverse(BSQON_AST_NLIST_OF_TYPES_Push(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create($3, $5), $2))); }
-   | '{' TOKEN_IDENTIFIER SYM_COLON error '}' { $$ = BSQON_AST_NODE_CONS(RecordType, BSQON_AST_TAG_RecordType, MK_SPOS_R(@1, @5), BSQON_AST_NLIST_OF_TYPES_Singleton(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create($2, BSQON_AST_ERROR(MK_SPOS_S(@4))))); yyerrok; }
-   | '{' bsqonnametypel TOKEN_IDENTIFIER SYM_COLON error '}' { $$ = BSQON_AST_NODE_CONS(RecordType, BSQON_AST_TAG_RecordType, MK_SPOS_R(@1, @6), BSQON_AST_NLIST_OF_TYPES_Reverse(BSQON_AST_NLIST_OF_TYPES_Push(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create($3, BSQON_AST_ERROR(MK_SPOS_S(@3))), $2))); yyerrok; }
+bsqonelisttype:
+   SYM_ELIST_LEFT SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R(@1, @2), NULL); }
+   | SYM_ELIST_LEFT bsqontype SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_TYPES_Singleton($2)); }
+   | SYM_ELIST_LEFT bsqontypel bsqontype SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push($3, $2))); }
+   | SYM_ELIST_LEFT error SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R(@1, @3), BSQON_AST_LIST_OF_TYPES_Singleton(BSQON_AST_ERROR(MK_SPOS_S(@1)))); yyerrok; }
+   | SYM_ELIST_LEFT bsqontypel error SYM_ELIST_RIGHT { $$ = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R(@1, @4), BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push(BSQON_AST_ERROR(MK_SPOS_S(@3)), $2))); yyerrok; }
 ;
 
 bsqontype:
    bsqonnominaltype { $$ = $1; }
-   | bsqontupletype { $$ = $1; }
-   | bsqonrecordtype { $$ = $1; }
-   | bsqontype SYM_AMP bsqontype { $$ = BSQON_AST_NODE_CONS(ConjunctionType, BSQON_AST_TAG_ConjunctionType, MK_SPOS_R(@1, @3), $1, $3); }
-   | bsqontype SYM_BAR bsqontype { $$ = BSQON_AST_NODE_CONS(UnionType, BSQON_AST_TAG_UnionType, MK_SPOS_R(@1, @3), $1, $3); }
+   | bsqonelisttype { $$ = $1; }
    | '(' bsqontype ')' { $$ = $2; }
    | '(' error ')' { $$ = BSQON_AST_ERROR(MK_SPOS_S(@2)); yyerrok; }
 ;
 
-bsqontspec: 
-   bsqonnominaltype { $$ = $1; }
-   | bsqontupletype { $$ = $1; }
-   | bsqonrecordtype { $$ = $1; }
-;
-
 bsqonliteral: 
    KW_NONE                    { $$ = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_NoneValue, MK_SPOS_S(@1)); }
-   | KW_NOTHING               { $$ = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_NothingValue, MK_SPOS_S(@1)); }
    | KW_TRUE                  { $$ = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_TrueValue, MK_SPOS_S(@1)); }
    | KW_FALSE                 { $$ = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_FalseValue, MK_SPOS_S(@1)); }
    | TOKEN_NAT                { $$ = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_NatValue, MK_SPOS_S(@1), $1); }
@@ -223,8 +208,8 @@ bsqonliteral:
    | TOKEN_UUID_V7            { $$ = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_UUIDv7Value, MK_SPOS_S(@1), $1); }
    | TOKEN_SHA_HASH           { $$ = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_SHAHashcodeValue, MK_SPOS_S(@1), $1); }
    | TOKEN_STRING             { $$ = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_StringValue, MK_SPOS_S(@1), $1); }
-   | TOKEN_ASCII_STRING       { $$ = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_ASCIIStringValue, MK_SPOS_S(@1), $1); }
-   | TOKEN_PATH_ITEM          { $$ = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_NakedPathValue, MK_SPOS_S(@1), $1); }
+   | TOKEN_CSTRING            { $$ = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_CStringValue, MK_SPOS_S(@1), $1); }
+   XX | TOKEN_PATH_ITEM          { $$ = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_NakedPathValue, MK_SPOS_S(@1), $1); }
    | TOKEN_REGEX              { $$ = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_RegexValue, MK_SPOS_S(@1), $1); }
    | TOKEN_DATE_TIME          { $$ = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DateTimeValue, MK_SPOS_S(@1), $1); }
    | TOKEN_UTC_DATE_TIME      { $$ = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_UTCDateTimeValue, MK_SPOS_S(@1), $1); }
