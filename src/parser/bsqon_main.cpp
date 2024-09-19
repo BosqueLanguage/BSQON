@@ -157,7 +157,7 @@ int main(int argc, char** argv, char **envp)
             printf("Assembly info specified on BOTH command line and as she-bang in package -- using she-bang version\n");
         }
 
-        loadtype = assembly.resolveType(metainfo.second.value());
+        loadtype = assembly.lookupTypeKey(metainfo.second.value());
     }
     else {
         if(metadata == "<implicit>") {
@@ -165,7 +165,7 @@ int main(int argc, char** argv, char **envp)
             exit(1);
         }
 
-        loadtype = assembly.resolveType(argv[2]);
+        loadtype = assembly.lookupTypeKey(argv[2]);
     }
 
     if(loadtype->isUnresolved()) {

@@ -90,7 +90,7 @@ TYPE_IDENTIFIER ([A-Z][a-zA-Z0-9_]*)
 
 "some"      { return KW_SOME; }
 "ok"        { return KW_OK; }
-"err"       { return KW_ERR; }
+"fail"       { return KW_ERR; }
 "let"       { return KW_LET; }
 "in"        { return KW_IN; }
 

@@ -324,7 +324,7 @@ namespace bsqon
         TypeKey ttype;
         TypeKey etype;
 
-        ErrorType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Err", annotations), ttype(ttype), etype(etype) { ; }
+        ErrorType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Fail", annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ErrorType() = default;
     };
 
@@ -334,7 +334,7 @@ namespace bsqon
         TypeKey ttype;
         TypeKey etype;
 
-        ResultType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_RESULT, "Result<" + ttype + ", " + etype + ">", { "Result<" + ttype + ", " + etype + ">::Ok", "Result<" + ttype + ", " + etype + ">::Err" }, annotations), ttype(ttype), etype(etype) { ; }
+        ResultType(TypeKey ttype, TypeKey etype, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_RESULT, "Result<" + ttype + ", " + etype + ">", { "Result<" + ttype + ", " + etype + ">::Ok", "Result<" + ttype + ", " + etype + ">::Fail" }, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ResultType() = default;
     };
 
@@ -352,7 +352,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        PathFragmentType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH_FRAGMENT, "PathFragment<" + oftype + ">", annotations), oftype(oftype) { ; }
+        PathFragmentType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH_FRAGMENT, "PathItem<" + oftype + ">", annotations), oftype(oftype) { ; }
         virtual ~PathFragmentType() = default;
     };
 
@@ -361,7 +361,7 @@ namespace bsqon
     public:
         TypeKey oftype;
 
-        PathGlobType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH_GLOB, "PathGlob<" + oftype + ">", annotations), oftype(oftype) { ; }
+        PathGlobType(TypeKey oftype, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PATH_GLOB, "Glob<" + oftype + ">", annotations), oftype(oftype) { ; }
         virtual ~PathGlobType() = default;
     };
 

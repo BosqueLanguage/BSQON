@@ -340,7 +340,7 @@ bsqonletexp:
 ;
 
 bsqonref: 
-   bsqonliteral | bsqonidentifier | bsqonscopedidentifier | bsqonaccess { $$ = $1; }
+   bsqonidentifier | bsqonscopedidentifier | bsqonaccess { $$ = $1; }
 ;
 
 bsqonaccess:

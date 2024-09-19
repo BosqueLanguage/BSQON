@@ -69,6 +69,7 @@ namespace bsqon
         std::optional<std::vector<Value*>> processPropertiesForEntity(const StdEntityType* ttype, const BSQON_AST_NODE(BraceValue)* node);
 
         std::optional<Value*> processPropertiesForSpecialCons(const Type* etype, const BSQON_AST_NODE(BraceValue)* node);
+        Value* processAPIXValue(const Type* t, const char* name, const BSQON_AST_Node* node, const Type* etype);
         std::optional<std::pair<Value*, Value*>> processPropertiesForMapEntry(const Type* ktype, const Type* vtype, const BSQON_AST_NODE(BraceValue)* node);
         void processEntriesForSequence(const Type* etype, const BSQON_AST_Node* node, std::vector<Value*>& vals, bool advanceimplicitindex);
         void processEntriesForMap(const Type* keytype, const Type* valtype, const BSQON_AST_NODE(BraceValue)* node, std::vector<MapEntryValue*>& entries);
@@ -204,6 +205,12 @@ namespace bsqon
         Value* parseSome(const SomeType* t, const BSQON_AST_Node* node);
         Value* parseOk(const OkType* t, const BSQON_AST_Node* node);
         Value* parseErr(const ErrorType* t, const BSQON_AST_Node* node);
+
+        Value* parseAPIRejected(const APIRejectedType* t, const BSQON_AST_Node* node);
+        Value* parseAPIFailed(const APIFailedType* t, const BSQON_AST_Node* node);
+        Value* parseAPIError(const APIErrorType* t, const BSQON_AST_Node* node);
+        Value* parseAPISuccess(const APISuccessType* t, const BSQON_AST_Node* node);
+
         Value* parseMapEntry(const MapEntryType* t, const BSQON_AST_Node* node, bool implicitkey);
         
         Value* parseEList(const EListType* t, const BSQON_AST_Node* node);
@@ -222,25 +229,12 @@ namespace bsqon
         Value* parseValueDirect(const Type* t, const BSQON_AST_Node* node);
 
         Value* parseValueConcept(const Type* t, const BSQON_AST_Node* node);
-        
-        bool isNoneableParse(const UnionType* t)
-        {
-            return t->types.size() == 2 && std::find(t->types.cbegin(), t->types.cend(), "None") != t->types.cend();
-        }
-
-        const Type* getNoneableRealType(const UnionType* t)
-        {
-            auto tii = std::find_if(t->types.cbegin(), t->types.cend(), [](const TypeKey& tt){ return tt != "None"; });
-            return this->assembly->resolveType(*tii);
-        }        
 
         Value* parseValueSimple(const Type* t, const BSQON_AST_Node* node);
-        Value* parseValueUnion(const UnionType* t, const BSQON_AST_Node* node);
 
         Value* parseIdentifier(const Type* t, const BSQON_AST_Node* node);
         Value* parseScopedName(const Type* t, const BSQON_AST_Node* node);
         Value* parseLetIn(const Type* t, const BSQON_AST_Node* node);
-        Value* parseAccessIndex(const Type* t, const BSQON_AST_Node* node);
         Value* parseAccessName(const Type* t, const BSQON_AST_Node* node);
         Value* parseAccessKey(const Type* t, const BSQON_AST_Node* node);
 

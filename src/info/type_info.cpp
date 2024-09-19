@@ -36,7 +36,7 @@ namespace bsqon
         else if(tname == "Result::Ok") {
             ttag = TypeTag::TYPE_OK;
         }
-        else if(tname == "Result::Err") {
+        else if(tname == "Result::Fail") {
             ttag = TypeTag::TYPE_ERROR;
         }
         else if(tname == "Result") {
