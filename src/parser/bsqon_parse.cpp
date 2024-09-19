@@ -15,7 +15,7 @@ namespace bsqon
         "DeltaDateTime", "DeltaSeconds", "DeltaLogicalTime", "DeltaISOTimestamp",
         "String", "CString", 
         "Regex", "CRegex", "PathRegex",
-        "Path", "Fragment", "Glob"
+        "Path", "PathItem", "Glob"
     };
 
     bool s_isLeapYear(uint16_t y)
@@ -1215,47 +1215,73 @@ namespace bsqon
         return rparse;
     }
 
-    Value* Parser::parsePath(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node)
+    Value* Parser::parsePath(const PrimitiveType* t, const BSQON_AST_Node* node)
     {
-        if(*node->data->bytes != '\\') {
-            this->addError("Expected Path literal", spos);
-            return new ErrorValue(t, spos);
+        if(node->tag != BSQON_AST_TAG_PathValue) {
+            this->addError("Expected path literal", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
-        PathValue* popt = PathValue::createFromParse(t, spos, node->data->bytes, node->data->len);
+        auto pnode = BSQON_AST_NODE_AS(LiteralPathValue, node);
+
+        if(*pnode->data->bytes != '\\') {
+            this->addError("Expected Path literal", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+        }
+
+        PathValue* popt = PathValue::createFromParse(t, Parser::convertSrcPos(node->pos), pnode->data->bytes, pnode->data->len);
 
         if(popt == nullptr) {
-            this->addError("Invalid characters in path (does not validate)", spos);
-            return new ErrorValue(t, spos);
+            this->addError("Invalid characters in path (does not validate)", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
         return popt;
     }
 
-    Value* Parser::parsePathFragment(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node)
+    Value* Parser::parsePathItem(const PrimitiveType* t, const BSQON_AST_Node* node)
     {
-        if(*node->data->bytes != 'g') {
-            this->addError("Expected PathFragment literal", spos);
-            return new ErrorValue(t, spos);
+        if(node->tag != BSQON_AST_TAG_PathValue) {
+            this->addError("Expected path literal", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
-        PathFragmentValue* popt = PathFragmentValue::createFromParse(t, spos, node->data->bytes, node->data->len);
+        auto pnode = BSQON_AST_NODE_AS(LiteralPathValue, node);
+
+        if(*pnode->data->bytes != 'f') {
+            this->addError("Expected PathItem literal", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+        }
+
+        PathItemValue* popt = PathItemValue::createFromParse(t, Parser::convertSrcPos(node->pos), pnode->data->bytes, pnode->data->len);
 
         if(popt == nullptr) {
-            this->addError("Invalid characters in path (does not validate)", spos);
-            return new ErrorValue(t, spos);
+            this->addError("Invalid characters in path (does not validate)", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
         return popt;
     }
 
-    Value* Parser::parsePathGlob(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node)
+    Value* Parser::parseGlob(const PrimitiveType* t, const BSQON_AST_Node* node)
     {
-        PathGlobValue* popt = PathGlobValue::createFromParse(t, spos, node->data->bytes, node->data->len);
+        if(node->tag != BSQON_AST_TAG_PathValue) {
+            this->addError("Expected glob literal", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+        }
+
+        auto pnode = BSQON_AST_NODE_AS(LiteralPathValue, node);
+
+        if(*pnode->data->bytes != 'g') {
+            this->addError("Expected PathItem literal", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+        }
+
+        GlobValue* popt = GlobValue::createFromParse(t, Parser::convertSrcPos(node->pos), pnode->data->bytes, pnode->data->len);
 
         if(popt == nullptr) {
-            this->addError("Invalid characters in pathGlob (does not validate)", spos);
-            return new ErrorValue(t, spos);
+            this->addError("Invalid characters in pathGlob (does not validate)", Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
         return popt;
@@ -1779,8 +1805,8 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
-        const Type* tkey = this->assembly->resolveType(t->ktype);
-        const Type* tvalue = this->assembly->resolveType(t->vtype);
+        const Type* tkey = this->assembly->lookupTypeKey(t->ktype);
+        const Type* tvalue = this->assembly->lookupTypeKey(t->vtype);
 
         {
             ContainerParseStackEntryManager mgr(ContainerParseStackEntryTag::Map, this);
@@ -1835,9 +1861,6 @@ namespace bsqon
         if(tk == "None") {
             return this->parseNone(t, node);
         }
-        else if(tk == "Nothing") {
-            return this->parseNothing(t, node);
-        }
         else if(tk == "Bool") {
             return this->parseBool(t, node);
         }
@@ -1874,32 +1897,23 @@ namespace bsqon
         else if(tk == "String") {
             return this->parseString(t, node);
         }
-        else if(tk == "ASCIIString") {
-            return this->parseASCIIString(t, node);
-        }
-        else if(tk == "StringView") {
-            return this->parseStringSlice(t, node);
-        }
-        else if(tk == "ASCIIStringView") {
-            return this->parseASCIIStringSlice(t, node);
+        else if(tk == "CString") {
+            return this->parseCString(t, node);
         }
         else if(tk == "ByteBuffer") {
             return this->parseByteBuffer(t, node);
         }
-        else if(tk == "DateTime") {
-            return this->parseDateTime(t, node);
+        else if(tk == "TZDateTime") {
+            return this->parseTZDateTime(t, node);
         }
-        else if(tk == "UTCDateTime") {
-            return this->parseUTCDateTime(t, node);
+        else if(tk == "TIATime") {
+            return this->parseTIATime(t, node);
         }
         else if(tk == "PlainDate") {
             return this->parsePlainDate(t, node);
         }
         else if(tk == "PlainTime") {
             return this->parsePlainTime(t, node);
-        }
-        else if(tk == "TickTime") {
-            return this->parseTickTime(t, node);
         }
         else if(tk == "LogicalTime") {
             return this->parseLogicalTime(t, node);
@@ -1919,32 +1933,32 @@ namespace bsqon
         else if(tk == "DataTimeDelta") {
             return this->parseDeltaDateTime(t, node);
         }
-        else if(tk == "PlainDateDelta") {
-            return this->parseDeltaPlainDate(t, node);
-        }
-        else if(tk == "PlainTimeDelta") {
-            return this->parseDeltaPlainTime(t, node);
+        else if(tk == "SecondsDelta") {
+            return this->parseDeltaSeconds(t, node);
         }
         else if(tk == "ISOTimestampDelta") {
             return this->parseDeltaISOTimeStamp(t, node);
         }
-        else if(tk == "SecondsDelta") {
-            return this->parseDeltaSeconds(t, node);
-        }
-        else if(tk == "TickTimeDelta") {
-            return this->parseDeltaTick(t, node);
-        }
         else if(tk == "LogicalTimeDelta") {
             return this->parseDeltaLogical(t, node);
-        }
+        }      
         else if(tk == "UnicodeRegex") {
             return this->parseUnicodeRegex(t, node);
         }
-        else if(tk == "ASCIIRegex") {
-            return this->parseASCIIRegex(t, node);
+        else if(tk == "CRegex") {
+            return this->parseCRegex(t, node);
         }
         else if(tk == "PathRegex") {
             return this->parsePathRegex(t, node);
+        }
+        else if(tk == "Path") {
+            return this->parsePath(t, node);
+        }
+        else if(tk == "PathItem") {
+            return this->parsePathItem(t, node);
+        }
+        else if(tk == "Glob") {
+            return this->parseGlob(t, node);
         }
         else {
             this->addError("Unknown primitive type " + tk, Parser::convertSrcPos(node->pos));
@@ -1955,11 +1969,8 @@ namespace bsqon
     Value* Parser::parseValueDirect(const Type* t, const BSQON_AST_Node* node)
     {
         switch(t->tag) {
-            case TypeTag::TYPE_TUPLE: {
-                return this->parseTuple(static_cast<const TupleType*>(t), node);
-            }
-            case TypeTag::TYPE_RECORD: {
-                return this->parseRecord(static_cast<const RecordType*>(t), node);
+            case TypeTag::TYPE_ELIST: {
+                return this->parseEList(static_cast<const EListType*>(t), node);
             }
             case TypeTag::TYPE_STD_ENTITY: {
                 return this->parseStdEntity(static_cast<const StdEntityType*>(t), node);
@@ -1970,14 +1981,8 @@ namespace bsqon
             case TypeTag::TYPE_TYPE_DECL: {
                 return this->parseTypeDecl(static_cast<const TypedeclType*>(t), node);
             }
-            case TypeTag::TYPE_STRING_OF: {
-                return this->parseStringOf(static_cast<const StringOfType*>(t), node);
-            }
-            case TypeTag::TYPE_ASCII_STRING_OF: {
-                return this->parseASCIIStringOf(static_cast<const ASCIIStringOfType*>(t), node);
-            }
-            case TypeTag::TYPE_SOMETHING: {
-                return this->parseSomething(static_cast<const SomethingType*>(t), node);
+            case TypeTag::TYPE_SOME: {
+                return this->parseSome(static_cast<const SomeType*>(t), node);
             }
             case TypeTag::TYPE_OK: {
                 return this->parseOk(static_cast<const OkType*>(t), node);
@@ -1985,14 +1990,17 @@ namespace bsqon
             case TypeTag::TYPE_ERROR: {
                 return this->parseErr(static_cast<const ErrorType*>(t), node);
             }
-            case TypeTag::TYPE_PATH: {
-                return this->parsePath(static_cast<const PathType*>(t), node);
+            case TypeTag::TYPE_APIREJECTED: {
+                return xxxx;
             }
-            case TypeTag::TYPE_PATH_FRAGMENT: {
-                return this->parsePathFragment(static_cast<const PathFragmentType*>(t), node);
+            case TypeTag::TYPE_APIFAILED: {
+                return xxxx;
             }
-            case TypeTag::TYPE_PATH_GLOB: {
-                return this->parsePathGlob(static_cast<const PathGlobType*>(t), node);
+            case TypeTag::TYPE_APIERROR: {
+                return xxxx;
+            }
+            case TypeTag::TYPE_APISUCCESS: {
+                return xxxx;
             }
             case TypeTag::TYPE_LIST: {
                 return this->parseList(static_cast<const ListType*>(t), node);
@@ -2025,8 +2033,8 @@ namespace bsqon
             return nullptr;
             const OptionType* otype = static_cast<const OptionType*>(t);
                 
-            if(node->tag == BSQON_AST_TAG_NothingValue) {
-                return this->parseNothing(static_cast<const PrimitiveType*>(this->assembly->resolveType("Nothing")), node);
+            if(node->tag == BSQON_AST_TAG_NoneValue) {
+                return this->parseNone(static_cast<const PrimitiveType*>(this->assembly->lookupTypeKey("None")), node);
             }
             else {
                 if(node->tag != BSQON_AST_TAG_TypedValue) {
@@ -2039,12 +2047,7 @@ namespace bsqon
                     return new ErrorValue(t, Parser::convertSrcPos(node->pos));
                 }
 
-                if(oftype->tkey == "Nothing") {
-                    return this->parseNothing(static_cast<const PrimitiveType*>(this->assembly->resolveType("Nothing")), node);
-                }
-                else {
-                    return this->parseSomething(static_cast<const SomethingType*>(this->assembly->resolveType("Something<" + otype->oftype + ">")), node);    
-                }
+                return this->parseSome(static_cast<const SomeType*>(this->assembly->lookupTypeKey("Some<" + otype->oftype + ">")), node);    
             }
         }
         else if(t->tag == TypeTag::TYPE_RESULT) {
@@ -2082,7 +2085,10 @@ namespace bsqon
                 }
             }
         }
-        else if(t->tag == TypeTag::TYPE_STD_CONCEPT || t->tag == TypeTag::TYPE_CONCEPT_SET) {
+        else if(t->tag == TypeTag::TYPE_APIRESULT) {
+            xxxx;
+        }
+        else if(t->tag == TypeTag::TYPE_STD_CONCEPT) {
             if(node->tag != BSQON_AST_TAG_TypedValue) {
                 this->addError("Values of Concept type must be tagged", Parser::convertSrcPos(node->pos));
                 return new ErrorValue(t, Parser::convertSrcPos(node->pos));

@@ -96,7 +96,7 @@ namespace bsqon
         return nullptr;
     }
 
-    PathFragmentValue* PathFragmentValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
+    PathItemValue* PathItemValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
     {
         //
         //TODO: path parser and validator implementation needed
@@ -104,7 +104,7 @@ namespace bsqon
         return nullptr;
     }
 
-    PathGlobValue* PathGlobValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
+    GlobValue* GlobValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
     {
         //
         //TODO: path parser and validator implementation needed
@@ -134,7 +134,7 @@ namespace bsqon
         "String", 
         "CString", 
         "Path", 
-        "Fragment", 
+        "PathItem", 
         "Glob"
     };
 
@@ -221,12 +221,12 @@ namespace bsqon
                 else if(dtype == "Path") {
                     return PathValue::keyCompare(static_cast<const PathValue*>(v1), static_cast<const PathValue*>(v2));
                 }
-                else if(dtype == "Fragment") {
-                    return PathFragmentValue::keyCompare(static_cast<const PathFragmentValue*>(v1), static_cast<const PathFragmentValue*>(v2));
+                else if(dtype == "PathItem") {
+                    return PathItemValue::keyCompare(static_cast<const PathItemValue*>(v1), static_cast<const PathItemValue*>(v2));
                 }
                 else {
                     //should be Glob
-                    return PathGlobValue::keyCompare(static_cast<const PathGlobValue*>(v1), static_cast<const PathGlobValue*>(v2));
+                    return GlobValue::keyCompare(static_cast<const GlobValue*>(v1), static_cast<const GlobValue*>(v2));
                 }
             }
             else {

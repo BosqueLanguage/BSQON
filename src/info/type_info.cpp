@@ -250,7 +250,7 @@ namespace bsqon
         "DeltaDateTime", "DeltaSeconds", "DeltaLogicalTime", "DeltaISOTimestamp",
         "String", "CString", 
         "Regex", "CRegex", "PathRegex",
-        "Path", "Fragment", "Glob"
+        "Path", "PathItem", "Glob"
     };
 
     std::vector<TypeKey> g_primitiveKeyTypes = {
@@ -260,7 +260,7 @@ namespace bsqon
         "TZDateTime", "TAITime", "PlainDate", "PlainTime", "LogicalTime", "ISOTimestamp",
         "DeltaDateTime", "DeltaSeconds", "DeltaLogicalTime", "DeltaISOTimestamp",
         "String", "CString", 
-        "Path", "Fragment", "Glob"
+        "Path", "PathItem", "Glob"
     };
 
     bool AssemblyInfo::isKeyType(TypeKey tkey) const

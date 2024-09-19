@@ -142,14 +142,14 @@ namespace bsqon
             return this->parseTemplateTypeHelper_One("Path", spos, tlist);
         }
 
-        const Type* parsePathFragmentType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
+        const Type* parsePathItemType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
         {
-            return this->parseTemplateTypeHelper_One("PathFragment", spos, tlist);
+            return this->parseTemplateTypeHelper_One("PathItem", spos, tlist);
         }
 
         const Type* parsePathGlobType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
         {
-            return this->parseTemplateTypeHelper_One("PathGlob", spos, tlist);
+            return this->parseTemplateTypeHelper_One("Glob", spos, tlist);
         }
 
         const Type* parseListType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)

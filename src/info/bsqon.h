@@ -60,8 +60,8 @@ namespace bsqon
         APIErrorValueKind,
         APISuccessValueKind,
         PathValueKind,
-        PathFragmentValueKind,
-        PathGlobValueKind,
+        PathItemValueKind,
+        GlobValueKind,
         ListValueKind,
         StackValueKind,
         QueueValueKind,
@@ -1142,16 +1142,16 @@ namespace bsqon
         PathValue(const Type* vtype, SourcePos spos, bpath::Path* path, std::u8string normalizedpth) : Value(ValueKind::PathValueKind, vtype, spos), path(path), normalizedpth(normalizedpth) { ; }
     };
 
-    class PathFragmentValue : public Value
+    class PathItemValue : public Value
     {
     public:
         const bpath::PathFragment* fragment;
         const std::u8string normalizedfrag;
 
-        virtual ~PathFragmentValue() = default;
+        virtual ~PathItemValue() = default;
 
         //null if it fails
-        static PathFragmentValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
+        static PathItemValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
 
         virtual std::u8string toString() const override
         {
@@ -1163,25 +1163,25 @@ namespace bsqon
             return true;
         }
 
-        static int keyCompare(const PathFragmentValue* v1, const PathFragmentValue* v2)
+        static int keyCompare(const PathItemValue* v1, const PathItemValue* v2)
         {
             return Value::keyCompareImplStringish(v1->normalizedfrag, v2->normalizedfrag);
         }
 
     private:
-        PathFragmentValue(const Type* vtype, SourcePos spos, bpath::PathFragment* fragment, std::u8string normalizedfrag) : Value(ValueKind::PathFragmentValueKind, vtype, spos), fragment(fragment), normalizedfrag(normalizedfrag) { ; }
+        PathItemValue(const Type* vtype, SourcePos spos, bpath::PathFragment* fragment, std::u8string normalizedfrag) : Value(ValueKind::PathItemValueKind, vtype, spos), fragment(fragment), normalizedfrag(normalizedfrag) { ; }
     };
 
-    class PathGlobValue : public Value
+    class GlobValue : public Value
     {
     public:
         const bpath::PathGlob* glob;
         const std::u8string normalizedglob;
 
-        virtual ~PathGlobValue() = default;
+        virtual ~GlobValue() = default;
 
         //null if it fails
-        static PathGlobValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
+        static GlobValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length);
 
         virtual std::u8string toString() const override
         {
@@ -1193,13 +1193,13 @@ namespace bsqon
             return true;
         }
 
-        static int keyCompare(const PathGlobValue* v1, const PathGlobValue* v2)
+        static int keyCompare(const GlobValue* v1, const GlobValue* v2)
         {
             return Value::keyCompareImplStringish(v1->normalizedglob, v2->normalizedglob);
         }
 
     private:
-        PathGlobValue(const Type* vtype, SourcePos spos, bpath::PathGlob* glob, std::u8string normalizedglob) : Value(ValueKind::PathGlobValueKind, vtype, spos), glob(glob), normalizedglob(normalizedglob) { ; }
+        GlobValue(const Type* vtype, SourcePos spos, bpath::PathGlob* glob, std::u8string normalizedglob) : Value(ValueKind::GlobValueKind, vtype, spos), glob(glob), normalizedglob(normalizedglob) { ; }
     };
 
     class ListValue : public Value

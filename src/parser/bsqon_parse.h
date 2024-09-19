@@ -197,9 +197,9 @@ namespace bsqon
         Value* parseCRegex(const PrimitiveType* t, const BSQON_AST_Node* node);
         Value* parsePathRegex(const PrimitiveType* t, const BSQON_AST_Node* node);
 
-        Value* parsePath(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node);
-        Value* parsePathFragment(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node);
-        Value* parsePathGlob(const PrimitiveType* t, SourcePos spos, const BSQON_AST_NODE(LiteralPathValue)* node);
+        Value* parsePath(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parsePathItem(const PrimitiveType* t, const BSQON_AST_Node* node);
+        Value* parseGlob(const PrimitiveType* t, const BSQON_AST_Node* node);
 
         Value* parseSome(const SomeType* t, const BSQON_AST_Node* node);
         Value* parseOk(const OkType* t, const BSQON_AST_Node* node);
