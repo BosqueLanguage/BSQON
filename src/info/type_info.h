@@ -3,6 +3,8 @@
 
 #include "../common.h"
 
+#include "../../build/include/brex/regex/brex_system.h"
+
 namespace bsqon
 {
     //
@@ -217,10 +219,10 @@ namespace bsqon
     public:
         TypeKey primitivetype;
 
-        std::optional<std::vector<std::string>> optOfValidators;
+        std::optional<std::vector<std::u8string>> optOfValidators;
         bool hasvalidations;
 
-        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, TypeKey primitivetype, std::optional<std::vector<std::string>> optOfValidators, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype), optOfValidators(optOfValidators), hasvalidations(hasvalidations) { ; }
+        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, TypeKey primitivetype, std::optional<std::vector<std::u8string>> optOfValidators, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype), optOfValidators(optOfValidators), hasvalidations(hasvalidations) { ; }
         virtual ~TypedeclType() = default;
     };
 
@@ -409,7 +411,16 @@ namespace bsqon
 
         std::vector<std::set<TypeKey>> recursiveSets;
 
-        AssemblyInfo() : namespaces(), typerefs(), recursiveSets()
+        //maps from literal regex representations to their executable forms
+        std::map<std::u8string, brex::UnicodeRegexExecutor*> executableUnicodeRegexMap;
+        std::map<std::u8string, brex::CRegexExecutor*> executableCRegexMap;
+
+        //maps from namespace const named Foo::bar regex representations to their named regex opt forms
+        std::map<std::string, const brex::RegexOpt*> namedUnicodeRegexMap;
+        std::map<std::string, const brex::RegexOpt*> namedCRegexMap;
+        brex::ReNSRemapper nsremapper;
+
+        AssemblyInfo() : namespaces(), typerefs(), recursiveSets(), executableUnicodeRegexMap(), executableCRegexMap(), namedUnicodeRegexMap(), namedCRegexMap(), nsremapper()
         { 
             ; 
         }
@@ -421,6 +432,7 @@ namespace bsqon
             //
         }
 
+        static void parseRESystem(json j, AssemblyInfo& assembly);
         static void parse(json j, AssemblyInfo& assembly);
 
         Type* lookupTypeKey(TypeKey tkey)
@@ -454,6 +466,13 @@ namespace bsqon
                 return std::binary_search(t->supertypes.cbegin(), t->supertypes.cend(), oftype->tkey);
             }
         }
+
+
+        void processUnicodeRegex(const std::string& inns, const std::u8string& regex);
+        void processCRegex(const std::string& inns, const std::u8string& regex);
+
+        bool validateString(const std::u8string& regex, std::u8string* ustr, const std::string& inns);
+        bool validateCString(const std::u8string& regex, std::string* cstr, const std::string& inns);
 
         bool isKeyType(TypeKey tkey) const;
     };

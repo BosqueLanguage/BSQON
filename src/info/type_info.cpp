@@ -126,10 +126,13 @@ namespace bsqon
                 return new EnumType(j["tkey"].get<TypeKey>(), supertypes, annotations, variants);
             }
             case TypeTag::TYPE_TYPE_DECL: {
-                std::optional<std::vector<std::string>> optOfValidators = std::nullopt;
+                std::optional<std::vector<std::u8string>> optOfValidators = std::nullopt;
                 if(j.contains("ofvalidators") && !j["ofvalidators"].is_null()) {
-                    std::vector<std::string> ovv;
-                    std::transform(j["ofvalidators"].begin(), j["ofvalidators"].end(), std::back_inserter(ovv), [](const json& jv) { return jv.get<std::string>(); });
+                    std::vector<std::u8string> ovv;
+                    std::transform(j["ofvalidators"].begin(), j["ofvalidators"].end(), std::back_inserter(ovv), [](const json& jv) { 
+                        auto vv = jv.get<std::string>(); 
+                        return std::u8string{vv.cbegin(), vv.cend()};
+                    });
                     optOfValidators = std::make_optional(ovv);
                 }
 
@@ -217,6 +220,73 @@ namespace bsqon
         return new NamespaceDecl(istoplevel, imports, fullns, ns, subns, types);
     }
 
+    void AssemblyInfo::parseRESystem(json j, AssemblyInfo& assembly)
+    {
+        assert(j.is_array());
+
+        std::vector<brex::RENSInfo> ninfos;
+        for(size_t i = 0; i < j.size(); ++i) {
+            auto ninfoentry = j[i];
+            assert(ninfoentry.is_object() && ninfoentry.contains("nsinfo") && ninfoentry["nsinfo"].is_object() && ninfoentry.contains("reinfos") && ninfoentry["reinfos"].is_array());
+
+            auto remapinfo = ninfoentry["nsinfo"];
+            assert(remapinfo.contains("inns") && remapinfo["inns"].is_string() && remapinfo.contains("nsmappings") && remapinfo["nsmappings"].is_array());
+            
+            std::vector<std::pair<std::string, std::string>> nsmappings;
+            auto mappingarr = remapinfo["nsmappings"];
+
+            size_t mappinglen = mappingarr.size();
+            for(size_t j = 0; j < mappinglen; ++j) {
+                auto nsmappingentry = mappingarr[j];
+                assert(nsmappingentry.is_array() && nsmappingentry.size() == 2 && nsmappingentry[0].is_string() && nsmappingentry[1].is_string());
+
+                nsmappings.push_back({nsmappingentry[0].get<std::string>(), nsmappingentry[1].get<std::string>()});
+            }
+
+            auto reinfos = ninfoentry["reinfos"];
+            std::vector<brex::REInfo> reinfovec;
+
+            size_t reinfoslen = reinfos.size();
+            for(size_t j = 0; j < reinfoslen; ++j) {
+                auto reinfoentry = reinfos[j];
+                assert(reinfoentry.is_object() && reinfoentry.contains("name") && reinfoentry["name"].is_string() && reinfoentry.contains("restr") && reinfoentry["restr"].is_string());
+
+                std::string rename = reinfoentry["name"].get<std::string>();
+                std::string restring = reinfoentry["restr"].get<std::string>();
+
+                std::u8string u8restring = std::u8string(restring.cbegin(), restring.cend());
+
+                reinfovec.push_back({rename, u8restring});
+            }
+
+            ninfos.push_back({{remapinfo["inns"].get<std::string>(), nsmappings}, reinfovec});
+        }
+
+        std::vector<std::u8string> errors;
+        brex::ReSystem rsystem = brex::ReSystem::processSystem(ninfos, errors);
+
+        assert(errors.empty());
+
+        for(size_t i = 0; i < rsystem.entries.size(); ++i) {
+            if(rsystem.entries[i]->isUnicode()) {
+                auto reentry = static_cast<brex::ReSystemUnicodeEntry*>(rsystem.entries[i]);
+
+                if(reentry->re->isValidNamedRegexComponent()) {
+                    assembly.namedUnicodeRegexMap[reentry->fullname] = static_cast<const brex::RegexSingleComponent*>(reentry->re->re)->entry.opt;
+                }
+            }
+            else {
+                auto reentry = static_cast<brex::ReSystemCEntry*>(rsystem.entries[i]);
+
+                if(reentry->re->isValidNamedRegexComponent()) {
+                    assembly.namedCRegexMap[reentry->fullname] = static_cast<const brex::RegexSingleComponent*>(reentry->re->re)->entry.opt;
+                }
+            }
+        }
+
+        assembly.nsremapper = rsystem.remapper;
+    }
+
     void AssemblyInfo::parse(json j, AssemblyInfo& assembly)
     {
         std::for_each(j["namespaces"].begin(), j["namespaces"].end(), [&assembly](const json &ns) { 
@@ -235,8 +305,10 @@ namespace bsqon
             assembly.recursiveSets.push_back(rset);
         });
 
-        auto resystem = j["resystem"];
-        xxxx;
+        if(j.contains("resystem") && !j["resystem"].is_null()) {
+            auto resystem = j["resystem"];
+            AssemblyInfo::parseRESystem(resystem, assembly);
+        }
     }
 
     std::vector<TypeKey> g_primitiveTypes = {
@@ -262,6 +334,55 @@ namespace bsqon
         "String", "CString", 
         "Path", "PathItem", "Glob"
     };
+
+
+    void AssemblyInfo::processUnicodeRegex(const std::string& inns, const std::u8string& regex) 
+    {
+        auto pr = brex::RegexParser::parseUnicodeRegex(regex, false);
+        assert(pr.first.has_value());
+
+        std::vector<brex::RegexCompileError> compileerror;
+        auto rmp = brex::ReSystemResolverInfo(inns, &nsremapper);
+        auto executor = brex::RegexCompiler::compileUnicodeRegexToExecutor(pr.first.value(), this->namedUnicodeRegexMap, {}, false, &rmp, &brex::ReSystem::resolveREName, compileerror);
+        assert(compileerror.empty());
+
+        this->executableUnicodeRegexMap[regex] = executor;
+    }
+
+    void AssemblyInfo::processCRegex(const std::string& inns, const std::u8string& regex) 
+    {
+        auto pr = brex::RegexParser::parseCRegex(regex, false);
+        assert(pr.first.has_value());
+
+        std::vector<brex::RegexCompileError> compileerror;
+        auto rmp = brex::ReSystemResolverInfo(inns, &nsremapper);
+        auto executor = brex::RegexCompiler::compileCRegexToExecutor(pr.first.value(), this->namedCRegexMap, {}, false, &rmp, &brex::ReSystem::resolveREName, compileerror);
+        assert(compileerror.empty());
+
+        this->executableCRegexMap[regex] = executor;
+    }
+
+    bool AssemblyInfo::validateString(const std::u8string& regex, std::u8string* ustr, const std::string& inns)
+    {
+        this->processUnicodeRegex(inns, regex);
+    
+        brex::ExecutorError err;
+        bool accepts = this->executableUnicodeRegexMap[regex]->test(ustr, err);
+    
+        assert(err == brex::ExecutorError::Ok);
+        return accepts;
+    }
+
+    bool AssemblyInfo::validateCString(const std::u8string& regex, std::string* cstr, const std::string& inns)
+    {
+        this->processCRegex(inns, regex);
+
+        brex::ExecutorError err;
+        bool accepts = this->executableCRegexMap[regex]->test(cstr, err);
+    
+        assert(err == brex::ExecutorError::Ok);
+        return accepts;
+    }
 
     bool AssemblyInfo::isKeyType(TypeKey tkey) const
     {

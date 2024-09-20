@@ -1637,7 +1637,7 @@ namespace bsqon
         }
 
         if(t->optOfValidators.has_value()) {
-            const std::vector<std::string>& validators = t->optOfValidators.value();
+            const std::vector<std::u8string>& validators = t->optOfValidators.value();
 
             for(size_t i = 0; i < validators.size(); ++i) {
                 auto vv = validators[i];
