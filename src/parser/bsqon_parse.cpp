@@ -378,7 +378,7 @@ namespace bsqon
         std::string baseprefix = basenominal.substr(0, basenominal.find("::"));
 
         std::string scopedname;
-        if (this->assembly->namespaces.at("Core")->hasTypenameDecl(basenominal)) {
+        if (this->assembly->namespaces.at("Core")->types.contains(basenominal)) {
             scopedname = basenominal;
         }
         else if (this->importmap.find(baseprefix) != this->importmap.end()) {
@@ -398,17 +398,11 @@ namespace bsqon
         }
 
         auto titer = this->assembly->typerefs.find(scopedname);
-        if (titer != this->assembly->typerefs.end()) {
-            return titer->second;
+        if (titer == this->assembly->typerefs.end()) {
+            return UnresolvedType::singleton;
         }
         else {
-            auto aiter = this->assembly->aliasmap.find(scopedname);
-            if(aiter != this->assembly->aliasmap.end()) {
-                return aiter->second;
-            }
-            else {
-                return UnresolvedType::singleton;
-            }
+            return titer->second;
         }
     }
 
@@ -1642,7 +1636,19 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
-        xxxx; //run of checks here + register validation callbacks
+        if(t->optOfValidators.has_value()) {
+            const std::vector<std::string>& validators = t->optOfValidators.value();
+
+            for(size_t i = 0; i < validators.size(); ++i) {
+                auto vv = validators[i];
+
+                xxxx;
+            }
+        }
+
+        if(t->hasvalidations) {
+            this->validatecallbacks.push_front({ t->tkey, {pval} });
+        }
 
         return new TypedeclValue(t, Parser::convertSrcPos(node->pos), pval);
     }
@@ -1675,7 +1681,9 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
         
-        xxxx; //register validation callbacks
+        if(t->hasvalidations) {
+            this->validatecallbacks.push_front({ t->tkey, {vvals.value().begin(), vvals.value().end()} });
+        }
 
         return new EntityValue(t, Parser::convertSrcPos(node->pos), std::move(vvals.value()));
     }
@@ -2346,21 +2354,53 @@ namespace bsqon
         return res;
     }
 
-    Value* Parser::parseAccessName(const Type* t /*maybe null*/, const BSQON_AST_Node* node)
+    Value* Parser::parseAccessInternal(const BSQON_AST_Node* node)
+    {
+        if(node->tag == BSQON_AST_TAG_IdentifierValue) {
+            return this->parseStrictIdentifier(node);
+        }
+        else if(node->tag == BSQON_AST_TAG_AccessNameValue) {
+            return this->parseAccessName(node);
+        }
+        else if(node->tag == BSQON_AST_TAG_AccessKeyValue) {
+            return this->parseAccessKey(node);
+        }
+        else {
+            this->addError("Expected access value", Parser::convertSrcPos(node->pos));
+            return nullptr;
+        }
+    }
+        
+    Value* Parser::parseStrictIdentifier(const BSQON_AST_Node* node)
+    {
+        if(node->tag != BSQON_AST_TAG_IdentifierValue) {
+            this->addError("Expected Identifier value", Parser::convertSrcPos(node->pos));
+            return nullptr;
+        }
+
+        std::string vname = BSQON_AST_NODE_AS(NameValue, node)->data;
+
+        if(!this->vbinds.contains(vname)) {
+            this->addError("Unknown let binding " + vname, Parser::convertSrcPos(node->pos));
+            return nullptr;
+        }
+
+        return this->vbinds[vname];
+    }
+        
+    Value* Parser::parseAccessName(const BSQON_AST_Node* node)
     {
         if(node->tag != BSQON_AST_TAG_AccessNameValue) {
             this->addError("Expected access index value", Parser::convertSrcPos(node->pos));
-            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+            return nullptr;
         }
         auto nnode = BSQON_AST_NODE_AS(AccessNameValue, node);
         auto anxstr = std::string(nnode->name);
-        
 
-
-        Value* lvalue = this->parseValue(atype, nnode->value);
-        if(lvalue->kind != ValueKind::EntityValueKind) {
+        Value* lvalue = this->parseAccessInternal(nnode->value);
+        if(lvalue == nullptr || lvalue->kind != ValueKind::EntityValueKind) {
             this->addError("Expected record or entity value (non-symbolic)", Parser::convertSrcPos(node->pos));
-            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+            return nullptr;
         }
 
         auto avalue = static_cast<EntityValue*>(lvalue);
@@ -2369,34 +2409,25 @@ namespace bsqon
         auto eeiter = std::find_if(atype->fields.cbegin(), atype->fields.cend(), [&anxstr](const EntityTypeFieldEntry& entry) { return entry.fname == anxstr; });
         if(eeiter == atype->fields.cend()) {
             this->addError("Unknown field " + anxstr, Parser::convertSrcPos(node->pos));
-            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+            return nullptr;
         }
  
-        Value* res = avalue->fieldvalues[std::distance(atype->fields.cbegin(), eeiter)]; 
-        
-        if(!this->assembly->checkSubtype(res->vtype, t)) {
-            this->addError("Expected result of type " + t->tkey + " but got " + res->vtype->tkey, Parser::convertSrcPos(node->pos));
-            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
-        }
-
-        return res;
+        return avalue->fieldvalues[std::distance(atype->fields.cbegin(), eeiter)]; 
     }
 
-    Value* Parser::parseAccessKey(const Type* t, const BSQON_AST_Node* node)
+    Value* Parser::parseAccessKey(const BSQON_AST_Node* node)
     {
         if(node->tag != BSQON_AST_TAG_AccessKeyValue) {
             this->addError("Expected access index value", Parser::convertSrcPos(node->pos));
-            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+            return nullptr;
         }
 
         auto knode = BSQON_AST_NODE_AS(AccessKeyValue, node);
+        Value* lvalue = this->parseAccessInternal(knode->value);
 
-        auto atype = this->resolveAndCheckType("Any", Parser::convertSrcPos(node->pos)); 
-        Value* lvalue = this->parseValue(atype, knode->value);
-
-        if(lvalue->kind != ValueKind::ListValueKind && lvalue->kind != ValueKind::MapValueKind) {
+        if(lvalue == nullptr || (lvalue->kind != ValueKind::ListValueKind && lvalue->kind != ValueKind::MapValueKind)) {
             this->addError("Expected list or map value (non-symbolic)", Parser::convertSrcPos(node->pos));
-            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+            return nullptr;
         }
 
         if(lvalue->kind == ValueKind::ListValueKind) {
@@ -2406,16 +2437,10 @@ namespace bsqon
             uint64_t aindex = static_cast<NatNumberValue*>(akey)->cnv;
             if(aindex >= avalue->vals.size()) {
                 this->addError("Index out of range", Parser::convertSrcPos(node->pos));
-                return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+                return nullptr;
             }
 
-            auto res = avalue->vals[aindex];
-            if(!this->assembly->checkSubtype(res->vtype, t)) {
-                this->addError("Expected result of type " + t->tkey + " but got " + res->vtype->tkey, Parser::convertSrcPos(node->pos));
-                return new ErrorValue(t, Parser::convertSrcPos(node->pos));
-            }
-
-            return res;
+            return avalue->vals[aindex];
         }
         else {
             auto avalue = static_cast<MapValue*>(lvalue);
@@ -2426,17 +2451,27 @@ namespace bsqon
 
             if(aiter == avalue->vals.end() || Value::keyCompare((*aiter)->key, akey) != 0) {
                 this->addError("Key not found in map", Parser::convertSrcPos(node->pos));
-                return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+                return nullptr;
             }
 
-            auto res = (*aiter)->val;
-            if(!this->assembly->checkSubtype(res->vtype, t)) {
-                this->addError("Expected result of type " + t->tkey + " but got " + res->vtype->tkey, Parser::convertSrcPos(node->pos));
-                return new ErrorValue(t, Parser::convertSrcPos(node->pos));
-            }
-
-            return res;
+            return (*aiter)->val;
         }
+    }
+
+    Value* Parser::parseAccess(const Type* t, const BSQON_AST_Node* node)
+    {
+        Value* avv = this->parseAccessInternal(node);
+
+        if(avv == nullptr) {
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+        }
+
+        if(!this->assembly->checkSubtype(avv->vtype, t)) {
+            this->addError("Expected result of type " + t->tkey + " but got " + avv->vtype->tkey, Parser::convertSrcPos(node->pos));
+            return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+        }
+
+        return avv;
     }
 
     Value* Parser::parseEnvAccess(const Type* t, const BSQON_AST_Node* node) 
@@ -2496,11 +2531,8 @@ namespace bsqon
         else if(node->tag == BSQON_AST_TAG_EnvAccessValue) {
             return this->parseEnvAccess(t, node);
         }
-        else if(node->tag == BSQON_AST_TAG_AccessNameValue) {
-            return this->parseAccessName(t, node);
-        }
-        else if(node->tag == BSQON_AST_TAG_AccessKeyValue) {
-            return this->parseAccessKey(t, node);
+        else if(node->tag == BSQON_AST_TAG_AccessNameValue || node->tag == BSQON_AST_TAG_AccessKeyValue) {
+            return this->parseAccess(t, node);
         }
         else if(node->tag == BSQON_AST_TAG_LetInValue) {
             return this->parseLetIn(t, node);

@@ -36,6 +36,13 @@ namespace bsqon
         ContainerParseStackEntry(ContainerParseStackEntryTag tag, int64_t ival) : tag(tag), ival(ival), kval(nullptr) {;}
     };
 
+    class ParseValidateCallbackInfo
+    {
+    public:
+        TypeKey tkey;
+        std::vector<Value*> args;
+    };
+
     class Parser
     {
     private:
@@ -87,6 +94,8 @@ namespace bsqon
         std::map<std::string, Value*> vbinds;
 
         std::list<ContainerParseStackEntry> containerstack;
+
+        std::list<ParseValidateCallbackInfo> validatecallbacks;
 
         Parser(const AssemblyInfo* assembly) {;}
         virtual ~Parser() = default;
@@ -235,8 +244,13 @@ namespace bsqon
         Value* parseIdentifier(const Type* t, const BSQON_AST_Node* node);
         Value* parseScopedName(const Type* t, const BSQON_AST_Node* node);
         Value* parseLetIn(const Type* t, const BSQON_AST_Node* node);
-        Value* parseAccessName(const Type* t, const BSQON_AST_Node* node);
-        Value* parseAccessKey(const Type* t, const BSQON_AST_Node* node);
+
+
+        Value* parseAccessInternal(const BSQON_AST_Node* node);
+        Value* parseStrictIdentifier(const BSQON_AST_Node* node);
+        Value* parseAccessName(const BSQON_AST_Node* node);
+        Value* parseAccessKey(const BSQON_AST_Node* node);
+        Value* parseAccess(const Type* t, const BSQON_AST_Node* node);
 
         Value* parseUnspecIdentifierValue(const Type* t, const BSQON_AST_Node* node);
         Value* parseEnvAccess(const Type* t, const BSQON_AST_Node* node);
