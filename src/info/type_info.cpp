@@ -335,6 +335,14 @@ namespace bsqon
         "Path", "PathItem", "Glob"
     };
 
+    std::u8string AssemblyInfo::resolveConstantRegexValue(const std::u8string& reexp, bool isutf) const {
+        if(reexp.starts_with(u8'/')) {
+            return reexp;
+        }
+        else {
+            return u8"/${" + reexp + u8"}/" + (isutf ? u8"" : u8"c");
+        }
+    }
 
     void AssemblyInfo::processUnicodeRegex(const std::string& inns, const std::u8string& regex) 
     {
@@ -362,23 +370,25 @@ namespace bsqon
         this->executableCRegexMap[regex] = executor;
     }
 
-    bool AssemblyInfo::validateString(const std::u8string& regex, std::u8string* ustr, const std::string& inns)
+    bool AssemblyInfo::validateString(const std::u8string& regex, brex::UnicodeString* ustr, const std::string& inns)
     {
-        this->processUnicodeRegex(inns, regex);
+        auto uregex = this->resolveConstantRegexValue(regex, true);
+        this->processUnicodeRegex(inns, uregex);
     
         brex::ExecutorError err;
-        bool accepts = this->executableUnicodeRegexMap[regex]->test(ustr, err);
+        bool accepts = this->executableUnicodeRegexMap[uregex]->test(ustr, err);
     
         assert(err == brex::ExecutorError::Ok);
         return accepts;
     }
 
-    bool AssemblyInfo::validateCString(const std::u8string& regex, std::string* cstr, const std::string& inns)
+    bool AssemblyInfo::validateCString(const std::u8string& regex, brex::CString* cstr, const std::string& inns)
     {
-        this->processCRegex(inns, regex);
+        auto cregex = this->resolveConstantRegexValue(regex, false);
+        this->processCRegex(inns, cregex);
 
         brex::ExecutorError err;
-        bool accepts = this->executableCRegexMap[regex]->test(cstr, err);
+        bool accepts = this->executableCRegexMap[cregex]->test(cstr, err);
     
         assert(err == brex::ExecutorError::Ok);
         return accepts;

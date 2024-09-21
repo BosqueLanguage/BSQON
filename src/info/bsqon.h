@@ -146,7 +146,7 @@ namespace bsqon
                 return 1;
             }
             else {
-                auto mmi = std::mismatch(tz1, tz1 + tz1len, tz2, tz2len);
+                auto mmi = std::mismatch(tz1, tz1 + tz1len, tz2);
                 if(mmi.first == (tz1 + tz1len) && mmi.second == (tz2 + tz2len)) {
                     return 0;
                 }
@@ -502,7 +502,7 @@ namespace bsqon
     class StringValue : public PrimtitiveValue 
     {
     public:
-        const brex::UnicodeString sv;
+        brex::UnicodeString sv;
     
         virtual ~StringValue() = default;
 
@@ -531,7 +531,7 @@ namespace bsqon
     class CStringValue : public PrimtitiveValue
     {
     public:
-        const brex::CString sv;
+        brex::CString sv;
     
         virtual ~CStringValue() = default;
 

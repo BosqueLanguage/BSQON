@@ -60,66 +60,62 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    SYM_BAR = 258,                 /* SYM_BAR  */
-    SYM_AMP = 260,                 /* SYM_AMP  */
-    KW_NONE = 262,                 /* "none"  */
-    KW_NOTHING = 263,              /* "nothing"  */
-    KW_TRUE = 264,                 /* "true"  */
-    KW_FALSE = 265,                /* "false"  */
-    KW_SOMETHING = 266,            /* "something"  */
-    KW_OK = 267,                   /* "ok"  */
-    KW_ERR = 268,                  /* "err"  */
-    KW_NPOS = 269,                 /* "$npos"  */
-    KW_INDEX = 270,                /* "$i"  */
-    KW_KEY = 271,                  /* "$key"  */
-    KW_SRC = 272,                  /* "$src"  */
-    KW_LET = 273,                  /* "let"  */
-    KW_IN = 274,                   /* "in"  */
-    KW_ENV = 275,                  /* "env"  */
-    SYM_DOUBLE_COLON = 276,        /* "::"  */
-    SYM_ENTRY = 277,               /* "=>"  */
-    SYM_COLON = 278,               /* ":"  */
-    SYM_COMMA = 279,               /* ","  */
-    SYM_EQUALS = 280,              /* "="  */
-    SYM_UNDERSCORE = 281,          /* "_"  */
-    TOKEN_NAT = 282,               /* "nat literal"  */
-    TOKEN_INT = 283,               /* "int literal"  */
-    TOKEN_BIG_NAT = 284,           /* "big nat literal"  */
-    TOKEN_BIG_INT = 285,           /* "big int literal"  */
-    TOKEN_RATIONAL = 286,          /* "rational literal"  */
-    TOKEN_FLOAT = 287,             /* "float literal"  */
-    TOKEN_DECIMAL = 288,           /* "decimal literal"  */
-    TOKEN_DECIMAL_DEGREE = 289,    /* "decimal degree literal"  */
-    TOKEN_COMPLEX = 290,           /* "complex literal"  */
-    TOKEN_LAT_LONG = 291,          /* "geo coordinate literal"  */
-    TOKEN_NUMBERINO = 292,         /* "numberino"  */
-    TOKEN_BYTE_BUFFER = 293,       /* "byte buffer"  */
-    TOKEN_UUID_V4 = 294,           /* "uuid (v4)"  */
-    TOKEN_UUID_V7 = 295,           /* "uuid (v7)"  */
-    TOKEN_SHA_HASH = 296,          /* "sha3 hashcode (512 bits)"  */
-    TOKEN_STRING = 297,            /* "string"  */
-    TOKEN_ASCII_STRING = 298,      /* "ascii string"  */
-    TOKEN_REGEX = 299,             /* "regular expression"  */
-    TOKEN_PATH_ITEM = 300,         /* "path item"  */
-    TOKEN_DATE_TIME = 301,         /* "date & time with timezone"  */
-    TOKEN_UTC_DATE_TIME = 302,     /* "date & time in UTC"  */
-    TOKEN_PLAIN_DATE = 303,        /* "plain date"  */
-    TOKEN_PLAIN_TIME = 304,        /* "plain time"  */
-    TOKEN_DELTA_DATE_TIME = 305,   /* "date & time delta"  */
-    TOKEN_DELTA_PLAIN_DATE = 306,  /* "plain date delta"  */
-    TOKEN_DELTA_PLAIN_TIME = 307,  /* "plain time delta"  */
-    TOKEN_LOGICAL_TIME = 308,      /* "logical time"  */
-    TOKEN_TICK_TIME = 309,         /* "tick time"  */
-    TOKEN_TIMESTAMP = 310,         /* "ISO timestamp"  */
-    TOKEN_DELTA_ISOTIMESTAMP = 311, /* "timestamp delta"  */
-    TOKEN_DELTA_SECONDS = 312,     /* "delta in seconds"  */
-    TOKEN_DELTA_TICK = 313,        /* "tick delta"  */
-    TOKEN_DELTA_LOGICAL = 314,     /* "logical time delta"  */
-    TOKEN_IDENTIFIER = 315,        /* "identifier"  */
-    TOKEN_TYPE_COMPONENT = 316,    /* "type name"  */
-    TOKEN_UNSPEC_IDENTIFIER = 317, /* "unspec identifier"  */
-    TOKEN_SHEBANG_LINE = 318,      /* "shebang line"  */
-    SYM_DOT = 319                  /* "."  */
+    KW_TRUE = 258,                 /* "true"  */
+    KW_FALSE = 259,                /* "false"  */
+    KW_NONE = 260,                 /* "none"  */
+    KW_SOME = 261,                 /* "some"  */
+    KW_OK = 262,                   /* "ok"  */
+    KW_ERR = 263,                  /* "err"  */
+    KW_NPOS = 264,                 /* "$npos"  */
+    KW_INDEX = 265,                /* "$i"  */
+    KW_KEY = 266,                  /* "$key"  */
+    KW_SRC = 267,                  /* "$src"  */
+    KW_LET = 268,                  /* "let"  */
+    KW_IN = 269,                   /* "in"  */
+    KW_ENV = 270,                  /* "env"  */
+    SYM_DOUBLE_COLON = 271,        /* "::"  */
+    SYM_ENTRY = 272,               /* "=>"  */
+    SYM_COLON = 273,               /* ":"  */
+    SYM_COMMA = 274,               /* ","  */
+    SYM_EQUALS = 275,              /* "="  */
+    SYM_DOT = 276,                 /* "."  */
+    SYM_ELIST_LEFT = 277,          /* "(|"  */
+    SYM_ELIST_RIGHT = 278,         /* "|)"  */
+    SYM_LBRACK_BAR = 279,          /* "[|"  */
+    SYM_RBRACK_BAR = 280,          /* "|]"  */
+    TOKEN_NAT = 281,               /* "nat literal"  */
+    TOKEN_INT = 282,               /* "int literal"  */
+    TOKEN_BIG_NAT = 283,           /* "big nat literal"  */
+    TOKEN_BIG_INT = 284,           /* "big int literal"  */
+    TOKEN_RATIONAL = 285,          /* "rational literal"  */
+    TOKEN_FLOAT = 286,             /* "float literal"  */
+    TOKEN_DECIMAL = 287,           /* "decimal literal"  */
+    TOKEN_DECIMAL_DEGREE = 288,    /* "decimal degree literal"  */
+    TOKEN_COMPLEX = 289,           /* "complex literal"  */
+    TOKEN_LAT_LONG = 290,          /* "geo coordinate literal"  */
+    TOKEN_NUMBERINO = 291,         /* "numberino"  */
+    TOKEN_BYTE_BUFFER = 292,       /* "byte buffer"  */
+    TOKEN_UUID_V4 = 293,           /* "uuid (v4)"  */
+    TOKEN_UUID_V7 = 294,           /* "uuid (v7)"  */
+    TOKEN_SHA_HASH = 295,          /* "sha3 hashcode (512 bits)"  */
+    TOKEN_STRING = 296,            /* "string"  */
+    TOKEN_CSTRING = 297,           /* "cstring"  */
+    TOKEN_REGEX = 298,             /* "regular expression"  */
+    TOKEN_PATH_ITEM = 299,         /* "path item"  */
+    TOKEN_TZ_DATE_TIME = 300,      /* "date & time with timezone"  */
+    TOKEN_TIA_TIME = 301,          /* "date & time in TIA"  */
+    TOKEN_PLAIN_DATE = 302,        /* "plain date"  */
+    TOKEN_PLAIN_TIME = 303,        /* "plain time"  */
+    TOKEN_LOGICAL_TIME = 304,      /* "logical time"  */
+    TOKEN_TIMESTAMP = 305,         /* "ISO timestamp"  */
+    TOKEN_DELTA_DATE_TIME = 306,   /* "date & time delta"  */
+    TOKEN_DELTA_SECONDS = 307,     /* "delta in seconds"  */
+    TOKEN_DELTA_LOGICAL = 308,     /* "logical time delta"  */
+    TOKEN_DELTA_ISOTIMESTAMP = 309, /* "timestamp delta"  */
+    TOKEN_IDENTIFIER = 310,        /* "identifier"  */
+    TOKEN_TYPE_COMPONENT = 311,    /* "type name"  */
+    TOKEN_UNSPEC_IDENTIFIER = 312, /* "unspec identifier"  */
+    TOKEN_SHEBANG_LINE = 313       /* "shebang line"  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -148,7 +144,7 @@ union YYSTYPE
    struct BSQON_AST_NLIST_OF_VALUES_ENTRY bsqon_named_value_list_entry;
    struct BSQON_AST_NLIST_OF_VALUES* bsqon_named_value_list;
 
-#line 152 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.h"
+#line 148 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

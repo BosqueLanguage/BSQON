@@ -128,7 +128,7 @@ namespace bsqon
     {
         auto pp = sscanf(ds.c_str(), "%2" SCNu8 ":%2" SCNu8 ":%2" SCNu8, &hh, &mm, &ss);
 
-        return pp == 3 && hh < 24 && mm < 60 && ss < allow60sec ? 61 : 60;
+        return pp == 3 && hh < 24 && mm < 60 && ss < (allow60sec ? 61 : 60);
     }
 
     bool Parser::processMillisInfo(const std::string& ds, uint16_t& millis)
@@ -1639,10 +1639,28 @@ namespace bsqon
         if(t->optOfValidators.has_value()) {
             const std::vector<std::u8string>& validators = t->optOfValidators.value();
 
+            std::string nodefault("[TODO -- no default resolve]");
             for(size_t i = 0; i < validators.size(); ++i) {
                 auto vv = validators[i];
 
-                xxxx;
+                if(ptype->tkey == "String") {
+                    StringValue* sval = static_cast<StringValue*>(pval);
+                    bool isok = this->assembly->validateString(vv, &sval->sv, nodefault);
+
+                    if(!isok) {
+                        this->addError("Value does not validate against the validator " + std::string(vv.cbegin(), vv.cend()), Parser::convertSrcPos(node->pos));
+                        return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+                    }
+                }
+                else {
+                    CStringValue* sval = static_cast<CStringValue*>(pval);
+                    bool isok = this->assembly->validateCString(vv, &sval->sv, nodefault);
+
+                    if(!isok) {
+                        this->addError("Value does not validate against the validator " + std::string(vv.cbegin(), vv.cend()), Parser::convertSrcPos(node->pos));
+                        return new ErrorValue(t, Parser::convertSrcPos(node->pos));
+                    }
+                }
             }
         }
 

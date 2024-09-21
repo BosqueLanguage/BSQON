@@ -82,7 +82,7 @@ namespace bsqon
         void processEntriesForMap(const Type* keytype, const Type* valtype, const BSQON_AST_NODE(BraceValue)* node, std::vector<MapEntryValue*>& entries);
 
     public:
-        const AssemblyInfo* assembly;
+        AssemblyInfo* assembly;
 
         const std::string defaultns;
         std::map<std::string, std::string> importmap;

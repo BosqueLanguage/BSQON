@@ -467,12 +467,13 @@ namespace bsqon
             }
         }
 
+        std::u8string resolveConstantRegexValue(const std::u8string& reexp, bool isutf) const;
 
         void processUnicodeRegex(const std::string& inns, const std::u8string& regex);
         void processCRegex(const std::string& inns, const std::u8string& regex);
 
-        bool validateString(const std::u8string& regex, std::u8string* ustr, const std::string& inns);
-        bool validateCString(const std::u8string& regex, std::string* cstr, const std::string& inns);
+        bool validateString(const std::u8string& regex, brex::UnicodeString* ustr, const std::string& inns);
+        bool validateCString(const std::u8string& regex, brex::CString* cstr, const std::string& inns);
 
         bool isKeyType(TypeKey tkey) const;
     };
