@@ -126,12 +126,13 @@ namespace bsqon
                 return new EnumType(j["tkey"].get<TypeKey>(), supertypes, annotations, variants);
             }
             case TypeTag::TYPE_TYPE_DECL: {
-                std::optional<std::vector<std::u8string>> optOfValidators = std::nullopt;
+                std::optional<std::vector<std::pair<std::u8string, std::string>>> optOfValidators = std::nullopt;
                 if(j.contains("ofvalidators") && !j["ofvalidators"].is_null()) {
-                    std::vector<std::u8string> ovv;
+                    std::vector<std::pair<std::u8string, std::string>> ovv;
                     std::transform(j["ofvalidators"].begin(), j["ofvalidators"].end(), std::back_inserter(ovv), [](const json& jv) { 
-                        auto vv = jv.get<std::string>(); 
-                        return std::u8string{vv.cbegin(), vv.cend()};
+                        auto vvre = jv[0].get<std::string>();
+                        auto vvns = jv[1].get<std::string>();
+                        return std::make_pair(std::u8string{vvre.cbegin(), vvre.cend()}, vvns);
                     });
                     optOfValidators = std::make_optional(ovv);
                 }

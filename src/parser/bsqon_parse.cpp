@@ -89,53 +89,62 @@ namespace bsqon
 
     bool Parser::isValidNat(const std::string nv, int64_t& vv)
     {
-        auto ecount = sscanf(nv.c_str(), "%" SCNu64, &vv);
-        return ecount == 1 && 0 <= vv && vv <= Type::MAX_SAFE_NAT; 
+        vv = (int64_t)std::stoll(nv.c_str(), nullptr, 10);
+        return (errno != ERANGE) && 0 <= vv && vv <= Type::MAX_SAFE_NAT; 
     }
 
     bool Parser::isValidInt(const std::string nv, int64_t& vv)
     {
-        auto ecount = sscanf(nv.c_str(), "%" SCNd64, &vv);
-        return ecount == 1 && Type::MIN_SAFE_INT <= vv && vv <= Type::MAX_SAFE_INT;
+        vv = (int64_t)std::stoll(nv.c_str(), nullptr, 10);
+        return (errno != ERANGE) && Type::MIN_SAFE_INT <= vv && vv <= Type::MAX_SAFE_INT;
     }
 
     bool Parser::isValidFloat(const std::string nv, double& vv)
     {
-        auto ecount = sscanf(nv.c_str(), "%lf", &vv);
-        return ecount == 1;
+        vv = std::stod(nv, nullptr);
+        return (errno != ERANGE);
     }
 
     bool Parser::isValidWCTime(const std::string nv, uint64_t& vv)
     {
-        auto ecount = sscanf(nv.c_str(), "%" SCNu64, &vv);
-        return ecount == 1;
+        vv = (uint64_t)std::stoull(nv.c_str(), nullptr, 10);
+        return (errno != ERANGE);
     }
 
     bool Parser::isValidWCDelta(const std::string nv, int64_t& vv)
     {
-        auto ecount = sscanf(nv.c_str(), "%" SCNi64, &vv);
-        return ecount == 1;
+        vv = (int64_t)std::stoll(nv.c_str(), nullptr, 10);
+        return (errno != ERANGE);
     }
 
     bool Parser::processDateInfo(const std::string& ds, uint16_t& yy, uint8_t& mm, uint8_t& dd)
     {
-        auto pp = sscanf(ds.c_str(), "%4" SCNu16 "-%2" SCNu8 "-%2" SCNu8, &yy, &mm, &dd);
+        /*
+        auto pp = sxscanf(ds.c_str(), "%4" SCNu16 "-%2" SCNu8 "-%2" SCNu8, &yy, &mm, &dd);
 
         return pp == 3 && (1900 <= yy && yy <= 2200) && mm < 12 && s_dayInMonth(dd, mm, yy);
+        */
+        return false;
     }
 
     bool Parser::processTimeInfo(const std::string& ds, uint8_t& hh, uint8_t& mm, uint8_t& ss, bool allow60sec)
     {
-        auto pp = sscanf(ds.c_str(), "%2" SCNu8 ":%2" SCNu8 ":%2" SCNu8, &hh, &mm, &ss);
+        /*
+        auto pp = sxscanf(ds.c_str(), "%2" SCNu8 ":%2" SCNu8 ":%2" SCNu8, &hh, &mm, &ss);
 
         return pp == 3 && hh < 24 && mm < 60 && ss < (allow60sec ? 61 : 60);
+        */
+        return false;
     }
 
     bool Parser::processMillisInfo(const std::string& ds, uint16_t& millis)
     {
-        auto pp = sscanf(ds.c_str(), ".%3" SCNu16, &millis);
+        /*
+        auto pp = sxscanf(ds.c_str(), ".%3" SCNu16, &millis);
 
         return pp == 1 && millis < 1000;
+        */
+        return false;
     }
 
     bool Parser::processTZInfo(const std::string& ds, const char** tz)
@@ -156,20 +165,29 @@ namespace bsqon
 
     bool Parser::processDeltaDateInfo(const std::string& ds, uint16_t& yy, uint16_t& mm, uint32_t& dd)
     {
-        auto pp = sscanf(ds.c_str(), "%4" SCNu16 "-%2" SCNu16 "-%2" SCNu32, &yy, &mm, &dd);
+        /*
+        auto pp = sxscanf(ds.c_str(), "%4" SCNu16 "-%2" SCNu16 "-%2" SCNu32, &yy, &mm, &dd);
         return pp == 3;
+        */
+        return false;
     }
 
     bool Parser::processDeltaTimeInfo(const std::string& ds, uint32_t& hh, uint32_t& mm, uint32_t& ss)
     {
-        auto pp = sscanf(ds.c_str(), "%2" SCNu32 ":%2" SCNu32 ":%2" SCNu32, &hh, &mm, &ss);
+        /*
+        auto pp = sxscanf(ds.c_str(), "%2" SCNu32 ":%2" SCNu32 ":%2" SCNu32, &hh, &mm, &ss);
         return pp == 3;
+        */
+        return false;
     }
 
     bool Parser::processDeltaMillisInfo(const std::string& ds, uint32_t& millis)
     {
-        auto pp = sscanf(ds.c_str(), ".%3" SCNu32, &millis);
+        /*
+        auto pp = sxscanf(ds.c_str(), ".%3" SCNu32, &millis);
         return pp == 1;
+        */
+        return false;
     }
 
     std::optional<std::vector<Value*>> Parser::processEntriesForEList(const EListType* ttype, const BSQON_AST_NODE(BracketValue)* node)
@@ -1637,27 +1655,26 @@ namespace bsqon
         }
 
         if(t->optOfValidators.has_value()) {
-            const std::vector<std::u8string>& validators = t->optOfValidators.value();
+            const std::vector<std::pair<std::u8string, std::string>>& validators = t->optOfValidators.value();
 
-            std::string nodefault("[TODO -- no default resolve]");
             for(size_t i = 0; i < validators.size(); ++i) {
                 auto vv = validators[i];
 
                 if(ptype->tkey == "String") {
                     StringValue* sval = static_cast<StringValue*>(pval);
-                    bool isok = this->assembly->validateString(vv, &sval->sv, nodefault);
+                    bool isok = this->assembly->validateString(vv.first, &sval->sv, vv.second);
 
                     if(!isok) {
-                        this->addError("Value does not validate against the validator " + std::string(vv.cbegin(), vv.cend()), Parser::convertSrcPos(node->pos));
+                        this->addError("Value does not validate against the validator " + std::string(vv.first.cbegin(), vv.first.cend()), Parser::convertSrcPos(node->pos));
                         return new ErrorValue(t, Parser::convertSrcPos(node->pos));
                     }
                 }
                 else {
                     CStringValue* sval = static_cast<CStringValue*>(pval);
-                    bool isok = this->assembly->validateCString(vv, &sval->sv, nodefault);
+                    bool isok = this->assembly->validateCString(vv.first, &sval->sv, vv.second);
 
                     if(!isok) {
-                        this->addError("Value does not validate against the validator " + std::string(vv.cbegin(), vv.cend()), Parser::convertSrcPos(node->pos));
+                        this->addError("Value does not validate against the validator " + std::string(vv.first.cbegin(), vv.first.cend()), Parser::convertSrcPos(node->pos));
                         return new ErrorValue(t, Parser::convertSrcPos(node->pos));
                     }
                 }

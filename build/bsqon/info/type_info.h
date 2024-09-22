@@ -219,10 +219,10 @@ namespace bsqon
     public:
         TypeKey primitivetype;
 
-        std::optional<std::vector<std::u8string>> optOfValidators;
+        std::optional<std::vector<std::pair<std::u8string, std::string>>> optOfValidators;
         bool hasvalidations;
 
-        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, TypeKey primitivetype, std::optional<std::vector<std::u8string>> optOfValidators, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype), optOfValidators(optOfValidators), hasvalidations(hasvalidations) { ; }
+        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, TypeKey primitivetype, std::optional<std::vector<std::pair<std::u8string, std::string>>> optOfValidators, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype), optOfValidators(optOfValidators), hasvalidations(hasvalidations) { ; }
         virtual ~TypedeclType() = default;
     };
 
