@@ -126,19 +126,17 @@ namespace bsqon
                 return new EnumType(j["tkey"].get<TypeKey>(), supertypes, annotations, variants);
             }
             case TypeTag::TYPE_TYPE_DECL: {
-                std::optional<std::vector<std::pair<std::u8string, std::string>>> optOfValidators = std::nullopt;
+                std::optional<std::pair<std::u8string, std::string>> optOfValidator = std::nullopt;
                 if(j.contains("ofvalidators") && !j["ofvalidators"].is_null()) {
-                    std::vector<std::pair<std::u8string, std::string>> ovv;
-                    std::transform(j["ofvalidators"].begin(), j["ofvalidators"].end(), std::back_inserter(ovv), [](const json& jv) { 
-                        auto vvre = jv[0].get<std::string>();
-                        auto vvns = jv[1].get<std::string>();
-                        return std::make_pair(std::u8string{vvre.cbegin(), vvre.cend()}, vvns);
-                    });
-                    optOfValidators = std::make_optional(ovv);
+                    auto jvv = j["ofvalidators"][0].get<std::string>();
+                    auto inns = j["ofvalidators"][1].get<std::string>();
+
+                    std::pair<std::u8string, std::string> ovv = std::make_pair(std::u8string{jvv.cbegin(), jvv.cend()}, inns);
+                    optOfValidator = std::make_optional(ovv);
                 }
 
                 bool hasvalidations = j["hasvalidations"].get<bool>();
-                return new TypedeclType(j["tkey"].get<TypeKey>(), supertypes, annotations, j["primitivetype"].get<TypeKey>(), optOfValidators, hasvalidations);
+                return new TypedeclType(j["tkey"].get<TypeKey>(), supertypes, annotations, j["primitivetype"].get<TypeKey>(), optOfValidator, hasvalidations);
             }
             case TypeTag::TYPE_SOME: {
                 return new SomeType(j["oftype"].get<TypeKey>(), supertypes, annotations);

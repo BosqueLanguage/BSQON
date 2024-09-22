@@ -1654,29 +1654,25 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
-        if(t->optOfValidators.has_value()) {
-            const std::vector<std::pair<std::u8string, std::string>>& validators = t->optOfValidators.value();
+        if(t->optOfValidator.has_value()) {
+           auto vv = t->optOfValidator.value();
 
-            for(size_t i = 0; i < validators.size(); ++i) {
-                auto vv = validators[i];
+            if(ptype->tkey == "String") {
+                StringValue* sval = static_cast<StringValue*>(pval);
+                bool isok = this->assembly->validateString(vv.first, &sval->sv, vv.second);
 
-                if(ptype->tkey == "String") {
-                    StringValue* sval = static_cast<StringValue*>(pval);
-                    bool isok = this->assembly->validateString(vv.first, &sval->sv, vv.second);
-
-                    if(!isok) {
-                        this->addError("Value does not validate against the validator " + std::string(vv.first.cbegin(), vv.first.cend()), Parser::convertSrcPos(node->pos));
-                        return new ErrorValue(t, Parser::convertSrcPos(node->pos));
-                    }
+                if(!isok) {
+                    this->addError("Value does not validate against the validator " + std::string(vv.first.cbegin(), vv.first.cend()), Parser::convertSrcPos(node->pos));
+                    return new ErrorValue(t, Parser::convertSrcPos(node->pos));
                 }
-                else {
-                    CStringValue* sval = static_cast<CStringValue*>(pval);
-                    bool isok = this->assembly->validateCString(vv.first, &sval->sv, vv.second);
+            }
+            else {
+                CStringValue* sval = static_cast<CStringValue*>(pval);
+                bool isok = this->assembly->validateCString(vv.first, &sval->sv, vv.second);
 
-                    if(!isok) {
-                        this->addError("Value does not validate against the validator " + std::string(vv.first.cbegin(), vv.first.cend()), Parser::convertSrcPos(node->pos));
-                        return new ErrorValue(t, Parser::convertSrcPos(node->pos));
-                    }
+                if(!isok) {
+                    this->addError("Value does not validate against the validator " + std::string(vv.first.cbegin(), vv.first.cend()), Parser::convertSrcPos(node->pos));
+                    return new ErrorValue(t, Parser::convertSrcPos(node->pos));
                 }
             }
         }
