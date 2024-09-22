@@ -30,9 +30,9 @@ namespace bpath
     class LiteralComponent : public GlobSimpleComponent
     {
     public:
-        const brex::ASCIIString value;
+        const brex::CString value;
 
-        LiteralComponent(brex::ASCIIString value) : GlobSimpleComponent(GlobSimpleComponentTag::LITERAL_TAG), value(value) {;}
+        LiteralComponent(brex::CString value) : GlobSimpleComponent(GlobSimpleComponentTag::LITERAL_TAG), value(value) {;}
         virtual ~LiteralComponent() {;}
 
         std::u8string toBSQONFormat() const override final
@@ -101,9 +101,9 @@ namespace bpath
     class SegmentLiteralComponent : public SegmentGlobCompnent
     {
     public:
-        const brex::ASCIIString value;
+        const brex::CString value;
 
-        SegmentLiteralComponent(brex::ASCIIString value) : SegmentGlobCompnent(GlobSegmentComponentTag::SEGMENT_LITERAL_TAG), value(value) {;}
+        SegmentLiteralComponent(brex::CString value) : SegmentGlobCompnent(GlobSegmentComponentTag::SEGMENT_LITERAL_TAG), value(value) {;}
         virtual ~SegmentLiteralComponent() {;}
 
         std::u8string toBSQONFormat() const override final

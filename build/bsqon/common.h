@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <list>
 
 #include "json.hpp"
 typedef nlohmann::json json;
@@ -22,7 +23,7 @@ typedef nlohmann::json json;
 
 namespace bsqon
 {
-    struct DateTime
+    struct TZDateTime
     {
         uint16_t year;   // Year since 1900
         uint8_t month;   // 0-11
@@ -34,14 +35,14 @@ namespace bsqon
         char* tzdata; //timezone name as spec in tzdata database
     };
 
-    struct UTCDateTime
+    struct TIATime
     {
         uint16_t year;   // Year since 1900
         uint8_t month;   // 0-11
         uint8_t day;     // 1-31
         uint8_t hour;    // 0-23
         uint8_t min;     // 0-59
-        uint8_t sec;     // 0-60
+        uint8_t sec;     // 0-59
     };
 
     struct PlainDate
@@ -78,26 +79,6 @@ namespace bsqon
         uint32_t hour;    
         uint32_t min;     
         uint32_t sec;     
-
-        char8_t sign;    // '+' or '-'
-    };
-
-    struct DeltaPlainDate
-    {
-        //Leading value is always in range -- e.g. if year is set then month must be 0-11, etc.
-        uint16_t year;   
-        uint16_t month;   
-        uint32_t day;     
-
-        char8_t sign;    // '+' or '-'
-    };
-
-    struct DeltaPlainTime
-    {
-        //Leading value is always in range -- e.g. if hour is set then min must be 0-59, etc.
-        uint32_t hour;
-        uint32_t min;
-        uint32_t sec;
 
         char8_t sign;    // '+' or '-'
     };

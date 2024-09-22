@@ -34,7 +34,7 @@ void yyerror(const char* s, ...);
 %}
 
 %x STRING
-%x ASCII_STRING
+%x CSTRING
 %x REGEX
 %x PATH_ITEM
 %x SHEBANG_LINE
@@ -63,7 +63,11 @@ TYPE_IDENTIFIER ([A-Z][a-zA-Z0-9_]*)
 "{" |
 "}" |
 "[" |
-"]" | 
+"]" |
+"(|" |
+"|)" |
+"[|" |
+"|]" | 
 "<" |
 ">"         { return yytext[0]; }
 
@@ -73,29 +77,22 @@ TYPE_IDENTIFIER ([A-Z][a-zA-Z0-9_]*)
 
 ":"         { return SYM_COLON; }
 ","         { return SYM_COMMA; }
-"&"         { return SYM_AMP; }
-"|"         { return SYM_BAR; }
 "="         { return SYM_EQUALS; }
 "."         { return SYM_DOT; }
-"_"         { return SYM_UNDERSCORE; }
 
  /* keywords */
-"something" { return KW_SOMETHING; }
-
-"nothing"   { return KW_NOTHING; }
-
-"false"     { return KW_FALSE; }
 
 "$npos"     { return KW_NPOS; }
 "$src"      { return KW_SRC; }
 "none"      { return KW_NONE; }
 "true"      { return KW_TRUE; } 
+"false"     { return KW_FALSE; }
 
-"err"       { return KW_ERR; }
-"let"       { return KW_LET; }
-
-"in"        { return KW_IN; }
+"some"      { return KW_SOME; }
 "ok"        { return KW_OK; }
+"fail"       { return KW_ERR; }
+"let"       { return KW_LET; }
+"in"        { return KW_IN; }
 
 "env"        { return KW_ENV; }
 
@@ -158,21 +155,21 @@ sha3"{"[a-zA-Z0-9]+        { yyerror("Missing close bracket"); return YYerror; }
 }
 
 <INITIAL>{
-'             { BEGIN(ASCII_STRING); string_buf_bs.len = 0; ByteStringStoreChar('\''); }
+'             { BEGIN(CSTRING); string_buf_bs.len = 0; ByteStringStoreChar('\''); }
 }
-<ASCII_STRING>{
-'             { BEGIN(INITIAL); ByteStringStoreChar('\''); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_ASCII_STRING; }
+<CSTRING>{
+'             { BEGIN(INITIAL); ByteStringStoreChar('\''); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_CSTRING; }
 <<EOF>>       { BEGIN(INITIAL); yyerror("Unclosed ASCIIString"); return YYEOF; }
 \n[ \t\r]*\\  { ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
-[ \t!-~]      { ByteStringStoreChar(yytext[0]); }
-.|\n          { yyerror("Invalid character (ignoring)"); return YYerror;}
+[ -~\t\n]     { ByteStringStoreChar(yytext[0]); }
+.             { yyerror("Invalid character (ignoring)"); return YYerror;}
 }
 
 <INITIAL>{
 "/"         { BEGIN(REGEX); string_buf_bs.len = 0; ByteStringStoreChar('/'); }
 }
 <REGEX>{
-"/"[ap]?    { BEGIN(INITIAL); ByteStringStoreText(yytext, yyleng); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_REGEX; }
+"/"[cp]?    { BEGIN(INITIAL); ByteStringStoreText(yytext, yyleng); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_REGEX; }
 <<EOF>>     { BEGIN(INITIAL); yyerror("Unclosed Regex"); return YYEOF; }
 \n          { yyerror("Newline in Regex"); return YYerror; }
 [!-~ \t]    { ByteStringStoreChar(yytext[0]); }
@@ -191,30 +188,26 @@ sha3"{"[a-zA-Z0-9]+        { yyerror("Missing close bracket"); return YYerror; }
 }
 
  /* dates */
-{DATE}T{TIME}@{TZNAME} { yylval.str = AST_STRDUP(yytext); return TOKEN_DATE_TIME; }
-{DATE}T{TIME}Z?        { yylval.str = AST_STRDUP(yytext); return TOKEN_UTC_DATE_TIME; }
+{DATE}T{TIME}@{TZNAME} { yylval.str = AST_STRDUP(yytext); return TOKEN_TZ_DATE_TIME; }
+{DATE}T{TIME}Z?        { yylval.str = AST_STRDUP(yytext); return TOKEN_TIA_TIME; }
 {DATE}                 { yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_DATE; }
 {TIME}                 { yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_TIME; }
 
-(0|{NON_ZERO_INTEGRAL})t { yylval.str = AST_STRDUP(yytext); return TOKEN_TICK_TIME; }
 (0|{NON_ZERO_INTEGRAL})l { yylval.str = AST_STRDUP(yytext); return TOKEN_LOGICAL_TIME; }
 
-[+-]0[tl]                                        { yyerror("Cannot have sign/negative time"); return YYerror; }
-[+-]{NON_ZERO_INTEGRAL}[tl]                      { yyerror("Cannot have sign/negative time"); return YYerror; }
-0+{NON_ZERO_INTEGRAL}[tl]                        { yyerror("Leading zero is not allowed"); return YYerror; }
-[+-]?00+[tl]                                     { yyerror("Leading zero is not allowed"); return YYerror; }
+[+-]0[l]                                        { yyerror("Cannot have sign/negative time"); return YYerror; }
+[+-]{NON_ZERO_INTEGRAL}[l]                      { yyerror("Cannot have sign/negative time"); return YYerror; }
+0+{NON_ZERO_INTEGRAL}[l]                        { yyerror("Leading zero is not allowed"); return YYerror; }
+[+-]?00+[l]                                     { yyerror("Leading zero is not allowed"); return YYerror; }
 
 {DATE}T{TIME}("."[0-9]{3})Z { yylval.str = AST_STRDUP(yytext); return TOKEN_TIMESTAMP; }
 
  /* deltas */
-[+-]{DATE}T{TIME} { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_DATE_TIME; }
-[+-]{DATE}        { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_PLAIN_DATE; }
-[+-]{TIME}        { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_PLAIN_TIME; }
-
-[+-]{DATE}T{TIME}("."[0-9]{3})           { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_ISOTIMESTAMP; }
+[+-]{DATE}T{TIME}                        { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_DATE_TIME; }
 [+-]{NON_ZERO_INTEGRAL}"."[0-9]{1,4}"ds" { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_SECONDS; }
-[+-]{NON_ZERO_INTEGRAL}"dt"              { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_TICK; }
 [+-]{NON_ZERO_INTEGRAL}"dl"              { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_LOGICAL; }
+[+-]{DATE}T{TIME}("."[0-9]{3})           { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_ISOTIMESTAMP; }
+
 
 <INITIAL>{
 "#!"          { BEGIN(SHEBANG_LINE); string_buf_bs.len = 0; ByteStringStoreText(yytext, yyleng); }
@@ -226,37 +219,8 @@ sha3"{"[a-zA-Z0-9]+        { yyerror("Missing close bracket"); return YYerror; }
 }
 
  /* names */
-{IDENTIFIER} { 
-    size_t conflict = isSpecialTypedLiteralIdConflict(yytext);
-    if(conflict != 0) {
-        char buff[16];
-        memcpy(buff, yytext, conflict);
-
-        yyless(strlen(yytext) - conflict);
-        if(strncmp("none", buff, 4) == 0) {
-            return KW_NONE;
-        }
-        else if(strncmp("true", buff, 4) == 0) {
-            return KW_TRUE;
-        }
-        else if(strncmp("false", buff, 5) == 0) {
-            return KW_FALSE;
-        }
-        else {
-            return KW_NOTHING;
-        }
-    } 
-    else { 
-        yylval.str = AST_STRDUP(yytext); 
-        return TOKEN_IDENTIFIER; 
-    } 
-  }
-
-"$?"{IDENTIFIER} { 
-    yylval.str = AST_STRDUP(yytext); 
-    return TOKEN_UNSPEC_IDENTIFIER; 
-  }
-
+{IDENTIFIER}                            { yylval.str = AST_STRDUP(yytext); return TOKEN_IDENTIFIER; } 
+"$?"{IDENTIFIER}                        { yylval.str = AST_STRDUP(yytext); return TOKEN_UNSPEC_IDENTIFIER; }
 {TYPE_IDENTIFIER}(::{TYPE_IDENTIFIER})* { yylval.str = AST_STRDUP(yytext); return TOKEN_TYPE_COMPONENT; }
 
  /* comments */
@@ -264,7 +228,7 @@ sha3"{"[a-zA-Z0-9]+        { yyerror("Missing close bracket"); return YYerror; }
 
 [ \t\n\r]   { } /* ignore white space */ 
 
-.	{ return yytext[0]; } /* catch all and error in parser */
+. { return yytext[0]; } /* catch all and error in parser */
 
 %%
 

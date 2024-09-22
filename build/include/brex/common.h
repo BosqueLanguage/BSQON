@@ -28,8 +28,8 @@ namespace brex
     typedef std::u8string UnicodeString;
     typedef char8_t UnicodeStringChar;
 
-    typedef std::string ASCIIString;
-    typedef char ASCIIStringChar;
+    typedef std::string CString;
+    typedef char CStringChar;
 
     typedef uint32_t RegexChar;
 
@@ -109,26 +109,26 @@ namespace brex
         }
     };
 
-    class ASCIIRegexIterator
+    class CRegexIterator
     {
     public:
-        const ASCIIString* sstr;
+        const CString* sstr;
         
         int64_t spos; //the first position where the iterator is valid (inclusive)
         int64_t epos; //the last position where the iterator is valid (exclusive)
 
         int64_t curr;
 
-        ASCIIRegexIterator() : sstr(nullptr), spos(0), epos(-1), curr(0) {;}
-        ASCIIRegexIterator(const ASCIIString* sstr) : sstr(sstr), spos(0), epos(sstr->size() - 1), curr(0) {;}
-        ASCIIRegexIterator(const ASCIIString* sstr, int64_t spos, int64_t epos, int64_t curr) : sstr(sstr), spos(spos), epos(epos), curr(curr) {;}
-        ~ASCIIRegexIterator() = default;
+        CRegexIterator() : sstr(nullptr), spos(0), epos(-1), curr(0) {;}
+        CRegexIterator(const CString* sstr) : sstr(sstr), spos(0), epos(sstr->size() - 1), curr(0) {;}
+        CRegexIterator(const CString* sstr, int64_t spos, int64_t epos, int64_t curr) : sstr(sstr), spos(spos), epos(epos), curr(curr) {;}
+        ~CRegexIterator() = default;
 
-        ASCIIRegexIterator(const ASCIIRegexIterator& other) = default;
-        ASCIIRegexIterator(ASCIIRegexIterator&& other) = default;
+        CRegexIterator(const CRegexIterator& other) = default;
+        CRegexIterator(CRegexIterator&& other) = default;
 
-        ASCIIRegexIterator& operator=(const ASCIIRegexIterator& other) = default;
-        ASCIIRegexIterator& operator=(ASCIIRegexIterator&& other) = default;
+        CRegexIterator& operator=(const CRegexIterator& other) = default;
+        CRegexIterator& operator=(CRegexIterator&& other) = default;
         
         inline bool valid() const
         {
@@ -157,44 +157,46 @@ namespace brex
     bool isHexEscapePrefix(const uint8_t* s, const uint8_t* e);
     std::optional<RegexChar> decodeHexEscapeAsRegex(const uint8_t* s, const uint8_t* e);
     std::optional<UnicodeString> decodeHexEscapeAsUnicode(const uint8_t* s, const uint8_t* e);
-    std::optional<ASCIIString> decodeHexEscapeAsASCII(const uint8_t* s, const uint8_t* e, bool strict);
+    std::optional<CString> decodeHexEscapeAsC(const uint8_t* s, const uint8_t* e);
     std::vector<uint8_t> extractRegexCharToBytes(RegexChar rc); //utf8 encoded but no escaping
 
     //Take a bytebuffer (of utf8 bytes) with escapes and convert to/from a UnicodeString
-    std::optional<UnicodeString> unescapeUnicodeString(const uint8_t* bytes, size_t length);
+    std::pair<std::optional<UnicodeString>, std::optional<std::u8string>> unescapeUnicodeString(const uint8_t* bytes, size_t length);
+    std::pair<std::optional<UnicodeString>, std::optional<std::u8string>> unescapeUnicodeStringLiteralInclMultiline(const uint8_t* bytes, size_t length);
     std::vector<uint8_t> escapeUnicodeString(const UnicodeString& sv);
 
-    //Take a bytebuffer (of ascii bytes) with escapes and convert to/from an ASCIIString
-    std::optional<ASCIIString> unescapeASCIIString(const uint8_t* bytes, size_t length, bool strict);
-    std::vector<uint8_t> escapeASCIIString(const ASCIIString& sv);
+    //Take a bytebuffer (of char bytes) with escapes and convert to/from an CString
+    std::pair<std::optional<CString>, std::optional<std::u8string>> unescapeCString(const uint8_t* bytes, size_t length);
+    std::pair<std::optional<CString>, std::optional<std::u8string>> unescapeCStringLiteralInclMultiline(const uint8_t* bytes, size_t length);
+    std::vector<uint8_t> escapeCString(const CString& sv);
 
-    //Take a bytebuffer regex literal (of utf8 bytes or ascii bytes) with escapes and convert to/from a vector of RegexChars
+    //Take a bytebuffer regex literal (of utf8 bytes or chat bytes) with escapes and convert to/from a vector of RegexChars
     std::optional<std::vector<RegexChar>> unescapeUnicodeRegexLiteral(const uint8_t* bytes, size_t length);
-    std::optional<std::vector<RegexChar>> unescapeASCIIRegexLiteral(const uint8_t* bytes, size_t length, bool strict);
+    std::optional<std::vector<RegexChar>> unescapeCRegexLiteral(const uint8_t* bytes, size_t length);
 
-    //Take a bytebuffer regex char range element (of utf8 bytes or ascii bytes) with escapes and convert to a RegexChar
+    //Take a bytebuffer regex char range element (of utf8 bytes or char bytes) with escapes and convert to a RegexChar
     std::optional<RegexChar> unescapeSingleUnicodeRegexChar(const uint8_t* s, const uint8_t* e);
-    std::optional<RegexChar> unescapeSingleASCIIRegexChar(const uint8_t* s, const uint8_t* e, bool strict);
+    std::optional<RegexChar> unescapeSingleCRegexChar(const uint8_t* s, const uint8_t* e);
 
     std::vector<uint8_t> escapeSingleUnicodeRegexChar(RegexChar c);
     std::vector<uint8_t> escapeRegexUnicodeLiteralCharBuffer(const std::vector<RegexChar>& sv);
 
-    std::vector<uint8_t> escapeSingleASCIIRegexChar(RegexChar c);
-    std::vector<uint8_t> escapeRegexASCIILiteralCharBuffer(const std::vector<RegexChar>& sv);
+    std::vector<uint8_t> escapeSingleCRegexChar(RegexChar c);
+    std::vector<uint8_t> escapeRegexCLiteralCharBuffer(const std::vector<RegexChar>& sv);
 
     //In the parser if we find an invalid literal character or code then generate the right way to escape it for a nice error msg
     std::u8string parserGenerateDiagnosticUnicodeEscapeName(uint8_t c);
-    std::u8string parserGenerateDiagnosticASCIIEscapeName(uint8_t c);
+    std::u8string parserGenerateDiagnosticCEscapeName(uint8_t c);
     std::u8string parserGenerateDiagnosticEscapeCode(uint8_t c);
 
     //If we have decode failures then go through and generate nice messages for them
-    std::vector<std::u8string> parserValidateEscapeSequences(bool isascii, bool strict, const uint8_t* s, const uint8_t* e);
+    std::vector<std::u8string> parserValidateEscapeSequences(bool ischar, const uint8_t* s, const uint8_t* e);
 
-    //Scan the string and ensure that there are no multibyte chars that have messed up encodings -- or that the string is only ascii chars
+    //Scan the string and ensure that there are no multibyte chars that have messed up encodings -- or that the string is only char chars
     std::optional<std::u8string> parserValidateUTF8ByteEncoding(const uint8_t* s, const uint8_t* e);
-    std::optional<std::u8string> parserValidateAllASCIIEncoding(const uint8_t* s, const uint8_t* e);
+    std::optional<std::u8string> parserValidateAllCEncoding(const uint8_t* s, const uint8_t* e);
 
     std::optional<std::u8string> parserValidateUTF8ByteEncoding_SingleChar(const uint8_t* s, const uint8_t* epos);
-    std::optional<std::u8string> parserValidateAllASCIIEncoding_SingleChar(const uint8_t* s, const uint8_t* epos, bool strict);
+    std::optional<std::u8string> parserValidateAllCEncoding_SingleChar(const uint8_t* s, const uint8_t* epos);
 }
 

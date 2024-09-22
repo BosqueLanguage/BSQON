@@ -5,21 +5,21 @@ namespace bsqon
     StringValue* StringValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
         auto sv = brex::unescapeUnicodeString(bytes, length);
-        if(!sv.has_value()) {
+        if(!sv.first.has_value()) {
             return nullptr;
         }
 
-        return new StringValue(vtype, spos, std::move(sv.value()));
+        return new StringValue(vtype, spos, std::move(sv.first.value()));
     }
 
-    ASCIIStringValue* ASCIIStringValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
+    CStringValue* CStringValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
-        auto sv = brex::unescapeASCIIString(bytes, length, false);
-        if(!sv.has_value()) {
+        auto sv = brex::unescapeCString(bytes, length);
+        if(!sv.first.has_value()) {
             return nullptr;
         }
 
-        return new ASCIIStringValue(vtype, spos, std::move(sv.value()));
+        return new CStringValue(vtype, spos, std::move(sv.first.value()));
     }
 
     uint8_t ByteBufferValue::extractByteValue(char hb, char lb)
@@ -57,7 +57,7 @@ namespace bsqon
 
     UnicodeRegexValue* UnicodeRegexValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
-        auto re = brex::RegexParser::parseRegex((uint8_t*)bytes, length, true, false, false, true);
+        auto re = brex::RegexParser::parseRegex((uint8_t*)bytes, length, true, false, false);
         if(!re.first.has_value()) {
             return nullptr;
         }
@@ -66,20 +66,20 @@ namespace bsqon
         return new UnicodeRegexValue(vtype, spos, re.first.value(), normalizedre);
     }
 
-    ASCIIRegexValue* ASCIIRegexValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
+    CRegexValue* CRegexValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
-        auto re = brex::RegexParser::parseRegex((uint8_t*)bytes, length, false, true, false, true);
+        auto re = brex::RegexParser::parseRegex((uint8_t*)bytes, length, false, true, false);
         if(!re.first.has_value()) {
             return nullptr;
         }
 
         auto normalizedre = re.first.value()->toBSQONFormat();
-        return new ASCIIRegexValue(vtype, spos, re.first.value(), normalizedre);
+        return new CRegexValue(vtype, spos, re.first.value(), normalizedre);
     }
 
     PathRegexValue* PathRegexValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
-        auto re = brex::RegexParser::parseRegex((uint8_t*)bytes, length, false, true, true, true);
+        auto re = brex::RegexParser::parseRegex((uint8_t*)bytes, length, false, true, true);
         if(!re.first.has_value()) {
             return nullptr;
         }
@@ -88,31 +88,7 @@ namespace bsqon
         return new PathRegexValue(vtype, spos, re.first.value(), normalizedre);
     }
 
-    StringOfValue* StringOfValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length, const brex::Regex* validator, brex::UnicodeRegexExecutor* executor)
-    {
-        auto sv = brex::unescapeUnicodeString(bytes, length);
-        if(!sv.has_value()) {
-            return nullptr;
-        }
-
-        brex::ExecutorError error;
-        bool accepts = executor->test(&sv.value(), error);
-        return (accepts && error == brex::ExecutorError::Ok) ? new StringOfValue(vtype, spos, std::move(sv.value())) : nullptr;
-    }
-
-    ASCIIStringOfValue* ASCIIStringOfValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length, const brex::Regex* validator, brex::ASCIIRegexExecutor* executor)
-    {
-        auto sv = brex::unescapeASCIIString(bytes, length, false);
-        if(!sv.has_value()) {
-            return nullptr;
-        }
-
-        brex::ExecutorError error;
-        bool accepts = executor->test(&sv.value(), error);
-        return (accepts && error == brex::ExecutorError::Ok) ? new ASCIIStringOfValue(vtype, spos, std::move(sv.value())) : nullptr;
-    }
-
-    PathValue* PathValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length, const bpath::PathGlob* validator)
+    PathValue* PathValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
     {
         //
         //TODO: path parser and validator implementation needed
@@ -120,7 +96,7 @@ namespace bsqon
         return nullptr;
     }
 
-    PathFragmentValue* PathFragmentValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length, const bpath::PathGlob* validator)
+    PathItemValue* PathItemValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
     {
         //
         //TODO: path parser and validator implementation needed
@@ -128,7 +104,7 @@ namespace bsqon
         return nullptr;
     }
 
-    PathGlobValue* PathGlobValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length, const bpath::PathGlob* validator)
+    GlobValue* GlobValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* chars, size_t length)
     {
         //
         //TODO: path parser and validator implementation needed
@@ -137,23 +113,29 @@ namespace bsqon
     }
 
     std::vector<TypeKey> s_known_key_order = {
-        "None",
-        "Bool",
-        "Nat",
-        "Int",
+        "Bool", 
+        "Nat", 
+        "Int", 
+        "BigInt", 
         "BigNat",
-        "BigInt",
-        "String",
-        "ASCIIString",
-        "UTCDateTime",
-        "PlainDate",
-        "PlainTime",
-        "TickTime",
-        "LogicalTime",
-        "ISOTimeStamp",
-        "UUIDv4",
-        "UUIDv7",
-        "SHAContentHash"
+        "UUIDv4", 
+        "UUIDv7", 
+        "SHAContentHash", 
+        "TZDateTime", 
+        "TAITime", 
+        "PlainDate", 
+        "PlainTime", 
+        "LogicalTime", 
+        "ISOTimestamp",
+        "DeltaDateTime", 
+        "DeltaSeconds", 
+        "DeltaLogicalTime", 
+        "DeltaISOTimestamp",
+        "String", 
+        "CString", 
+        "Path", 
+        "PathItem", 
+        "Glob"
     };
 
     int Value::keyCompare(const Value* v1, const Value* v2)
@@ -179,10 +161,7 @@ namespace bsqon
             const std::string dtype = v1->vtype->tkey;
 
             if(v1->vtype->tag == TypeTag::TYPE_PRIMITIVE) {
-                if(dtype == "None") {
-                    return false;
-                }
-                else if(dtype == "Bool") {
+                if(dtype == "Bool") {
                     return BoolValue::keyCompare(static_cast<const BoolValue*>(v1), static_cast<const BoolValue*>(v2));
                 }
                 else if(dtype == "Nat") {
@@ -197,12 +176,6 @@ namespace bsqon
                 else if(dtype == "BigInt") {
                     return BigIntNumberValue::keyCompare(static_cast<const BigIntNumberValue*>(v1), static_cast<const BigIntNumberValue*>(v2));
                 }
-                else if(dtype == "String") {
-                    return StringValue::keyCompare(static_cast<const StringValue*>(v1), static_cast<const StringValue*>(v2));
-                }
-                else if(dtype == "ASCIIString") {
-                    return ASCIIStringValue::keyCompare(static_cast<const ASCIIStringValue*>(v1), static_cast<const ASCIIStringValue*>(v2));
-                }
                 else if(dtype == "UUIDv4") {
                     return UUIDv4Value::keyCompare(static_cast<const UUIDv4Value*>(v1), static_cast<const UUIDv4Value*>(v2));
                 }
@@ -212,8 +185,8 @@ namespace bsqon
                 else if(dtype == "SHAContentHash") {
                     return SHAContentHashValue::keyCompare(static_cast<const SHAContentHashValue*>(v1), static_cast<const SHAContentHashValue*>(v2));
                 }
-                else if(dtype == "UTCDateTime") {
-                    return UTCDateTimeValue::keyCompare(static_cast<const UTCDateTimeValue*>(v1), static_cast<const UTCDateTimeValue*>(v2));
+                else if(dtype == "TZDateTime") {
+                    return TZDateTimeValue::keyCompare(static_cast<const TZDateTimeValue*>(v1), static_cast<const TZDateTimeValue*>(v2));
                 }
                 else if(dtype == "PlainDate") {
                     return PlainDateValue::keyCompare(static_cast<const PlainDateValue*>(v1), static_cast<const PlainDateValue*>(v2));
@@ -221,24 +194,39 @@ namespace bsqon
                 else if(dtype == "PlainTime") {
                     return PlainTimeValue::keyCompare(static_cast<const PlainTimeValue*>(v1), static_cast<const PlainTimeValue*>(v2));
                 }
-                else if(dtype == "TickTime") {
-                    return TickTimeValue::keyCompare(static_cast<const TickTimeValue*>(v1), static_cast<const TickTimeValue*>(v2));
-                }
                 else if(dtype == "LogicalTime") {
                     return LogicalTimeValue::keyCompare(static_cast<const LogicalTimeValue*>(v1), static_cast<const LogicalTimeValue*>(v2));
                 }
-                else if(dtype == "Regex") {
-                    return UnicodeRegexValue::keyCompare(static_cast<const UnicodeRegexValue*>(v1), static_cast<const UnicodeRegexValue*>(v2));
+                else if(dtype == "ISOTimestamp") {
+                    return ISOTimeStampValue::keyCompare(static_cast<const ISOTimeStampValue*>(v1), static_cast<const ISOTimeStampValue*>(v2));
                 }
-                else if(dtype == "ASCIIRegex") {
-                    return ASCIIRegexValue::keyCompare(static_cast<const ASCIIRegexValue*>(v1), static_cast<const ASCIIRegexValue*>(v2));
+                else if(dtype == "DeltaDateTime") {
+                    return DeltaDateTimeValue::keyCompare(static_cast<const DeltaDateTimeValue*>(v1), static_cast<const DeltaDateTimeValue*>(v2));
                 }
-                else if(dtype == "PathRegex") {
-                    return PathRegexValue::keyCompare(static_cast<const PathRegexValue*>(v1), static_cast<const PathRegexValue*>(v2));
+                else if(dtype == "DeltaSeconds") {
+                    return DeltaSecondsValue::keyCompare(static_cast<const DeltaSecondsValue*>(v1), static_cast<const DeltaSecondsValue*>(v2));
+                }
+                else if(dtype == "DeltaLogicalTime") {
+                    return DeltaLogicalTimeValue::keyCompare(static_cast<const DeltaLogicalTimeValue*>(v1), static_cast<const DeltaLogicalTimeValue*>(v2));
+                }
+                else if(dtype == "DeltaISOTimestamp") {
+                    return DeltaISOTimeStampValue::keyCompare(static_cast<const DeltaISOTimeStampValue*>(v1), static_cast<const DeltaISOTimeStampValue*>(v2));
+                }
+                else if(dtype == "String") {
+                    return StringValue::keyCompare(static_cast<const StringValue*>(v1), static_cast<const StringValue*>(v2));
+                }
+                else if(dtype == "CString") {
+                    return CStringValue::keyCompare(static_cast<const CStringValue*>(v1), static_cast<const CStringValue*>(v2));
+                }
+                else if(dtype == "Path") {
+                    return PathValue::keyCompare(static_cast<const PathValue*>(v1), static_cast<const PathValue*>(v2));
+                }
+                else if(dtype == "PathItem") {
+                    return PathItemValue::keyCompare(static_cast<const PathItemValue*>(v1), static_cast<const PathItemValue*>(v2));
                 }
                 else {
-                    //should be ISOTimestamp
-                    return ISOTimeStampValue::keyCompare(static_cast<const ISOTimeStampValue*>(v1), static_cast<const ISOTimeStampValue*>(v2));
+                    //should be Glob
+                    return GlobValue::keyCompare(static_cast<const GlobValue*>(v1), static_cast<const GlobValue*>(v2));
                 }
             }
             else {
@@ -246,19 +234,9 @@ namespace bsqon
                 {
                 case TypeTag::TYPE_ENUM:
                     return EnumValue::keyCompare(static_cast<const EnumValue*>(v1), static_cast<const EnumValue*>(v2));
-                case TypeTag::TYPE_STRING_OF:
-                    return StringOfValue::keyCompare(static_cast<const StringOfValue*>(v1), static_cast<const StringOfValue*>(v2));
-                case TypeTag::TYPE_ASCII_STRING_OF:
-                    return ASCIIStringOfValue::keyCompare(static_cast<const ASCIIStringOfValue*>(v1), static_cast<const ASCIIStringOfValue*>(v2));
-                case TypeTag::TYPE_PATH:
-                    return PathValue::keyCompare(static_cast<const PathValue*>(v1), static_cast<const PathValue*>(v2));
-                case TypeTag::TYPE_PATH_FRAGMENT:
-                    return PathFragmentValue::keyCompare(static_cast<const PathFragmentValue*>(v1), static_cast<const PathFragmentValue*>(v2));
-                case TypeTag::TYPE_PATH_GLOB:
-                    return PathGlobValue::keyCompare(static_cast<const PathGlobValue*>(v1), static_cast<const PathGlobValue*>(v2));
                 default:
                     //it must be a typedecl
-                    return Value::keyCompare(static_cast<const TypedeclValue*>(v1)->basevalue, static_cast<const TypedeclValue*>(v2)->basevalue);
+                    return Value::keyCompare(static_cast<const TypedeclValue*>(v1)->pvalue, static_cast<const TypedeclValue*>(v2)->pvalue);
                 }
             }
         }
