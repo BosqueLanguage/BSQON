@@ -1,6 +1,9 @@
 
 #include "type_info.h"
 
+//DEBUGGING
+#include <iostream>
+
 namespace bsqon 
 {
     static AssemblyInfo g_assembly;
@@ -88,7 +91,7 @@ namespace bsqon
         std::string ttag = j["tag"].get<std::string>();
         TypeTag tt = convertTagNameToEnum(ttag);
 
-        auto annotations = j.contains("annotations") && !j["annotations"].is_null() ? TypeAnnotationInfo::parse(j["annotations"]) : TypeAnnotationInfo(false, "", std::nullopt);
+        auto annotations = j.contains("annotations") && !j["annotations"].is_null() ? TypeAnnotationInfo::parse(j["annotations"]) : TypeAnnotationInfo("", std::nullopt);
         
         std::vector<TypeKey> supertypes;
         if(j.contains("supertypes") && !j["supertypes"].is_null()) {
@@ -105,11 +108,11 @@ namespace bsqon
                 std::vector<EntityTypeFieldEntry> fields;
                 std::transform(j["fields"].begin(), j["fields"].end(), std::back_inserter(fields), [](const json& jv) {
                     FieldAnnotationInfo fsannotation("", std::nullopt);
-                    if(jv.contains("fsannotation") && !jv["ssannotation"].is_null()) {
+                    if(jv.contains("fsannotation") && !jv["fsannotation"].is_null()) {
                         fsannotation = FieldAnnotationInfo::parse(jv["fsannotation"]);
                     }
 
-                    return EntityTypeFieldEntry(jv["fname"].get<std::string>(), jv["ftype"].get<TypeKey>(), fsannotation); 
+                    return EntityTypeFieldEntry(jv["fname"].get<std::string>(), jv["ftype"].get<TypeKey>(), jv["isoptional"].get<bool>(), fsannotation); 
                 });
                 bool hasvalidations = j["hasvalidations"].get<bool>();
                 return new StdEntityType(j["tkey"].get<TypeKey>(), supertypes, annotations, fields, hasvalidations);

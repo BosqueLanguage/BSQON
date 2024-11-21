@@ -31,6 +31,8 @@
 *.out
 *.app
 
+.vscode/
+
 # allow bin lib
 !build/include/brex/libbrex.a
 

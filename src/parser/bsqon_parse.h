@@ -84,7 +84,7 @@ namespace bsqon
     public:
         AssemblyInfo* assembly;
 
-        const std::string defaultns;
+        std::string defaultns;
         std::map<std::string, std::string> importmap;
         std::set<std::string> tzset;
 
@@ -97,7 +97,7 @@ namespace bsqon
 
         std::list<ParseValidateCallbackInfo> validatecallbacks;
 
-        Parser(const AssemblyInfo* assembly) {;}
+        Parser(AssemblyInfo* assembly): assembly(assembly) {;}
         virtual ~Parser() = default;
 
         const Type* resolveTypeFromNameList(std::string basenominal, std::vector<const Type*> terms);
