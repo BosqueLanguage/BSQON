@@ -232,12 +232,12 @@ int main(int argc, char** argv, char **envp)
             }
         }
 
-            for(size_t i = 0; i < parser.errors.size(); ++i) {
-                const bsqon::ParseError& pe = parser.errors.at(i);
-                printf("%s -- line %u\n", pe.message.c_str(), pe.loc.first_line);
-            }
-
-            fflush(stdout);
-            exit(1);
+        for(size_t i = 0; i < parser.errors.size(); ++i) {
+            const bsqon::ParseError& pe = parser.errors.at(i);
+            printf("%s -- line %u\n", pe.message.c_str(), pe.loc.first_line);
         }
+
+        fflush(stdout);
+        exit(1);
+    }
 }
