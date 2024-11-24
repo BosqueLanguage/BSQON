@@ -2,4 +2,4 @@
 #include "../src/info/bsqon.h"
 #include "bsqon_parse.h"
 
-bool tround(char* metafile, char* type, char* datafile, std::string& err);
+void tround(char* metafile, char* type, char* datafile, std::u8string& contents, std::u8string& result);

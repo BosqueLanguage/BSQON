@@ -9,9 +9,10 @@ void loadAssemblyJSONExplicit(const char* filename, json& jv)
     infile >> jv;
 }
 
-std::string wsnorm(const std::string& s) {
+std::u8string wsnorm(const std::u8string& s) {
     std::regex reg(R"(\s+)");
-    std::string ss = std::regex_replace(s, reg, " ");
+    std::string ssuu = std::string(s.cbegin(), s.cend());
+    std::string ss = std::regex_replace(ssuu, reg, " ");
 
     if(ss.starts_with(" ")) {
         ss = ss.substr(1);
@@ -21,31 +22,26 @@ std::string wsnorm(const std::string& s) {
         ss = ss.substr(0, ss.size() - 1);
     }
 
-    return ss;
+    return std::u8string(ss.cbegin(), ss.cend());
 }
 
-bool compareToOrig(const std::string& rstr, char* datafile, std::string& err) {
-    std::string origstr;
-    std::ifstream infile(datafile);
-    infile >> origstr;
-
-    std::string s = wsnorm(rstr);
-    std::string o = wsnorm(origstr);
-
-    if(rstr == origstr) {
-        return true;
-    }
-    else {
-        err = "Expected:\n" + o + "\n\nGot:\n" + s;
-        
-        return false;
-    }
-}
-
-bool tround(char* metafile, char* type, char* datafile, std::string& err)
+void loadContents(const char* filename, std::u8string& contents)
 {
-    err = "";
-    std::string metadata, type, data;
+    std::string line;
+    std::ifstream rfile;
+    rfile.open(filename);
+    while (std::getline(rfile, line)) {
+        contents += std::u8string(line.cbegin(), line.cend());
+    }
+    rfile.close();
+
+    contents = wsnorm(contents);
+}
+
+void tround(char* metafile, char* type, char* datafile, std::u8string& contents, std::u8string& result)
+{
+    result = u8"";
+    std::string metadata;
     
     //the property value is the BSQON value (as a JSON string) so parse it
     const BSQON_AST_Node* node = BSQON_AST_parse_from_file(datafile);
@@ -53,12 +49,12 @@ bool tround(char* metafile, char* type, char* datafile, std::string& err)
     size_t errorInfoCount = BSQON_AST_getErrorInfo(errorInfo);
 
     if(node == nullptr) {
-        for(size_t i = 0; i < errorInfoCount; ++i) {
-            err += ("++ %s\n", errorInfo[i]);
-        }
-
-        return false;
+        auto sstr = std::string(errorInfo[0]);
+        result = std::u8string(sstr.cbegin(), sstr.cend());
+        return;
     }
+
+    loadContents(datafile, contents);
 
     //parse the JSON 
     json jv = nullptr;
@@ -71,11 +67,12 @@ bool tround(char* metafile, char* type, char* datafile, std::string& err)
     bsqon::Parser parser(&assembly);
 
     //the property loadtype is the type so look it up
-    auto loadtype = assembly.lookupTypeKey(type);
+    std::string typestr = std::string(type);
+    auto loadtype = assembly.lookupTypeKey(typestr);
 
     if(loadtype->isUnresolved()) {
-        printf("Invalid 'loadtype'\n");
-        exit(1);
+        result = u8"Invalid 'loadtype";
+        return;
     }
     
     auto ccpos = loadtype->tkey.find("::");
@@ -94,23 +91,21 @@ bool tround(char* metafile, char* type, char* datafile, std::string& err)
 
     if(parser.errors.empty() && errorInfoCount == 0) {
         std::u8string rstr = res->toString();
-        std::string sstr(rstr.begin(), rstr.end());
 
-        return compareToOrig(sstr, datafile, err);
+        result = wsnorm(rstr);
+        return;
     }
     else {
         for(size_t i = 0; i < errorInfoCount; ++i) {
             std::string sstr(errorInfo[i]);
-            if(!sstr.starts_with("syntax error")) {
-                err += ("%s\n", sstr.c_str());
-            }
+            result += std::u8string(sstr.cbegin(), sstr.cend());
         }
 
         for(size_t i = 0; i < parser.errors.size(); ++i) {
             const bsqon::ParseError& pe = parser.errors.at(i);
-            err += ("%s -- line %u\n", pe.message.c_str(), pe.loc.first_line);
+            result = std::u8string(pe.message.cbegin(), pe.message.cend());
         }
 
-        return false;
+        return;
    }
 }

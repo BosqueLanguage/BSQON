@@ -1,0 +1,17 @@
+declare namespace Main;
+
+public function main(): None {
+    var b: Bool;
+
+    var n: Nat;
+    var i: Int;
+    var bn: BigNat;
+    var bi: BigInt;
+
+    var f: Float;
+
+    var s: String;
+    var cs: CString;
+
+    return none;
+}

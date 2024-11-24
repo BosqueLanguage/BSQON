@@ -73,6 +73,7 @@
         "charconv": "cpp",
         "source_location": "cpp",
         "shared_mutex": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "*.ipp": "cpp"
     }
 }

@@ -16,7 +16,8 @@ BREX_INCLUDES=-I $(BUILD_DIR)include/brex/
 BREX_PATH=$(BUILD_DIR)include/brex/
 LIB_PATH=$(OUT_EXE)
 
-BSQON_TEST_SRC_DIR=$(MAKE_PATH)/../test/bsqon/
+BSQON_TEST_DIR=$(MAKE_PATH)/../test/
+BSQON_TEST_SRC_DIR=$(BSQON_TEST_DIR)utests/
 
 #dev is default, for another flavor : make BUILD=release or debug
 BUILD := dev
@@ -53,7 +54,7 @@ BSQON_HEADERS=$(SRC_DIR)common.h $(INFO_DIR)type_info.h $(INFO_DIR)bsqon.h $(PAR
 BSQON_SOURCES=$(INFO_DIR)type_info.cpp $(INFO_DIR)bsqon.cpp $(PARSER_DIR)bsqon_parse.cpp
 BSQON_OBJS=$(OUT_OBJ)type_info.o $(OUT_OBJ)bsqon.o $(OUT_OBJ)bsqon_parse.o
 
-BSQON_TEST_SOURCES=$(BSQON_TEST_SRC_DIR)main.cpp
+BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp
 
 MAKEFLAGS += -j4
 
@@ -118,10 +119,11 @@ $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	flex --warn -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
 
-
-testfiles: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_SOURCES)
+testfiles: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)test_driver.h $(BSQON_TEST_SOURCES)
 	@mkdir -p $(BIN_DIR)
-	$(CPP) $(CPPFLAGS_TEST) -L$(LIB_PATH) $(JSON_INCLUDES) -o $(BIN_DIR)bsqon_test $(BSQON_TEST_SOURCES) $(OUT_EXE)libbsqon.a -lboost_unit_test_framework
+	cp $(BSQON_TEST_DIR)asm_meta/ $(BIN_DIR)asm_meta/
+	cp $(BSQON_TEST_DIR)bsqon/ $(BIN_DIR)bsqon/
+	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH="$(BIN_DIR)" -L$(LIB_PATH) $(JSON_INCLUDES) -o $(BIN_DIR)bsqon_test $(BSQON_TEST_SOURCES) $(OUT_EXE)libbsqon.a -lboost_unit_test_framework
 
 test: testfiles
 	$(BIN_DIR)bsqon_test --report_level=short --color_output
