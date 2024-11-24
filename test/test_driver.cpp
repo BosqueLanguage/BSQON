@@ -1,9 +1,10 @@
 #include "test_driver.h"
 
+#include <filesystem>
 #include <iostream>
 #include <fstream>
 
-void loadAssemblyJSONExplicit(const char* filename, json& jv)
+void loadAssemblyJSONExplicit(std::string filename, json& jv)
 {
     std::ifstream infile(filename);
     infile >> jv;
@@ -25,7 +26,7 @@ std::u8string wsnorm(const std::u8string& s) {
     return std::u8string(ss.cbegin(), ss.cend());
 }
 
-void loadContents(const char* filename, std::u8string& contents)
+void loadContents(std::string filename, std::u8string& contents)
 {
     std::string line;
     std::ifstream rfile;
@@ -38,13 +39,23 @@ void loadContents(const char* filename, std::u8string& contents)
     contents = wsnorm(contents);
 }
 
-void tround(char* metafile, char* type, char* datafile, std::u8string& contents, std::u8string& result)
+void tround(std::string metafile, const char* type, std::string datafile, std::u8string& contents, std::u8string& result)
 {
     result = u8"";
     std::string metadata;
     
+    if(!std::filesystem::exists(metafile)) {
+        result = u8"Metadata file does not exist";
+        return;
+    }
+
+    if(!std::filesystem::exists(datafile)) {
+        result = u8"Data file does not exist";
+        return;
+    }
+
     //the property value is the BSQON value (as a JSON string) so parse it
-    const BSQON_AST_Node* node = BSQON_AST_parse_from_file(datafile);
+    const BSQON_AST_Node* node = BSQON_AST_parse_from_file(datafile.c_str());
     char** errorInfo = (char**)malloc(sizeof(char*) * 128);
     size_t errorInfoCount = BSQON_AST_getErrorInfo(errorInfo);
 

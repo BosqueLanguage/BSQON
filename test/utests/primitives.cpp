@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
+#include "../test_driver.h"
+
 void checkAndReport(const std::u8string& result, const std::u8string& expected) {
     if(result != expected) {
         std::cout << "Expected: " << std::string(expected.cbegin(), expected.cend()) << std::endl;
@@ -9,13 +11,21 @@ void checkAndReport(const std::u8string& result, const std::u8string& expected) 
     BOOST_ASSERT(result == expected);
 }
 
-void mprint()
+#ifndef TEST_PATH
+#define TEST_PATH "./"
+#endif
+
+std::string createMetaPathName()
 {
-    std::cout << "Hello, World -- " << TEST_PATH << std::endl;
+    return std::string(TEST_PATH) + "/asm_meta/primitives.json";
 }
 
-//#define TEST_PRIMITIVE(TY, BSQ) { std::string meta = std::string(TEST_PATH) + "/asm_meta/primitives.json"; std::string bsq = std::string(TEST_PATH) + "/bsqon/primitives/" + BSQ; std::u8string& result; std::u8string& expected; tround(meta.c_str(), TY, bsq, expected, result); checkAndReport(result, expected); }
-#define TEST_PRIMITIVE(TY, BSQ) { mprint(); }
+std::string createBSQONPathName(std::string bsq)
+{
+    return std::string(TEST_PATH) + "/bsqon/primitives/" + bsq;
+}
+
+#define TEST_PRIMITIVE(TY, BSQ) { std::u8string result; std::u8string expected; tround(createMetaPathName(), TY, createBSQONPathName(BSQ), expected, result); checkAndReport(result, expected); }
 
 BOOST_AUTO_TEST_SUITE(Primitives)
 

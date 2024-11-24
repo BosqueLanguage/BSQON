@@ -1,5 +1,5 @@
 #include "../src/info/type_info.h"
 #include "../src/info/bsqon.h"
-#include "bsqon_parse.h"
+#include "../src/parser/bsqon_parse.h"
 
-void tround(char* metafile, char* type, char* datafile, std::u8string& contents, std::u8string& result);
+void tround(std::string metafile, const char* type, std::string datafile, std::u8string& contents, std::u8string& result);
