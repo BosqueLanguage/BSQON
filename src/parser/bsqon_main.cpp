@@ -218,7 +218,7 @@ int main(int argc, char** argv, char **envp)
     bsqon::BsqonDecl* res = parser.parseBSQON(metadata, loadtype, node);
 
     if(parser.errors.empty() && errorInfoCount == 0) {
-        std::u8string rstr = res->toString();
+        std::u8string rstr = res->toString(false);
         printf("%s\n", (const char*)rstr.c_str());
 
         fflush(stdout);

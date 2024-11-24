@@ -1,12 +1,14 @@
 {
     "namespaces": [
         {
+            "istoplevel": true,
             "imports": [],
             "ns": "Main",
             "subns": [],
             "types": []
         },
         {
+            "istoplevel": true,
             "imports": [],
             "ns": "Core",
             "subns": [
@@ -33,39 +35,39 @@
             ],
             "types": [
                 [
-                    null,
+                    "None",
                     "None"
                 ],
                 [
-                    null,
+                    "Bool",
                     "Bool"
                 ],
                 [
-                    null,
+                    "Nat",
                     "Nat"
                 ],
                 [
-                    null,
+                    "Int",
                     "Int"
                 ],
                 [
-                    null,
+                    "BigNat",
                     "BigNat"
                 ],
                 [
-                    null,
+                    "BigInt",
                     "BigInt"
                 ],
                 [
-                    null,
+                    "Float",
                     "Float"
                 ],
                 [
-                    null,
+                    "String",
                     "String"
                 ],
                 [
-                    null,
+                    "CString",
                     "CString"
                 ]
             ]
@@ -77,64 +79,74 @@
             "attributes": {
                 "docstring": "%** Type for representing the none option value. **%"
             },
-            "tkey": "None"
+            "tkey": "None",
+            "name": "None"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive boolean value. **%"
             },
-            "tkey": "Bool"
+            "tkey": "Bool",
+            "name": "Bool"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive natural number value. **%"
             },
-            "tkey": "Nat"
+            "tkey": "Nat",
+            "name": "Nat"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive integer value. **%"
             },
-            "tkey": "Int"
+            "tkey": "Int",
+            "name": "Int"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive big-integer value. **%"
             },
-            "tkey": "BigNat"
+            "tkey": "BigNat",
+            "name": "BigNat"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive big-integer value. **%"
             },
-            "tkey": "BigInt"
+            "tkey": "BigInt",
+            "name": "BigInt"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive float value. **%"
             },
-            "tkey": "Float"
+            "tkey": "Float",
+            "name": "Float"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive string value. **%"
             },
-            "tkey": "String"
+            "tkey": "String",
+            "name": "String"
         },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
                 "docstring": "%** Primitive string value. **%"
             },
-            "tkey": "CString"
+            "tkey": "CString",
+            "name": "CString"
         }
     ],
+    "recursiveSets": [],
     "resystem": []
 }

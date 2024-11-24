@@ -101,7 +101,7 @@ void tround(std::string metafile, const char* type, std::string datafile, std::u
     bsqon::BsqonDecl* res = parser.parseBSQON(metadata, loadtype, node);
 
     if(parser.errors.empty() && errorInfoCount == 0) {
-        std::u8string rstr = res->toString();
+        std::u8string rstr = res->toString(true);
 
         result = wsnorm(rstr);
         return;
