@@ -1469,10 +1469,16 @@ namespace bsqon
         BsqonDecl(std::string assemblypath, const Type* oftype, const Value* value) : assemblypath(assemblypath), oftype(oftype), value(value) { ; }
         virtual ~BsqonDecl() = default;
 
-        std::u8string toString() const
+        std::u8string toString(bool valueonly) const
         {
             auto dd = u8"#!" + std::u8string(this->assemblypath.cbegin(), this->assemblypath.cend()) + u8"?" + std::u8string(this->oftype->tkey.cbegin(), this->oftype->tkey.cend());
-            return dd + u8"\n\n" + this->value->toString();
+            
+            if(valueonly) {
+                return this->value->toString();
+            }
+            else {
+                return dd + u8"\n\n" + this->value->toString();
+            }
         }
     };
 }

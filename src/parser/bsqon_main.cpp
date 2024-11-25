@@ -23,7 +23,7 @@ bool processArgs(int argc, char** argv, std::string& metadata, std::string& type
         }
     }
 
-    size_t apos = 1;
+    size_t apos = 0;
     if(apos < args.size() && args[apos].ends_with(".json")) {
         metadata = args[apos];
         apos++;
@@ -172,8 +172,15 @@ int main(int argc, char** argv, char **envp)
         printf("Invalid 'loadtype'\n");
         exit(1);
     }
-
     
+    auto ccpos = loadtype->tkey.find("::");
+    if(ccpos == std::string::npos) {
+        parser.defaultns = "Core";
+    }
+    else {
+        parser.defaultns = loadtype->tkey.substr(0, ccpos);
+    }
+
     //load up any environment variables that we need
     auto envkeys = bsqon::Parser::getEnvironmentBindKeys(node);
     auto envmap = loadEnvironmentValues(envp, envkeys);
@@ -197,28 +204,21 @@ int main(int argc, char** argv, char **envp)
             if(etype->tkey == "String") {
                 parser.envbinds[envname] = bsqon::StringValue::createFromParse(etype, envpos, envvalue, envlen);
             }
-            else if(etype->tkey == "ASCIIString") {
-                
+            else if(etype->tkey == "CString") {
+                parser.envbinds[envname] = bsqon::CStringValue::createFromParse(etype, envpos, envvalue, envlen);
             }
             else {
                 printf("TODO: want to support most primitives + stringofs, paths, and typedecls\n");
                 exit(1);
             }
         }
-        
-        else {
-            printf("TODO: want to support most primitives + stringofs, paths, and typedecls\n");
-            exit(1);
-        }
-        
     }
 
-
     //finally parse the value
-    bsqon::Value* res = parser.parseValue(loadtype, node);
+    bsqon::BsqonDecl* res = parser.parseBSQON(metadata, loadtype, node);
 
     if(parser.errors.empty() && errorInfoCount == 0) {
-        std::u8string rstr = res->toString();
+        std::u8string rstr = res->toString(false);
         printf("%s\n", (const char*)rstr.c_str());
 
         fflush(stdout);
@@ -232,12 +232,12 @@ int main(int argc, char** argv, char **envp)
             }
         }
 
-            for(size_t i = 0; i < parser.errors.size(); ++i) {
-                const bsqon::ParseError& pe = parser.errors.at(i);
-                printf("%s -- line %u\n", pe.message.c_str(), pe.loc.first_line);
-            }
-
-            fflush(stdout);
-            exit(1);
+        for(size_t i = 0; i < parser.errors.size(); ++i) {
+            const bsqon::ParseError& pe = parser.errors.at(i);
+            printf("%s -- line %u\n", pe.message.c_str(), pe.loc.first_line);
         }
+
+        fflush(stdout);
+        exit(1);
+    }
 }

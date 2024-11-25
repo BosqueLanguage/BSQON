@@ -44,18 +44,16 @@ namespace bsqon
     class TypeAnnotationInfo
     {
     public:
-        bool isrecursive;
         std::string docstring;
         std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags;
 
-        TypeAnnotationInfo(bool isrecursive, std::string docstring, std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags) : isrecursive(isrecursive), docstring(docstring), sensitivetags(sensitivetags) { ; }
+        TypeAnnotationInfo(std::string docstring, std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags) : docstring(docstring), sensitivetags(sensitivetags) { ; }
 
         bool isSensitive() const {
             return this->sensitivetags.has_value();
         }
 
         static TypeAnnotationInfo parse(json j) {
-            bool isrecursive = j.contains("isrecursive") && j["isrecursive"].is_boolean() && j["isrecursive"].get<bool>();
             std::string docstring = j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
 
             std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags = std::nullopt;
@@ -68,7 +66,7 @@ namespace bsqon
                 sensitivetags = std::make_optional(tags);
             }
 
-            return TypeAnnotationInfo(isrecursive, docstring, sensitivetags);
+            return TypeAnnotationInfo(docstring, sensitivetags);
         }
     };
 
@@ -141,7 +139,7 @@ namespace bsqon
     class UnresolvedType : public Type
     {
     public:
-        UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {}, {false, "[UNRESOLVED]", std::nullopt}) { ; }
+        UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {}, {"[UNRESOLVED]", std::nullopt}) { ; }
         virtual ~UnresolvedType() = default;
 
         static UnresolvedType* singleton;
@@ -152,7 +150,7 @@ namespace bsqon
     public:
         std::vector<TypeKey> entries;
 
-        EListType(std::vector<TypeKey> entries) : Type(TypeTag::TYPE_ELIST, "(|" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) + "|)", {}, {false, "", {}}), entries(entries) { ; }
+        EListType(std::vector<TypeKey> entries) : Type(TypeTag::TYPE_ELIST, "(|" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) + "|)", {}, {"", {}}), entries(entries) { ; }
         virtual ~EListType() = default;
     };
 
@@ -175,10 +173,11 @@ namespace bsqon
     public:
         std::string fname;
         TypeKey ftype;
+        bool isOptional;
 
         FieldAnnotationInfo annotations;
 
-        EntityTypeFieldEntry(std::string fname, TypeKey ftype, FieldAnnotationInfo annotations) : fname(fname), ftype(ftype), annotations(annotations) { ; }
+        EntityTypeFieldEntry(std::string fname, TypeKey ftype, bool isOptional, FieldAnnotationInfo annotations) : fname(fname), ftype(ftype), isOptional(isOptional), annotations(annotations) { ; }
     };
 
     class StdEntityType : public EntityType
