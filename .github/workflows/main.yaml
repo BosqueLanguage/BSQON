@@ -8,10 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         lfs: 'true'
     - name: Install dependencies
@@ -19,8 +19,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install libboost-all-dev
         sudo apt-get install libgmp3-dev
-        sudo apt-get install flex
-        sudo apt-get install bison
     - name: Install
       run: make -f ./build/makefile all
     - name: Run Tests
