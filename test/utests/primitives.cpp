@@ -48,4 +48,29 @@ BOOST_AUTO_TEST_CASE(tfalse) {
 }
 BOOST_AUTO_TEST_SUITE_END() //Bool
 
+////
+//Nat
+BOOST_AUTO_TEST_SUITE(Nat)
+BOOST_AUTO_TEST_CASE(nat0) {
+    TEST_PRIMITIVE("Nat", "nat_0.bsqon");
+}
+BOOST_AUTO_TEST_CASE(nat3) {
+    TEST_PRIMITIVE("Nat", "nat_3.bsqon");
+}
+BOOST_AUTO_TEST_SUITE_END() //Nat
+
+////
+//Int
+BOOST_AUTO_TEST_SUITE(Int)
+BOOST_AUTO_TEST_CASE(int0) {
+    TEST_PRIMITIVE("Int", "int_0.bsqon");
+}
+BOOST_AUTO_TEST_CASE(intn3) {
+    TEST_PRIMITIVE("Int", "int_-3.bsqon");
+}
+BOOST_AUTO_TEST_CASE(int3) {
+    TEST_PRIMITIVE("Int", "int_3.bsqon");
+}
+BOOST_AUTO_TEST_SUITE_END() //Int
+
 BOOST_AUTO_TEST_SUITE_END() //Primitives
