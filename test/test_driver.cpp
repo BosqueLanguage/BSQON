@@ -39,6 +39,30 @@ void loadContents(std::string filename, std::u8string& contents)
     contents = wsnorm(contents);
 }
 
+void checkAndReport(const std::u8string& result, const std::u8string& expected)
+{
+    if(result != expected) {
+        std::cout << "Expected: " << std::string(expected.cbegin(), expected.cend()) << std::endl;
+        std::cout << "Got: " << std::string(result.cbegin(), result.cend()) << std::endl;
+    }
+
+    BOOST_ASSERT(result == expected);
+}
+
+#ifndef TEST_PATH
+#define TEST_PATH "./"
+#endif
+
+std::string createMetaPathName(std::string tcc)
+{
+    return std::string(TEST_PATH) + "/asm_meta/" + tcc + ".json";
+}
+
+std::string createBSQONPathName(std::string tcc, std::string bsq)
+{
+    return std::string(TEST_PATH) + "/bsqon/" + tcc + "/" + bsq;
+}
+
 void tround(std::string metafile, const char* type, std::string datafile, std::u8string& contents, std::u8string& result)
 {
     result = u8"";

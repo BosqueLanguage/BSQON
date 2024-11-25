@@ -2,30 +2,7 @@
 
 #include "../test_driver.h"
 
-void checkAndReport(const std::u8string& result, const std::u8string& expected) {
-    if(result != expected) {
-        std::cout << "Expected: " << std::string(expected.cbegin(), expected.cend()) << std::endl;
-        std::cout << "Got: " << std::string(result.cbegin(), result.cend()) << std::endl;
-    }
-
-    BOOST_ASSERT(result == expected);
-}
-
-#ifndef TEST_PATH
-#define TEST_PATH "./"
-#endif
-
-std::string createMetaPathName()
-{
-    return std::string(TEST_PATH) + "/asm_meta/primitives.json";
-}
-
-std::string createBSQONPathName(std::string bsq)
-{
-    return std::string(TEST_PATH) + "/bsqon/primitives/" + bsq;
-}
-
-#define TEST_PRIMITIVE(TY, BSQ) { std::u8string result; std::u8string expected; tround(createMetaPathName(), TY, createBSQONPathName(BSQ), expected, result); checkAndReport(result, expected); }
+#define TEST_PRIMITIVE(TY, BSQ) { std::u8string result; std::u8string expected; tround(createMetaPathName("primitives"), TY, createBSQONPathName("primitives", BSQ), expected, result); checkAndReport(result, expected); }
 
 BOOST_AUTO_TEST_SUITE(Primitives)
 
@@ -72,5 +49,44 @@ BOOST_AUTO_TEST_CASE(int3) {
     TEST_PRIMITIVE("Int", "int_3.bsqon");
 }
 BOOST_AUTO_TEST_SUITE_END() //Int
+
+////
+//BigNat
+BOOST_AUTO_TEST_SUITE(BigNat)
+BOOST_AUTO_TEST_CASE(bignat0) {
+    TEST_PRIMITIVE("BigNat", "bignat_0.bsqon");
+}
+BOOST_AUTO_TEST_CASE(bignat3) {
+    TEST_PRIMITIVE("BigNat", "bignat_3.bsqon");
+}
+BOOST_AUTO_TEST_SUITE_END() //BigNat
+
+////
+//BigInt
+BOOST_AUTO_TEST_SUITE(BigInt)
+BOOST_AUTO_TEST_CASE(bigint0) {
+    TEST_PRIMITIVE("BigInt", "bigint_0.bsqon");
+}
+BOOST_AUTO_TEST_CASE(bigintn3) {
+    TEST_PRIMITIVE("BigInt", "bigint_-3.bsqon");
+}
+BOOST_AUTO_TEST_CASE(bigint3) {
+    TEST_PRIMITIVE("BigInt", "bigint_3.bsqon");
+}
+BOOST_AUTO_TEST_SUITE_END() //BigInt
+
+////
+//Float
+BOOST_AUTO_TEST_SUITE(Float)
+BOOST_AUTO_TEST_CASE(float1) {
+    TEST_PRIMITIVE("Float", "float_1.bsqon");
+}
+BOOST_AUTO_TEST_CASE(floatn3) {
+    TEST_PRIMITIVE("Float", "float_-3.bsqon");
+}
+BOOST_AUTO_TEST_CASE(floatpt3) {
+    TEST_PRIMITIVE("Float", "float_.3.bsqon");
+}
+BOOST_AUTO_TEST_SUITE_END() //Float
 
 BOOST_AUTO_TEST_SUITE_END() //Primitives
