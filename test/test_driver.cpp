@@ -55,12 +55,12 @@ void checkAndReport(const std::u8string& result, const std::u8string& expected)
 
 std::string createMetaPathName(std::string tcc)
 {
-    return std::string(TEST_PATH) + "/asm_meta/" + tcc + ".json";
+    return std::string(TEST_PATH) + "asm_meta/" + tcc + ".json";
 }
 
 std::string createBSQONPathName(std::string tcc, std::string bsq)
 {
-    return std::string(TEST_PATH) + "/bsqon/" + tcc + "/" + bsq;
+    return std::string(TEST_PATH) + "bsqon/" + tcc + "/" + bsq;
 }
 
 void tround(std::string metafile, const char* type, std::string datafile, std::u8string& contents, std::u8string& result)
@@ -74,7 +74,7 @@ void tround(std::string metafile, const char* type, std::string datafile, std::u
     }
 
     if(!std::filesystem::exists(datafile)) {
-        result = u8"Data file does not exist";
+        result = std::u8string(u8"Data file does not exist: ") + std::u8string(datafile.cbegin(), datafile.cend());
         return;
     }
 
