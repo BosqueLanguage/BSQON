@@ -73,7 +73,7 @@ $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_E
 
 $(BIN_DIR)bsqon: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(PARSER_DIR)bsqon_main.cpp
 	@mkdir -p $(BIN_DIR)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)bsqon $(PARSER_DIR)bsqon_main.cpp -lbsqon -lbrex -ll -lgmp
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)bsqon $(PARSER_DIR)bsqon_main.cpp -lbsqon -lbrex -lfl -lgmp
 
 $(OUT_EXE)libbsqon.a: $(BSQON_OBJS) $(PARSER_OBJS)
 	@mkdir -p $(OUT_EXE)
@@ -124,7 +124,7 @@ testfiles: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_
 	@mkdir -p $(BIN_DIR)
 	cp -r $(BSQON_TEST_DIR)asm_meta/ $(BIN_DIR)asm_meta/
 	cp -r $(BSQON_TEST_DIR)bsqon/ $(BIN_DIR)bsqon/
-	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)bsqon_test $(BSQON_TEST_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -ll -lgmp -lboost_unit_test_framework
+	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)bsqon_test $(BSQON_TEST_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -lfl -lgmp -lboost_unit_test_framework
 
 test: testfiles
 	$(BIN_DIR)bsqon_test --report_level=short --color_output
