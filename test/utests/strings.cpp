@@ -8,7 +8,7 @@
 
 
 BOOST_AUTO_TEST_SUITE(Strings)
-/*
+
 ////
 //String
 BOOST_AUTO_TEST_SUITE(UnicodeStrings)
@@ -50,9 +50,6 @@ BOOST_AUTO_TEST_CASE(percent) {
 BOOST_AUTO_TEST_CASE(quote) {
     TEST_CSTRING("cstring_quote.bsqon");
 }
-BOOST_AUTO_TEST_CASE(unicode) {
-    TEST_CSTRING("cstring_unicode.bsqon");
-}
 BOOST_AUTO_TEST_SUITE_END() //CString
-*/
+
 BOOST_AUTO_TEST_SUITE_END() //Strings

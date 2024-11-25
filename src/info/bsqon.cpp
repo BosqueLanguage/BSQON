@@ -4,7 +4,7 @@ namespace bsqon
 {
     StringValue* StringValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
-        auto sv = brex::unescapeUnicodeString(bytes, length);
+        auto sv = brex::unescapeUnicodeString(bytes + 1, length - 2);
         if(!sv.first.has_value()) {
             return nullptr;
         }
@@ -14,7 +14,7 @@ namespace bsqon
 
     CStringValue* CStringValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
-        auto sv = brex::unescapeCString(bytes, length);
+        auto sv = brex::unescapeCString(bytes + 1, length - 2);
         if(!sv.first.has_value()) {
             return nullptr;
         }
