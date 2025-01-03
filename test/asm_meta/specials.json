@@ -1,0 +1,139 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": []
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Option",
+                    "Option<Int>"
+                ],
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Some",
+                    "Some<Int>"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ],
+                [
+                    "Result",
+                    "Result<Int, CString>"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Int>",
+            "name": "Option",
+            "oftype": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<T>"
+            ],
+            "tkey": "Some<Int>",
+            "name": "Some",
+            "oftype": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        },
+        {
+            "tag": "Result",
+            "attributes": {
+                "docstring": "%** Result type. **%"
+            },
+            "tkey": "Result<Int, CString>",
+            "name": "Result",
+            "ttype": "Int",
+            "etype": "CString"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

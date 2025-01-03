@@ -1,3 +1,4 @@
+declare namespace Main;
 
 concept Expression {
 }

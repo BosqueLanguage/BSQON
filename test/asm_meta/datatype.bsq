@@ -1,4 +1,4 @@
-namespace Main;
+declare namespace Main;
 
 datatype Foo using {
     field v: Int;

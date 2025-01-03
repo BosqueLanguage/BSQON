@@ -4,12 +4,12 @@
 
 #define TEST_IT(TYPE, BSQ) { std::u8string result; std::u8string expected; tround(createMetaPathName("typealias"), TYPE, createBSQONPathName("typealias", BSQ), expected, result); checkAndReport(result, expected); }
 
-BOOST_AUTO_TEST_SUITE(Strings)
+BOOST_AUTO_TEST_SUITE(TypeAlias)
 
 ////
 //TypeAlias
-BOOST_AUTO_TEST_SUITE(TypeAlias)
-BOOST_AUTO_TEST_CASE(f32addf64) {
+BOOST_AUTO_TEST_SUITE(TypeAlias_Direct)
+BOOST_AUTO_TEST_CASE(fahrenheit) {
     TEST_IT("Main::Fahrenheit", "fahrenheit.bsqon");
 }
 BOOST_AUTO_TEST_CASE(cid) {
@@ -25,4 +25,4 @@ BOOST_AUTO_TEST_CASE(sid) {
 }
 BOOST_AUTO_TEST_SUITE_END() //TypeAlias with Validate
 
-BOOST_AUTO_TEST_SUITE_END() //Strings
+BOOST_AUTO_TEST_SUITE_END() //TypeAlias
