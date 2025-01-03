@@ -1,0 +1,15 @@
+namespace Main;
+
+datatype Foo using {
+    field v: Int;
+}
+of
+A { field b: Bool; }
+| B { }
+;
+
+public function main(): None {
+    var op: Foo;
+
+    return none;
+}

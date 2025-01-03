@@ -1,0 +1,15 @@
+declare namespace Main;
+
+type Fahrenheit = Int;
+
+type CID = CString;
+type SID = CString of /"ID-"[0-9]{4}/c;
+
+public function main(): None {
+    var f: Fahrenheit;
+
+    var cid: CID;
+    var sid: SID;
+
+    return none;
+}

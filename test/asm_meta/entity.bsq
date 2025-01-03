@@ -1,0 +1,26 @@
+
+concept Expression {
+}
+
+entity Value provides Expression {
+    field v: Int;
+}
+
+enum OpKind {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+
+entity BinOp provides Expression {
+    field op: OpKind;
+    field l: Expression;
+    field r: Expression;
+}
+
+public function main(): None {
+    var op: BinOp;
+
+    return none;
+}
