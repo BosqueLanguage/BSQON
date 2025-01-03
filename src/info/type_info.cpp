@@ -139,7 +139,7 @@ namespace bsqon
                 }
 
                 bool hasvalidations = j["hasvalidations"].get<bool>();
-                return new TypedeclType(j["tkey"].get<TypeKey>(), supertypes, annotations, j["primitivetype"].get<TypeKey>(), optOfValidator, hasvalidations);
+                return new TypedeclType(j["tkey"].get<TypeKey>(), supertypes, annotations, j["valuetype"].get<TypeKey>(), optOfValidator, hasvalidations);
             }
             case TypeTag::TYPE_SOME: {
                 return new SomeType(j["oftype"].get<TypeKey>(), supertypes, annotations);

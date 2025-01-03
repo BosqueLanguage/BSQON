@@ -1,0 +1,131 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Fahrenheit",
+                    "Main::Fahrenheit"
+                ],
+                [
+                    "CID",
+                    "Main::CID"
+                ],
+                [
+                    "SID",
+                    "Main::SID"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "TypeDecl",
+            "hasvalidations": false,
+            "valuetype": "Int",
+            "tkey": "Main::Fahrenheit",
+            "name": "Fahrenheit"
+        },
+        {
+            "tag": "TypeDecl",
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::CID",
+            "name": "CID"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidator": "/\"ID-\"[0-9]{4}/c",
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::SID",
+            "name": "SID"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
