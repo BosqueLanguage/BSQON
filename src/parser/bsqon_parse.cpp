@@ -2135,9 +2135,13 @@ namespace bsqon
     {
         if(t->tag == TypeTag::TYPE_OPTION) {
             const OptionType* otype = static_cast<const OptionType*>(t);
+            const SomeType* stype = static_cast<const SomeType*>(this->assembly->lookupTypeKey("Some<" + otype->oftype + ">"));
                 
             if(node->tag == BSQON_AST_TAG_NoneValue) {
                 return this->parseNone(static_cast<const PrimitiveType*>(this->assembly->lookupTypeKey("None")), node);
+            }
+            else if(node->tag == BSQON_AST_TAG_SomeConsValue) {
+                return this->parseSome(stype, node);
             }
             else {
                 if(node->tag != BSQON_AST_TAG_TypedValue) {

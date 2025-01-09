@@ -2,7 +2,7 @@ declare namespace Main;
 
 public function main(): None {
     var o: Option<Int>;
-    var r: Result<Int, CString>;
+    var r: Result<Int, Bool>;
 
     return none;
 }
