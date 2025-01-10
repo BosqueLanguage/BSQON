@@ -1,0 +1,6 @@
+BinOp{ 
+    Value{1i}, 
+    op = OpKind#Add,
+    Value{2i}
+}
+
