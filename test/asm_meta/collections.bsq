@@ -1,0 +1,8 @@
+declare namespace Main;
+
+public function main(): None {
+    var l: List<Int>;
+    var m: Map<Int, Bool>;
+
+    return none;
+}

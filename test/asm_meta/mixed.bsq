@@ -1,0 +1,25 @@
+declare namespace Main;
+
+concept Expression {
+}
+
+entity Value provides Expression {
+    field v: Int;
+}
+
+datatype BinOp provides Expression using {
+    field l: Expression;
+    field r: Expression;
+}
+of
+Add { }
+| Sub { }
+| Mul { }
+| Div { }
+;
+
+public function main(): None {
+    var op: BinOp;
+
+    return none;
+}

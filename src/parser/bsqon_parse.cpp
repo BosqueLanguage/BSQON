@@ -2134,11 +2134,14 @@ namespace bsqon
     Value* Parser::parseValueConcept(const Type* t, const BSQON_AST_Node* node)
     {
         if(t->tag == TypeTag::TYPE_OPTION) {
-            return nullptr;
             const OptionType* otype = static_cast<const OptionType*>(t);
+            const SomeType* stype = static_cast<const SomeType*>(this->assembly->lookupTypeKey("Some<" + otype->oftype + ">"));
                 
             if(node->tag == BSQON_AST_TAG_NoneValue) {
                 return this->parseNone(static_cast<const PrimitiveType*>(this->assembly->lookupTypeKey("None")), node);
+            }
+            else if(node->tag == BSQON_AST_TAG_SomeConsValue) {
+                return this->parseSome(stype, node);
             }
             else {
                 if(node->tag != BSQON_AST_TAG_TypedValue) {
@@ -2248,7 +2251,7 @@ namespace bsqon
         if (t->tag == TypeTag::TYPE_PRIMITIVE) {
             return this->parseValuePrimitive(static_cast<const PrimitiveType*>(t), node);
         }
-        else if ((t->tag == TypeTag::TYPE_STD_CONCEPT)) {
+        else if ((t->tag == TypeTag::TYPE_STD_CONCEPT) | (t->tag == TypeTag::TYPE_OPTION) | (t->tag == TypeTag::TYPE_RESULT) | (t->tag == TypeTag::TYPE_APIRESULT)) {
             return this->parseValueConcept(t, node);
         }
         else {

@@ -119,7 +119,7 @@ namespace bsqon
 
         const Type* parseSomeType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)
         {
-            return this->parseTemplateTypeHelper_One("Something", spos, tlist);
+            return this->parseTemplateTypeHelper_One("Some", spos, tlist);
         }
 
         const Type* parseOptionType(SourcePos spos, const BSQON_AST_LIST_OF_TYPES* tlist)

@@ -1,0 +1,169 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": []
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Option",
+                    "Option<Int>"
+                ],
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Some",
+                    "Some<Int>"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "Result",
+                    "Result<Int, Bool>"
+                ],
+                [
+                    "Ok",
+                    "Result<Int, Bool>::Ok"
+                ],
+                [
+                    "Fail",
+                    "Result<Int, Bool>::Fail"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Int>",
+            "name": "Option",
+            "oftype": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Int>"
+            ],
+            "tkey": "Some<Int>",
+            "name": "Some",
+            "oftype": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "Result",
+            "attributes": {
+                "docstring": "%** Result type. **%"
+            },
+            "tkey": "Result<Int, Bool>",
+            "name": "Result",
+            "ttype": "Int",
+            "etype": "Bool"
+        },
+        {
+            "tag": "Result::Ok",
+            "attributes": {},
+            "supertypes": [
+                "Result<T, E>"
+            ],
+            "tkey": "Result<Int, Bool>::Ok",
+            "name": "Ok",
+            "ttype": "Int",
+            "etype": "Bool"
+        },
+        {
+            "tag": "Result::Fail",
+            "attributes": {},
+            "supertypes": [
+                "Result<T, E>"
+            ],
+            "tkey": "Result<Int, Bool>::Fail",
+            "name": "Fail",
+            "ttype": "Int",
+            "etype": "Bool"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
