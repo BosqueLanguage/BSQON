@@ -600,7 +600,7 @@ namespace bsqon
             return this->parseTemplateTypeHelper_API(roottype, "Success", Parser::convertSrcPos(node->base.pos));
         }
         else {
-            this->addError("Expected Result::Ok or Result::Err type", Parser::convertSrcPos(node->root->pos));
+            this->addError("Expected Result::Ok or Result::Fail type", Parser::convertSrcPos(node->root->pos));
             return UnresolvedType::singleton;
         }
     }
