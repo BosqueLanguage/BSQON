@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE_END() //BaseOps
 
 ////
 //BinOp
-BOOST_AUTO_TEST_SUITE(Result)
+BOOST_AUTO_TEST_SUITE(BinOp)
 BOOST_AUTO_TEST_CASE(binop_direct) {
     TEST_WITH("Main::BinOp", "entity_binop.bsqon", s_binop1);
 }

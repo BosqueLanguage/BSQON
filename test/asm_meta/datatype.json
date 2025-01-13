@@ -1,0 +1,151 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Foo",
+                    "Main::Foo"
+                ],
+                [
+                    "Bar",
+                    "Main::Bar"
+                ],
+                [
+                    "Baz",
+                    "Main::Baz"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdConcept",
+            "tkey": "Main::Foo",
+            "name": "Foo"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Foo"
+            ],
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "b",
+                    "ftype": "Bool",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Bar",
+            "name": "Bar"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Foo"
+            ],
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Int",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Baz",
+            "name": "Baz"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
