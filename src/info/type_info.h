@@ -259,7 +259,7 @@ namespace bsqon
         TypeKey ttype;
         TypeKey etype;
 
-        ErrorType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Err", supertypes, annotations), ttype(ttype), etype(etype) { ; }
+        ErrorType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Fail", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ErrorType() = default;
     };
 

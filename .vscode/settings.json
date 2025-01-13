@@ -74,6 +74,7 @@
         "source_location": "cpp",
         "shared_mutex": "cpp",
         "stdfloat": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "codecvt": "cpp"
     }
 }

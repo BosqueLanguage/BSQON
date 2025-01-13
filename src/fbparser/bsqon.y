@@ -71,6 +71,7 @@ int errorcount = 0;
 %token KW_ENV "env"
 
 %token SYM_DOUBLE_COLON "::"
+%token SYM_HASH "#"
 %token SYM_ENTRY "=>"
 %token SYM_COLON ":"
 %token SYM_COMMA ","
@@ -239,6 +240,8 @@ bsqonidentifier:
 
 bsqonscopedidentifier:
    bsqonnominaltype SYM_DOUBLE_COLON TOKEN_IDENTIFIER { $$ = BSQON_AST_NODE_CONS(ScopedNameValue, BSQON_AST_TAG_ScopedNameValue, MK_SPOS_R(@1, @3), $1, $3); }
+   | bsqonnominaltype SYM_HASH TOKEN_IDENTIFIER { $$ = BSQON_AST_NODE_CONS(EnumAccessValue, BSQON_AST_TAG_EnumAccessValue, MK_SPOS_R(@1, @3), $1, $3); }
+   | bsqonnominaltype SYM_HASH TOKEN_TYPE_COMPONENT { $$ = BSQON_AST_NODE_CONS(EnumAccessValue, BSQON_AST_TAG_EnumAccessValue, MK_SPOS_R(@1, @3), $1, $3); }
 ;
 
 bsqontypeliteral:

@@ -1,0 +1,6 @@
+BinOp{
+    OpKind#Add, 
+    BinOp{OpKind#Sub, Value{3i}, Value{2i}}, 
+    Value{2i}
+}
+

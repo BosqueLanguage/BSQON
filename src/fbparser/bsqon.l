@@ -73,6 +73,7 @@ TYPE_IDENTIFIER ([A-Z][a-zA-Z0-9_]*)
 
  /* symbols */
 "::"        { return SYM_DOUBLE_COLON; }
+"#"         { return SYM_HASH; }
 "=>"        { return SYM_ENTRY; }
 
 ":"         { return SYM_COLON; }

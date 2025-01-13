@@ -1,0 +1,161 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Expression",
+                    "Main::Expression"
+                ],
+                [
+                    "Value",
+                    "Main::Value"
+                ],
+                [
+                    "OpKind",
+                    "Main::OpKind"
+                ],
+                [
+                    "BinOp",
+                    "Main::BinOp"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdConcept",
+            "tkey": "Main::Expression",
+            "name": "Expression"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression"
+            ],
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Int",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Value",
+            "name": "Value"
+        },
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "Add",
+                "Sub",
+                "Mul",
+                "Div"
+            ],
+            "supertypes": [],
+            "tkey": "Main::OpKind",
+            "name": "OpKind"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression"
+            ],
+            "fields": [
+                {
+                    "fname": "op",
+                    "ftype": "Main::OpKind",
+                    "isoptional": false
+                },
+                {
+                    "fname": "l",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::BinOp",
+            "name": "BinOp"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

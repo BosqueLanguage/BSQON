@@ -17,6 +17,9 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
+        sudo apt-get install flex
+        sudo apt-get install bison
+        sudo apt-get install libfl-dev
         sudo apt-get install libboost-all-dev
         sudo apt-get install libgmp3-dev
     - name: Install

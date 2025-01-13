@@ -1323,7 +1323,7 @@ namespace bsqon
         
         virtual std::u8string toString() const override
         {
-            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8"::" + std::u8string(this->evname.cbegin(), this->evname.cend());
+            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8"#" + std::u8string(this->evname.cbegin(), this->evname.cend());
         }
 
         virtual bool isValidForTypedecl() const override

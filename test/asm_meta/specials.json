@@ -145,7 +145,7 @@
             "tag": "Result::Ok",
             "attributes": {},
             "supertypes": [
-                "Result<T, E>"
+                "Result<Int, Bool>"
             ],
             "tkey": "Result<Int, Bool>::Ok",
             "name": "Ok",
@@ -156,7 +156,7 @@
             "tag": "Result::Fail",
             "attributes": {},
             "supertypes": [
-                "Result<T, E>"
+                "Result<Int, Bool>"
             ],
             "tkey": "Result<Int, Bool>::Fail",
             "name": "Fail",

@@ -1,1 +1,1 @@
-Result<Int, Bool>::fail{true}
+Result<Int, Bool>::Fail{true}
