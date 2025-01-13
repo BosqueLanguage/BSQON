@@ -1,0 +1,131 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": []
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "List",
+                    "List<Int>"
+                ],
+                [
+                    "MapEntry",
+                    "MapEntry<Int, Bool>"
+                ],
+                [
+                    "Map",
+                    "Map<Int, Bool>"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "List",
+            "attributes": {},
+            "tkey": "List<Int>",
+            "name": "List",
+            "oftype": "Int"
+        },
+        {
+            "tag": "MapEntry",
+            "attributes": {},
+            "tkey": "MapEntry<Int, Bool>",
+            "name": "MapEntry",
+            "ktype": "Int",
+            "vtype": "Bool"
+        },
+        {
+            "tag": "Map",
+            "attributes": {},
+            "tkey": "Map<Int, Bool>",
+            "name": "Map",
+            "ktype": "Int",
+            "vtype": "Bool"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
