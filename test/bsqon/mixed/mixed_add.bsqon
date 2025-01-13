@@ -1,0 +1,5 @@
+Main::Add{
+    l=Main::Value{1i}, 
+    r=Main::Value{2i}
+}
+
