@@ -1,0 +1,230 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Expression",
+                    "Main::Expression"
+                ],
+                [
+                    "Value",
+                    "Main::Value"
+                ],
+                [
+                    "BinOp",
+                    "Main::BinOp"
+                ],
+                [
+                    "Add",
+                    "Main::Add"
+                ],
+                [
+                    "Sub",
+                    "Main::Sub"
+                ],
+                [
+                    "Mul",
+                    "Main::Mul"
+                ],
+                [
+                    "Div",
+                    "Main::Div"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdConcept",
+            "tkey": "Main::Expression",
+            "name": "Expression"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression"
+            ],
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Int",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Value",
+            "name": "Value"
+        },
+        {
+            "tag": "StdConcept",
+            "supertypes": [
+                "Main::Expression"
+            ],
+            "tkey": "Main::BinOp",
+            "name": "BinOp"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression",
+                "Main::BinOp"
+            ],
+            "fields": [
+                {
+                    "fname": "l",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Add",
+            "name": "Add"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression",
+                "Main::BinOp"
+            ],
+            "fields": [
+                {
+                    "fname": "l",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Sub",
+            "name": "Sub"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression",
+                "Main::BinOp"
+            ],
+            "fields": [
+                {
+                    "fname": "l",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Mul",
+            "name": "Mul"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "Main::Expression",
+                "Main::BinOp"
+            ],
+            "fields": [
+                {
+                    "fname": "l",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "Main::Expression",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Div",
+            "name": "Div"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

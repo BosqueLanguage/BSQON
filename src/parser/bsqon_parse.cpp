@@ -556,7 +556,7 @@ namespace bsqon
         else if (tname == "MapEntry") {
             return this->parseMapEntryType(Parser::convertSrcPos(node->base.pos), node->terms);
         }
-        else if (tname == "Set") {
+        else if (tname == "Map") {
             return this->parseMapType(Parser::convertSrcPos(node->base.pos), node->terms);
         }
         else {
@@ -1729,9 +1729,11 @@ namespace bsqon
         {
             ContainerParseStackEntryManager mgr(ContainerParseStackEntryTag::List, this);
 
+            const Type* oftype = this->assembly->lookupTypeKey(t->oftype);
+
             std::vector<Value*> vv;
             if(node->tag == BSQON_AST_TAG_BracketValue) {
-                 this->processEntriesForSequence(t, node, vv, true);
+                 this->processEntriesForSequence(oftype, node, vv, true);
             }
             else {
                 auto tnode = BSQON_AST_NODE_AS(TypedValue, node);
@@ -1759,7 +1761,7 @@ namespace bsqon
                     return new ErrorValue(t, Parser::convertSrcPos(node->pos));
                 }
 
-                this->processEntriesForSequence(t, tnode->value, vv, true);
+                this->processEntriesForSequence(oftype, tnode->value, vv, true);
             }
 
             return new ListValue(t, Parser::convertSrcPos(node->pos), std::move(vv));
@@ -1773,9 +1775,11 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
+        const Type* oftype = this->assembly->lookupTypeKey(t->oftype);
+
         std::vector<Value*> vv;
         if(node->tag == BSQON_AST_TAG_BracketValue) {
-             this->processEntriesForSequence(t, node, vv, false);
+             this->processEntriesForSequence(oftype, node, vv, false);
         }
         else {
             auto tnode = BSQON_AST_NODE_AS(TypedValue, node);
@@ -1803,7 +1807,7 @@ namespace bsqon
                 return new ErrorValue(t, Parser::convertSrcPos(node->pos));
             }
 
-            this->processEntriesForSequence(t, tnode->value, vv, false);
+            this->processEntriesForSequence(oftype, tnode->value, vv, false);
         }
 
         return new StackValue(t, Parser::convertSrcPos(node->pos), std::move(vv));
@@ -1816,9 +1820,11 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
+        const Type* oftype = this->assembly->lookupTypeKey(t->oftype);
+
         std::vector<Value*> vv;
         if(node->tag == BSQON_AST_TAG_BracketValue) {
-             this->processEntriesForSequence(t, node, vv, false);
+             this->processEntriesForSequence(oftype, node, vv, false);
         }
         else {
             auto tnode = BSQON_AST_NODE_AS(TypedValue, node);
@@ -1846,7 +1852,7 @@ namespace bsqon
                 return new ErrorValue(t, Parser::convertSrcPos(node->pos));
             }
 
-            this->processEntriesForSequence(t, tnode->value, vv, false);
+            this->processEntriesForSequence(oftype, tnode->value, vv, false);
         }
 
         return new QueueValue(t, Parser::convertSrcPos(node->pos), std::move(vv));
@@ -1859,9 +1865,11 @@ namespace bsqon
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
+        const Type* oftype = this->assembly->lookupTypeKey(t->oftype);
+
         std::vector<Value*> vv;
         if(node->tag == BSQON_AST_TAG_BraceValue) {
-             this->processEntriesForSequence(t, node, vv, false);
+             this->processEntriesForSequence(oftype, node, vv, false);
         }
         else {
             auto tnode = BSQON_AST_NODE_AS(TypedValue, node);
@@ -1889,7 +1897,7 @@ namespace bsqon
                 return new ErrorValue(t, Parser::convertSrcPos(node->pos));
             }
 
-            this->processEntriesForSequence(t, tnode->value, vv, false);
+            this->processEntriesForSequence(oftype, tnode->value, vv, false);
         }
 
         std::sort(vv.begin(), vv.end(), [](const Value* v1, const Value* v2) { return Value::keyCompare(v1, v2) < 0; });

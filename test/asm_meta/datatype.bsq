@@ -4,8 +4,8 @@ datatype Foo using {
     field v: Int;
 }
 of
-A { field b: Bool; }
-| B { }
+Bar { field b: Bool; }
+| Baz { }
 ;
 
 public function main(): None {

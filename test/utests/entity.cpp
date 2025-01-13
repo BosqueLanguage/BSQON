@@ -5,10 +5,10 @@
 #define TEST_IT(TYPE, BSQ) { std::u8string result; std::u8string expected; tround(createMetaPathName("entity"), TYPE, createBSQONPathName("entity", BSQ), expected, result); checkAndReport(result, expected); }
 #define TEST_WITH(TYPE, BSQ, EXPECTED) { std::u8string result; std::u8string orig; tround(createMetaPathName("entity"), TYPE, createBSQONPathName("entity", BSQ), orig, result); checkAndReport(result, EXPECTED); }
 
+BOOST_AUTO_TEST_SUITE(Entity)
+
 std::u8string s_binop1 = u8"Main::BinOp{Main::OpKind#Add, Main::Value{1i}, Main::Value{2i}}";
 std::u8string s_binop2 = u8"Main::BinOp{Main::OpKind#Add, Main::BinOp{Main::OpKind#Sub, Main::Value{3i}, Main::Value{2i}}, Main::Value{2i}}";
-
-BOOST_AUTO_TEST_SUITE(Entity)
 
 ////
 //BaseOps
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE_END() //BaseOps
 
 ////
 //BinOp
-BOOST_AUTO_TEST_SUITE(Result)
+BOOST_AUTO_TEST_SUITE(BinOp)
 BOOST_AUTO_TEST_CASE(binop_direct) {
     TEST_WITH("Main::BinOp", "entity_binop.bsqon", s_binop1);
 }
