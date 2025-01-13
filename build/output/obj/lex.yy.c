@@ -374,8 +374,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 102
-#define YY_END_OF_BUFFER 103
+#define YY_NUM_RULES 103
+#define YY_END_OF_BUFFER 104
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -386,59 +386,59 @@ struct yy_trans_info
 static const flex_int16_t yy_accept[494] =
     {   0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,  103,  101,  100,  100,   60,  101,  101,  101,
-       64,    1,    2,  101,   16,  101,   18,   69,   49,   49,
-       15,   11,   17,   12,   98,    5,   74,    6,  101,   96,
-       96,   96,   96,   96,   96,   96,   96,   96,   96,   96,
-        3,  101,    4,   63,   63,   61,   68,   67,   67,   65,
-       73,   72,   71,   70,   78,   76,   76,   77,   75,   95,
-       94,   93,    0,    0,    0,   99,    7,   48,   48,   48,
-       48,    0,    0,    0,    0,   35,   34,   36,   33,   83,
-       32,    0,   49,   13,   14,   98,    0,    9,   96,   96,
+        0,    0,  104,  102,  101,  101,   61,   14,  102,  102,
+       65,    1,    2,  102,   17,  102,   19,   70,   50,   50,
+       16,   11,   18,   12,   99,    5,   75,    6,  102,   97,
+       97,   97,   97,   97,   97,   97,   97,   97,   97,   97,
+        3,  102,    4,   64,   64,   62,   69,   68,   68,   66,
+       74,   73,   72,   71,   79,   77,   77,   78,   76,   96,
+       95,   94,    0,    0,    0,  100,    7,   49,   49,   49,
+       49,    0,    0,    0,    0,   36,   35,   37,   34,   84,
+       33,    0,   50,   13,   15,   99,    0,    9,   97,   97,
 
-       96,   74,   96,   28,   96,   96,   25,   96,   96,   96,
-       96,    8,   10,    0,   62,    0,   66,   70,    0,   97,
-        0,    0,   99,    0,    0,   84,    0,   48,    0,   85,
-        0,   30,   48,    0,    0,    0,    0,    0,    0,   87,
-        0,   86,   57,   49,    0,   29,   96,   96,   27,   96,
-       96,   96,   96,   96,   97,    0,   20,    0,    0,    0,
-       48,   91,    0,   48,    0,    0,   40,   39,    0,   31,
-        0,   37,    0,    0,    0,    0,    0,   57,   57,   50,
-       49,   98,   26,   96,   21,   96,   24,   22,   96,   19,
-        0,    0,    0,   40,   48,    0,    0,   38,   38,    0,
+       97,   75,   97,   29,   97,   97,   26,   97,   97,   97,
+       97,    8,   10,    0,   63,    0,   67,   71,    0,   98,
+        0,    0,  100,    0,    0,   85,    0,   49,    0,   86,
+        0,   31,   49,    0,    0,    0,    0,    0,    0,   88,
+        0,   87,   58,   50,    0,   30,   97,   97,   28,   97,
+       97,   97,   97,   97,   98,    0,   21,    0,    0,    0,
+       49,   92,    0,   49,    0,    0,   41,   40,    0,   32,
+        0,   38,    0,    0,    0,    0,    0,   58,   58,   51,
+       50,   99,   27,   97,   22,   97,   25,   23,   97,   20,
+        0,    0,    0,   41,   49,    0,    0,   39,   39,    0,
 
-       48,    0,    0,    0,    0,    0,   41,    0,    0,    0,
-        0,    0,    0,   54,   49,   98,   23,    0,   96,   96,
-        0,    0,    0,   90,   48,    0,    0,    0,    0,    0,
-       38,    0,   48,    0,    0,    0,   40,    0,    0,    0,
-        0,   59,   59,   56,    0,    0,    0,    0,    0,    0,
-       38,    0,    0,    0,    0,    0,    0,    0,   59,    0,
-       58,   58,   55,   58,    0,    0,   38,    0,    0,    0,
-       47,    0,    0,    0,    0,    0,    0,   82,   59,   58,
-       58,    0,    0,   46,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,   59,   58,   58,    0,    0,
+       49,    0,    0,    0,    0,    0,   42,    0,    0,    0,
+        0,    0,    0,   55,   50,   99,   24,    0,   97,   97,
+        0,    0,    0,   91,   49,    0,    0,    0,    0,    0,
+       39,    0,   49,    0,    0,    0,   41,    0,    0,    0,
+        0,   60,   60,   57,    0,    0,    0,    0,    0,    0,
+       39,    0,    0,    0,    0,    0,    0,    0,   60,    0,
+       59,   59,   56,   59,    0,    0,   39,    0,    0,    0,
+       48,    0,    0,    0,    0,    0,    0,   83,   60,   59,
+       59,    0,    0,   47,    0,    0,    0,    0,    0,    0,
+        0,    0,    0,    0,    0,   60,   59,   59,    0,    0,
 
-        0,    0,    0,    0,    0,   45,    0,    0,   81,   59,
-       58,   58,    0,    0,    0,    0,    0,    0,    0,    0,
-       59,   58,   58,    0,    0,    0,    0,    0,    0,   59,
-       58,   58,    0,    0,    0,    0,    0,    0,   59,   58,
-       58,    0,    0,    0,   44,   42,    0,   59,   58,   58,
-        0,   43,   42,    0,   59,   58,   58,    0,    0,   59,
-       58,   58,    0,    0,   59,   58,   58,    0,    0,   59,
-       58,   58,    0,   80,   59,   58,   58,   89,    0,    0,
-       80,   59,   58,   58,    0,    0,   79,    0,   59,   58,
-       58,    0,    0,    0,   59,   58,   58,    0,    0,   79,
+        0,    0,    0,    0,    0,   46,    0,    0,   82,   60,
+       59,   59,    0,    0,    0,    0,    0,    0,    0,    0,
+       60,   59,   59,    0,    0,    0,    0,    0,    0,   60,
+       59,   59,    0,    0,    0,    0,    0,    0,   60,   59,
+       59,    0,    0,    0,   45,   43,    0,   60,   59,   59,
+        0,   44,   43,    0,   60,   59,   59,    0,    0,   60,
+       59,   59,    0,    0,   60,   59,   59,    0,    0,   60,
+       59,   59,    0,   81,   60,   59,   59,   90,    0,    0,
+       81,   60,   59,   59,    0,    0,   80,    0,   60,   59,
+       59,    0,    0,    0,   60,   59,   59,    0,    0,   80,
 
-       59,   58,   58,   92,   88,   59,   58,   58,   59,   58,
-       58,   59,   58,   58,   59,   58,   58,   59,   58,   58,
-       59,   58,   58,   59,   58,   58,   59,   58,   58,   59,
-       58,   58,   59,   58,   58,   59,   58,   58,   59,   58,
-       58,   59,   58,   58,   59,   58,   58,   59,   58,   58,
-       59,   58,   58,   59,   58,   58,   59,   58,   58,   59,
-       58,   58,   59,   51,   52,   59,   59,   59,   59,   59,
-       59,   59,   59,   59,   59,   59,   59,   59,   59,   59,
-       59,   59,   59,   59,   59,   59,   59,   59,   59,   59,
-       59,   53,    0
+       60,   59,   59,   93,   89,   60,   59,   59,   60,   59,
+       59,   60,   59,   59,   60,   59,   59,   60,   59,   59,
+       60,   59,   59,   60,   59,   59,   60,   59,   59,   60,
+       59,   59,   60,   59,   59,   60,   59,   59,   60,   59,
+       59,   60,   59,   59,   60,   59,   59,   60,   59,   59,
+       60,   59,   59,   60,   59,   59,   60,   59,   59,   60,
+       59,   59,   60,   52,   53,   60,   60,   60,   60,   60,
+       60,   60,   60,   60,   60,   60,   60,   60,   60,   60,
+       60,   60,   60,   60,   60,   60,   60,   60,   60,   60,
+       60,   54,    0
 
     } ;
 
@@ -1700,14 +1700,14 @@ static const flex_int16_t yy_chk[4933] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[103] =
+static const flex_int32_t yy_rule_can_match_eol[104] =
     {   0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 
-    0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
-    1, 0, 0,     };
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 
+    0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+    0, 1, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -2089,119 +2089,119 @@ YY_RULE_SETUP
 case 14:
 YY_RULE_SETUP
 #line 77 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return SYM_ENTRY; }
+{ return SYM_HASH; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 79 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return SYM_COLON; }
+#line 78 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ return SYM_ENTRY; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 80 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return SYM_COMMA; }
+{ return SYM_COLON; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 81 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return SYM_EQUALS; }
+{ return SYM_COMMA; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 82 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ return SYM_EQUALS; }
+	YY_BREAK
+case 19:
+YY_RULE_SETUP
+#line 83 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_DOT; }
 	YY_BREAK
 /* keywords */
-case 19:
-YY_RULE_SETUP
-#line 86 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_NPOS; }
-	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 87 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_SRC; }
+{ return KW_NPOS; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 88 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_NONE; }
+{ return KW_SRC; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 89 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_TRUE; } 
+{ return KW_NONE; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 90 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_FALSE; }
+{ return KW_TRUE; } 
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 92 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_SOME; }
+#line 91 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ return KW_FALSE; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 93 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_OK; }
+{ return KW_SOME; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 94 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_ERR; }
+{ return KW_OK; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 95 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_LET; }
+{ return KW_ERR; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 96 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return KW_IN; }
+{ return KW_LET; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 98 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 97 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ return KW_IN; }
+	YY_BREAK
+case 30:
+YY_RULE_SETUP
+#line 99 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_ENV; }
 	YY_BREAK
 /* numbers */
-case 30:
-YY_RULE_SETUP
-#line 101 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Zero cannot be negative"); return YYerror; }
-	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 102 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Zero as divisor"); return YYerror; }
+{ yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 104 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_NAT; }
+#line 103 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Zero as divisor"); return YYerror; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 105 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_INT; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_NAT; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 106 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_BIG_NAT; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_INT; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 107 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_BIG_INT; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_BIG_NAT; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 109 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_RATIONAL; }
+#line 108 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_BIG_INT; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
@@ -2210,28 +2210,28 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 112 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Zero cannot be negative"); return YYerror; }
+#line 111 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_RATIONAL; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 114 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_FLOAT; }
+#line 113 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 115 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_DECIMAL; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_FLOAT; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 116 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_DECIMAL_DEGREE; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_DECIMAL; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 119 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Zero cannot be negative"); return YYerror; }
+#line 117 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_DECIMAL_DEGREE; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
@@ -2240,13 +2240,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 122 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_LAT_LONG; }
+#line 121 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 124 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Zero cannot be negative"); return YYerror; }
+#line 123 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_LAT_LONG; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
@@ -2255,63 +2255,63 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 127 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 126 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Zero cannot be negative"); return YYerror; }
+	YY_BREAK
+case 48:
+YY_RULE_SETUP
+#line 128 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_COMPLEX; }
 	YY_BREAK
 /* numberinos */
-case 48:
-YY_RULE_SETUP
-#line 130 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Cannot have sign on indexer"); return YYerror; }
-	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 132 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 131 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Cannot have sign on indexer"); return YYerror; }
+	YY_BREAK
+case 50:
+YY_RULE_SETUP
+#line 133 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_NUMBERINO; }
 	YY_BREAK
 /* strings */
-case 50:
-YY_RULE_SETUP
-#line 135 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_BYTE_BUFFER; }
-	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 136 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_UUID_V4; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_BYTE_BUFFER; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 137 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_UUID_V7; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_UUID_V4; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 138 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_SHA_HASH; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_UUID_V7; }
 	YY_BREAK
 case 54:
-/* rule 54 can match eol */
 YY_RULE_SETUP
-#line 140 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Invalid buffer contents"); return YYerror; }
+#line 139 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_SHA_HASH; }
 	YY_BREAK
 case 55:
 /* rule 55 can match eol */
 YY_RULE_SETUP
 #line 141 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Invalid UUID value"); return YYerror; }
+{ yyerror("Invalid buffer contents"); return YYerror; }
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
 YY_RULE_SETUP
 #line 142 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Invalid SHA3 value"); return YYerror; }
+{ yyerror("Invalid UUID value"); return YYerror; }
 	YY_BREAK
 case 57:
+/* rule 57 can match eol */
 YY_RULE_SETUP
-#line 144 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Missing close bracket"); return YYerror; }
+#line 143 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Invalid SHA3 value"); return YYerror; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
@@ -2323,169 +2323,169 @@ YY_RULE_SETUP
 #line 146 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Missing close bracket"); return YYerror; }
 	YY_BREAK
-
 case 60:
 YY_RULE_SETUP
-#line 149 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 147 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Missing close bracket"); return YYerror; }
+	YY_BREAK
+
+case 61:
+YY_RULE_SETUP
+#line 150 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(STRING); string_buf_bs.len = 0; ByteStringStoreChar('"'); }
 	YY_BREAK
 
 
-case 61:
+case 62:
 YY_RULE_SETUP
-#line 152 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 153 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreChar('"'); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_STRING; }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 153 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ BEGIN(INITIAL); yyerror("Unclosed String"); return YYEOF; }
-	YY_BREAK
-case 62:
-/* rule 62 can match eol */
-YY_RULE_SETUP
 #line 154 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
+{ BEGIN(INITIAL); yyerror("Unclosed String"); return YYEOF; }
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
 #line 155 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ ByteStringStoreChar(yytext[0]); }
+{ ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
 	YY_BREAK
-
-
 case 64:
+/* rule 64 can match eol */
 YY_RULE_SETUP
-#line 159 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ BEGIN(CSTRING); string_buf_bs.len = 0; ByteStringStoreChar('\''); }
+#line 156 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
 
 
 case 65:
 YY_RULE_SETUP
-#line 162 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 160 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ BEGIN(CSTRING); string_buf_bs.len = 0; ByteStringStoreChar('\''); }
+	YY_BREAK
+
+
+case 66:
+YY_RULE_SETUP
+#line 163 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreChar('\''); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_CSTRING; }
 	YY_BREAK
 case YY_STATE_EOF(CSTRING):
-#line 163 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ BEGIN(INITIAL); yyerror("Unclosed ASCIIString"); return YYEOF; }
-	YY_BREAK
-case 66:
-/* rule 66 can match eol */
-YY_RULE_SETUP
 #line 164 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
+{ BEGIN(INITIAL); yyerror("Unclosed ASCIIString"); return YYEOF; }
 	YY_BREAK
 case 67:
 /* rule 67 can match eol */
 YY_RULE_SETUP
 #line 165 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ ByteStringStoreChar(yytext[0]); }
+{ ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
 	YY_BREAK
 case 68:
+/* rule 68 can match eol */
 YY_RULE_SETUP
 #line 166 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Invalid character (ignoring)"); return YYerror;}
+{ ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
-
-
 case 69:
 YY_RULE_SETUP
-#line 170 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ BEGIN(REGEX); string_buf_bs.len = 0; ByteStringStoreChar('/'); }
+#line 167 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 
 case 70:
 YY_RULE_SETUP
-#line 173 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 171 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ BEGIN(REGEX); string_buf_bs.len = 0; ByteStringStoreChar('/'); }
+	YY_BREAK
+
+
+case 71:
+YY_RULE_SETUP
+#line 174 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreText(yytext, yyleng); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_REGEX; }
 	YY_BREAK
 case YY_STATE_EOF(REGEX):
-#line 174 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 175 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yyerror("Unclosed Regex"); return YYEOF; }
 	YY_BREAK
-case 71:
-/* rule 71 can match eol */
-YY_RULE_SETUP
-#line 175 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Newline in Regex"); return YYerror; }
-	YY_BREAK
 case 72:
+/* rule 72 can match eol */
 YY_RULE_SETUP
 #line 176 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ ByteStringStoreChar(yytext[0]); }
+{ yyerror("Newline in Regex"); return YYerror; }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
 #line 177 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Invalid character (ignoring)"); return YYerror;}
+{ ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
-
-
 case 74:
 YY_RULE_SETUP
-#line 181 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ BEGIN(PATH_ITEM); string_buf_bs.len = 0; ByteStringStoreText(yytext, yyleng); }
+#line 178 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 
 case 75:
 YY_RULE_SETUP
-#line 184 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 182 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ BEGIN(PATH_ITEM); string_buf_bs.len = 0; ByteStringStoreText(yytext, yyleng); }
+	YY_BREAK
+
+
+case 76:
+YY_RULE_SETUP
+#line 185 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreChar('\\'); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_PATH_ITEM; }
 	YY_BREAK
 case YY_STATE_EOF(PATH_ITEM):
-#line 185 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 186 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yyerror("Unclosed Path Item"); return YYEOF; }
 	YY_BREAK
-case 76:
-/* rule 76 can match eol */
-YY_RULE_SETUP
-#line 186 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Whitespace in Path Item"); return YYerror; }
-	YY_BREAK
 case 77:
+/* rule 77 can match eol */
 YY_RULE_SETUP
 #line 187 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ ByteStringStoreChar(yytext[0]); }
+{ yyerror("Whitespace in Path Item"); return YYerror; }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
 #line 188 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ ByteStringStoreChar(yytext[0]); }
+	YY_BREAK
+case 79:
+YY_RULE_SETUP
+#line 189 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 /* dates */
-case 79:
-YY_RULE_SETUP
-#line 192 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_TZ_DATE_TIME; }
-	YY_BREAK
 case 80:
 YY_RULE_SETUP
 #line 193 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_TIA_TIME; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_TZ_DATE_TIME; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
 #line 194 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_DATE; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_TIA_TIME; }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
 #line 195 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_TIME; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_DATE; }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 197 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_LOGICAL_TIME; }
+#line 196 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_TIME; }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 199 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Cannot have sign/negative time"); return YYerror; }
+#line 198 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_LOGICAL_TIME; }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
@@ -2495,7 +2495,7 @@ YY_RULE_SETUP
 case 86:
 YY_RULE_SETUP
 #line 201 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yyerror("Leading zero is not allowed"); return YYerror; }
+{ yyerror("Cannot have sign/negative time"); return YYerror; }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
@@ -2504,93 +2504,98 @@ YY_RULE_SETUP
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 204 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 203 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yyerror("Leading zero is not allowed"); return YYerror; }
+	YY_BREAK
+case 89:
+YY_RULE_SETUP
+#line 205 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_TIMESTAMP; }
 	YY_BREAK
 /* deltas */
-case 89:
-YY_RULE_SETUP
-#line 207 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_DATE_TIME; }
-	YY_BREAK
 case 90:
 YY_RULE_SETUP
 #line 208 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_SECONDS; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_DATE_TIME; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
 #line 209 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_LOGICAL; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_SECONDS; }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
 #line 210 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_LOGICAL; }
+	YY_BREAK
+case 93:
+YY_RULE_SETUP
+#line 211 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_ISOTIMESTAMP; }
 	YY_BREAK
 
-case 93:
+case 94:
 YY_RULE_SETUP
-#line 214 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 215 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(SHEBANG_LINE); string_buf_bs.len = 0; ByteStringStoreText(yytext, yyleng); }
 	YY_BREAK
 
 
-case 94:
-/* rule 94 can match eol */
+case 95:
+/* rule 95 can match eol */
 YY_RULE_SETUP
-#line 217 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ BEGIN(INITIAL); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_SHEBANG_LINE; }
-	YY_BREAK
-case YY_STATE_EOF(SHEBANG_LINE):
 #line 218 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_SHEBANG_LINE; }
 	YY_BREAK
-case 95:
-YY_RULE_SETUP
+case YY_STATE_EOF(SHEBANG_LINE):
 #line 219 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ BEGIN(INITIAL); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_SHEBANG_LINE; }
+	YY_BREAK
+case 96:
+YY_RULE_SETUP
+#line 220 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 /* names */
-case 96:
-YY_RULE_SETUP
-#line 223 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_IDENTIFIER; } 
-	YY_BREAK
 case 97:
 YY_RULE_SETUP
 #line 224 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ yylval.str = AST_STRDUP(yytext); return TOKEN_UNSPEC_IDENTIFIER; }
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_IDENTIFIER; } 
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
 #line 225 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ yylval.str = AST_STRDUP(yytext); return TOKEN_UNSPEC_IDENTIFIER; }
+	YY_BREAK
+case 99:
+YY_RULE_SETUP
+#line 226 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_TYPE_COMPONENT; }
 	YY_BREAK
 /* comments */
-case 99:
+case 100:
 YY_RULE_SETUP
-#line 228 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 229 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 { } /* line comment */
 	YY_BREAK
-case 100:
-/* rule 100 can match eol */
-YY_RULE_SETUP
-#line 230 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ } /* ignore white space */ 
-	YY_BREAK
 case 101:
+/* rule 101 can match eol */
 YY_RULE_SETUP
-#line 232 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
-{ return yytext[0]; } /* catch all and error in parser */
+#line 231 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ } /* ignore white space */ 
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 234 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 233 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+{ return yytext[0]; } /* catch all and error in parser */
+	YY_BREAK
+case 103:
+YY_RULE_SETUP
+#line 235 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 2594 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 2599 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -3566,7 +3571,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 234 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 235 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
 
 
 void ByteStringStoreChar(char c)

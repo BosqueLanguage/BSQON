@@ -27,6 +27,7 @@ BSQON_AST_NODE_DEFINE_2(SpecialConsValue, struct BSQON_AST_Node*, value, const c
 BSQON_AST_NODE_DEFINE_2(EnvAccessValue, struct ByteString*, data, struct BSQON_AST_Node*, type)
 
 BSQON_AST_NODE_DEFINE_2(ScopedNameValue, struct BSQON_AST_Node*, root, const char*, identifier)
+BSQON_AST_NODE_DEFINE_2(EnumAccessValue, struct BSQON_AST_Node*, root, const char*, identifier)
 BSQON_AST_NODE_DEFINE_4(LetInValue, const char*, vname, struct BSQON_AST_Node*, vtype, struct BSQON_AST_Node*, value, struct BSQON_AST_Node*, exp)
 
 BSQON_AST_NODE_DEFINE_2(AccessNameValue, struct BSQON_AST_Node*, value, const char*, name)
@@ -97,6 +98,7 @@ const char* BSQON_AST_getTagName(const struct BSQON_AST_Node* node)
         case BSQON_AST_TAG_AccessIndexValue: return "AccessIndexValue";
         case BSQON_AST_TAG_AccessKeyValue: return "AccessKeyValue";
         case BSQON_AST_TAG_ScopedNameValue: return "ScopedNameValue";
+        case BSQON_AST_TAG_EnumAccessValue: return "EnumAccessValue";
         default: return "^^MISSING_CASE^^";
     }
 }
@@ -290,6 +292,12 @@ void BSQON_AST_print(const struct BSQON_AST_Node* node)
         const struct BSQON_AST_NODE(ScopedNameValue)* nn = BSQON_AST_NODE_AS(ScopedNameValue, node);
         BSQON_AST_print(nn->root);
         printf("::%s", nn->identifier);
+        break;
+    }
+    case BSQON_AST_TAG_EnumAccessValue: {
+        const struct BSQON_AST_NODE(EnumAccessValue)* nn = BSQON_AST_NODE_AS(EnumAccessValue, node);
+        BSQON_AST_print(nn->root);
+        printf("#%s", nn->identifier);
         break;
     }
     case BSQON_AST_TAG_BsqonDeclBody: {

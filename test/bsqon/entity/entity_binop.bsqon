@@ -1,6 +1,6 @@
-BinOp{
-    op=OpKind#Add, 
-    l=Value{1i}, 
-    r=Value{2i}
+Main::BinOp{
+    op=Main::OpKind#Add, 
+    l=Main::Value{1i}, 
+    r=Main::Value{2i}
 }
 

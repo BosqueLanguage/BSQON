@@ -1605,12 +1605,12 @@ namespace bsqon
 
     Value* Parser::parseEnum(const EnumType* t, const BSQON_AST_Node* node)
     {
-        if(node->tag != BSQON_AST_TAG_ScopedNameValue) {
+        if(node->tag != BSQON_AST_TAG_EnumAccessValue) {
             this->addError("Expected Enum value", Parser::convertSrcPos(node->pos));
             return new ErrorValue(t, Parser::convertSrcPos(node->pos));
         }
 
-        auto snode = BSQON_AST_NODE_AS(ScopedNameValue, node);
+        auto snode = BSQON_AST_NODE_AS(EnumAccessValue, node);
         const Type* ttype = this->parseTypeRoot(snode->root);
         if(ttype->tkey != t->tkey) {
             this->addError("Expected " + t->tkey + " value but got " + ttype->tkey, Parser::convertSrcPos(node->pos));

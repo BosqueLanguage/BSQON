@@ -72,6 +72,7 @@ enum BSQON_AST_TAG
     BSQON_AST_TAG_AccessKeyValue,
 
     BSQON_AST_TAG_ScopedNameValue,
+    BSQON_AST_TAG_EnumAccessValue,
 
     BSQON_AST_TAG_BsqonDeclBody
 };
@@ -144,6 +145,7 @@ BSQON_AST_NODE_DECLARE_2(SpecialConsValue, struct BSQON_AST_Node*, value, const 
 BSQON_AST_NODE_DECLARE_2(EnvAccessValue, struct ByteString*, data, struct BSQON_AST_Node*, type)
 
 BSQON_AST_NODE_DECLARE_2(ScopedNameValue, struct BSQON_AST_Node*, root, const char*, identifier)
+BSQON_AST_NODE_DECLARE_2(EnumAccessValue, struct BSQON_AST_Node*, root, const char*, identifier)
 BSQON_AST_NODE_DECLARE_4(LetInValue, const char*, vname, struct BSQON_AST_Node*, vtype, struct BSQON_AST_Node*, value, struct BSQON_AST_Node*, exp)
 
 BSQON_AST_NODE_DECLARE_2(AccessNameValue, struct BSQON_AST_Node*, value, const char*, name)
