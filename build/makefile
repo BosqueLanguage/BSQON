@@ -76,16 +76,16 @@ $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_E
 	cp $(BSQON_HEADERS) $(PCKG_DIR)info/
 	cp $(PARSER_HEADERS) $(PCKG_DIR)parser/
 
-$(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_SOURCES) $(OUT_EXE)libbsqon.a $(GEN_DIR)generator_main.cpp
-	@mkdir -p $(BIN_DIR)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)tgen $(GEN_OBJS) $(GEN_DIR)generator_main.cpp -lbsqon -lbrex -lfl -lgmp
+$(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)generator_main.cpp
+	@mkdir -p $(OUT_EXE)
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)generator_main.cpp -lbsqon -lbrex -lfl -lgmp
 
-$()$(OUT_OBJ)generator.o: $(GEN_HEADERS) $(GEN_SOURCES)
+$(OUT_OBJ)generator.o: $(GEN_HEADERS) $(GEN_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -o $(OUT_OBJ)generator.o -c $(GEN_DIR)generator.cpp
 
 $(OUT_EXE)bsqon: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(PARSER_DIR)bsqon_main.cpp
-	@mkdir -p $(BIN_DIR)
+	@mkdir -p $(OUT_EXE)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)bsqon $(PARSER_DIR)bsqon_main.cpp -lbsqon -lbrex -lfl -lgmp
 
 $(OUT_EXE)libbsqon.a: $(BSQON_OBJS) $(PARSER_OBJS)

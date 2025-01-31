@@ -15,13 +15,13 @@ bsqon::Value* TypeGeneratorRandom::generateBool(const bsqon::PrimitiveType* t)
 
 bsqon::Value* TypeGeneratorRandom::generateNat(const bsqon::PrimitiveType* t)
 {
-    std::uniform_int_distribution<> nv(0, bsqon::Type::MAX_SAFE_NAT);
+    std::uniform_int_distribution<uint64_t> nv(0, bsqon::Type::MAX_SAFE_NAT);
     return new bsqon::NatNumberValue(t, g_spos, nv(rng));
 }
 
 bsqon::Value* TypeGeneratorRandom::generateInt(const bsqon::PrimitiveType* t)
 {
-    std::uniform_int_distribution<> iv(bsqon::Type::MIN_SAFE_INT, bsqon::Type::MAX_SAFE_INT);
+    std::uniform_int_distribution<int64_t> iv(bsqon::Type::MIN_SAFE_INT, bsqon::Type::MAX_SAFE_INT);
     return new bsqon::IntNumberValue(t, g_spos, iv(rng));
 }
 

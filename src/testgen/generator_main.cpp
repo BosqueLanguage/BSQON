@@ -35,7 +35,7 @@ int main(int argc, char** argv, char **envp)
     const bsqon::Type* loadtype = generator.assembly.lookupTypeKey(argv[2]);
 
     if(loadtype->isUnresolved()) {
-        printf("Invalid 'loadtype'\n");
+        printf("Invalid 'loadtype' -- %s\n", argv[2]);
         exit(1);
     }
 
