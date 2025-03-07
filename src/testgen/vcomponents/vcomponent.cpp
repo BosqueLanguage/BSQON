@@ -161,7 +161,7 @@ ValueSetPartition ValueSetGenerator::generateStdEntityType(const bsqon::StdEntit
 
     std::vector<ValueSetPartition> fieldpaths;
     std::transform(t->fields.cbegin(), t->fields.cend(), std::back_inserter(fieldpaths), [this, &tctx, &env](const bsqon::EntityTypeFieldEntry& f) {
-        auto tenv = env.step(f.fname, env.constraints, tctx.extendForField(f));
+        auto tenv = env.step("." + f.fname, env.constraints, tctx.extendForField(f));
 
         return this->generateType(this->assembly.lookupTypeKey(f.ftype), tenv);
     });
