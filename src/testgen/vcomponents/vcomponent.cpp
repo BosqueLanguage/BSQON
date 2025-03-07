@@ -1,7 +1,5 @@
 #include "vcomponent.h"
 
-static bsqon::SourcePos g_spos = { 0, 0, 0, 0 };
-
 bool vcpathCMP(const VCPath& p1, const VCPath& p2)
 {
     if(p1.size() < p2.size()) {
@@ -167,6 +165,8 @@ ValueSetPartition ValueSetGenerator::generateStdEntityType(const bsqon::StdEntit
 
         return this->generateType(this->assembly.lookupTypeKey(f.ftype), tenv);
     });
+
+    return ValueSetPartition::punion(fieldpaths);
 }
 
 ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env)

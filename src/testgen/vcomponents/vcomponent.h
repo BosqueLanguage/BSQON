@@ -201,8 +201,10 @@ public:
     std::vector<ValueComponent*> components;
 
     ValueSetPartition() : components() { ; }
-    ValueSetPartition(std::vector<ValueComponent*>& components) : components(components) { ; }
-    ValueSetPartition(std::vector<ValueComponent*>&& components) : components(std::move(components)) { ; }
+    ValueSetPartition(const std::vector<ValueComponent*>& components) : components(components) { ; }
+
+    ValueSetPartition(const ValueSetPartition& other) : components(other.components) { ; }
+    ValueSetPartition(const ValueSetPartition&& other) : components(std::move(other.components)) { ; }
 
     ValueSetPartition& operator=(const ValueSetPartition& other)
     {

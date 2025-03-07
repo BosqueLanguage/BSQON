@@ -57,7 +57,7 @@ BSQON_OBJS=$(OUT_OBJ)type_info.o $(OUT_OBJ)bsqon.o $(OUT_OBJ)bsqon_parse.o
 
 GEN_HEADERS=$(GEN_DIR)generator.h $(GEN_DIR)vcomponents/vcomponent.h
 GEN_SOURCES=$(GEN_DIR)generator.cpp $(GEN_DIR)vcomponents/vcomponent.cpp
-GEN_OBJS=$(OUT_OBJ)generator.o $(GEN_DIR)vcomponent.o
+GEN_OBJS=$(OUT_OBJ)generator.o $(OUT_OBJ)vcomponent.o
 
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
