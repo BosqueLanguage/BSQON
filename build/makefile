@@ -55,15 +55,15 @@ BSQON_HEADERS=$(SRC_DIR)common.h $(INFO_DIR)type_info.h $(INFO_DIR)bsqon.h $(PAR
 BSQON_SOURCES=$(INFO_DIR)type_info.cpp $(INFO_DIR)bsqon.cpp $(PARSER_DIR)bsqon_parse.cpp
 BSQON_OBJS=$(OUT_OBJ)type_info.o $(OUT_OBJ)bsqon.o $(OUT_OBJ)bsqon_parse.o
 
-GEN_HEADERS=$(GEN_DIR)generator.h $(GEN_DIR)vcomponents/vcomponent.h
-GEN_SOURCES=$(GEN_DIR)generator.cpp $(GEN_DIR)vcomponents/vcomponent.cpp
-GEN_OBJS=$(OUT_OBJ)generator.o $(OUT_OBJ)vcomponent.o
+GEN_HEADERS=$(GEN_DIR)generator.h $(GEN_DIR)vcomponents/vcomponent.h $(GEN_DIR)/ai/ai_generator.h
+GEN_SOURCES=$(GEN_DIR)generator.cpp $(GEN_DIR)vcomponents/vcomponent.cpp $(GEN_DIR)/ai/ai_generator.cpp
+GEN_OBJS=$(OUT_OBJ)generator.o $(OUT_OBJ)vcomponent.o $(OUT_OBJ)ai_generator.o
 
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
 MAKEFLAGS += -j4
 
-all: $(OUT_EXE)libbsqon.a $(OUT_EXE)bsqon $(OUT_EXE)tgen $(PCKG_DIR)libbsqon.a
+all: $(OUT_EXE)libbsqon.a $(OUT_EXE)bsqon $(OUT_EXE)tgen $(PCKG_DIR)libbsqon.a $(OUT_EXE)ai
 
 $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_EXE)libbsqon.a
 	@mkdir -p $(PCKG_DIR)
@@ -76,9 +76,18 @@ $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_E
 	cp $(BSQON_HEADERS) $(PCKG_DIR)info/
 	cp $(PARSER_HEADERS) $(PCKG_DIR)parser/
 
+
+$(OUT_EXE)ai: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)ai/generator_main.cpp
+	@mkdir -p $(OUT_EXE)
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)ai $(GEN_OBJS) $(GEN_DIR)ai/generator_main.cpp -lbsqon -lbrex -lfl -lgmp -lcurl
+
 $(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)generator_main.cpp
 	@mkdir -p $(OUT_EXE)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)generator_main.cpp -lbsqon -lbrex -lfl -lgmp
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)generator_main.cpp -lbsqon -lbrex -lfl -lgmp -lcurl
+
+$(OUT_OBJ)ai_generator.o: $(GEN_HEADERS) $(GEN_SOURCES)
+	@mkdir -p $(OUT_OBJ)
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -o $(OUT_OBJ)ai_generator.o -c $(GEN_DIR)ai/ai_generator.cpp
 
 $(OUT_OBJ)vcomponent.o: $(GEN_HEADERS) $(GEN_SOURCES)
 	@mkdir -p $(OUT_OBJ)

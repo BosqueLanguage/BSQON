@@ -1,5 +1,6 @@
 #include "generator.h"
 #include "./vcomponents/vcomponent.h"
+#include "./ai/ai_generator.h"
 
 #include <iostream>
 #include <fstream>
