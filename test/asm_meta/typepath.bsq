@@ -1,0 +1,26 @@
+declare namespace Main;
+
+enum EFlag {
+    yes,
+    no
+}
+
+entity Bar {
+    field b: EFlag;
+}
+
+entity IPair {
+    field first: Int;
+    field second: Bar;
+}
+
+entity Foo {
+    field v: Nat;
+    field pp: IPair;
+}
+
+public function main(): None {
+    var op: Foo;
+
+    return none;
+}
