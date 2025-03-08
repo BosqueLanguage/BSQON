@@ -1,0 +1,177 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "EFlag",
+                    "Main::EFlag"
+                ],
+                [
+                    "Bar",
+                    "Main::Bar"
+                ],
+                [
+                    "IPair",
+                    "Main::IPair"
+                ],
+                [
+                    "Foo",
+                    "Main::Foo"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "yes",
+                "no"
+            ],
+            "supertypes": [],
+            "tkey": "Main::EFlag",
+            "name": "EFlag"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "b",
+                    "ftype": "Main::EFlag",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Bar",
+            "name": "Bar"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "first",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "second",
+                    "ftype": "Main::Bar",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::IPair",
+            "name": "IPair"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "pp",
+                    "ftype": "Main::IPair",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Foo",
+            "name": "Foo"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

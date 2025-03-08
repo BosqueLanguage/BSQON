@@ -103,7 +103,7 @@ public:
             ots = u8", oftype=" + std::u8string(this->oftype.value()->tkey.cbegin(), this->oftype.value()->tkey.cend());
         }
 
-        std::u8string vts = u8"valuetype=" + (this->valuetype != nullptr ? u8"[UNSET]" : std::u8string(this->valuetype->tkey.cbegin(), this->valuetype->tkey.cend()));
+        std::u8string vts = u8"valuetype=" + (this->valuetype == nullptr ? u8"[UNSET]" : std::u8string(this->valuetype->tkey.cbegin(), this->valuetype->tkey.cend()));
 
         return u8"{ " + vts + its + ffs + ots + u8" }";
 
