@@ -168,6 +168,28 @@ ValueSetPartition ValueSetGenerator::generateEnum(const bsqon::EnumType* t, cons
     return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
 }
 
+ValueSetPartition ValueSetGenerator::generateList(const bsqon::ListType* t, const ValueSetGeneratorEnvironment& env)
+{
+    auto tctx = env.context.extendWithEnclosingType(t);
+    std::vector<ValueSetPartition> partitions;
+
+    auto tenv = env.step(pathAccessSpecial(env.path, "length"), env.constraints, tctx.completeWithValueType(this->assembly->lookupTypeKey("Nat")));
+    auto len = this->generateType(this->assembly->lookupTypeKey("Nat"), tenv);
+    partitions.push_back(len);
+ 
+    for(size_t i = 0; i < MAX_COLLECTION_COUNT - 1; ++i) {
+        std::vector<ValueConstraint*> constraints(env.constraints);
+        constraints.push_back(new MinLengthConstraint(pathAccessSpecial(env.path, "length"), i + 1));
+        
+        auto tenv = env.step(pathAccessIndex(env.path, i), constraints, tctx.extendForIndex(i));
+        auto pp = this->generateType(this->assembly->lookupTypeKey(t->oftype), tenv);
+
+        partitions.push_back(pp);
+    }
+
+    return ValueSetPartition::punion(partitions);
+}
+
 //More special types here...
 
 ValueSetPartition ValueSetGenerator::generateStdEntityType(const bsqon::StdEntityType* t, const ValueSetGeneratorEnvironment& env)

@@ -17,10 +17,27 @@ void TypeGeneratorRandom::generateNat(const bsqon::PrimitiveType* t, ValueCompon
 {
     std::uniform_int_distribution<uint64_t> nv(0, 256);
 
-    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
+    if(!vc->context.forspecial.has_value()) {
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 1));
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 2));
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 3));
 
-    for(size_t i = 0; i < 10; ++i) {
-        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, nv(rng)));
+        for(size_t i = 0; i < 3; ++i) {
+            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, nv(rng)));
+        }
+    }
+    else {
+        auto sname = vc->context.forspecial.value();
+        if(sname == u8"length") {
+            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
+            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 1));
+            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 2));
+            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 3));
+        }
+        else {
+            assert(false); //unknown special name
+        }
     }
 }
 
@@ -28,9 +45,13 @@ void TypeGeneratorRandom::generateInt(const bsqon::PrimitiveType* t, ValueCompon
 {
     std::uniform_int_distribution<int64_t> iv(-256, 256);
 
+    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, -3));
+    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, -1));
     vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
+    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 1));
+    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 3));
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < 3; ++i) {
         vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, iv(rng)));
     }
 }
@@ -160,12 +181,14 @@ void TypeGeneratorRandom::generateType(const bsqon::Type* t, ValueComponent* vc)
     switch(t->tag) {
         case bsqon::TypeTag::TYPE_PRIMITIVE: {
             this->generatePrimitive(static_cast<const bsqon::PrimitiveType*>(t), vc);
+            break;
         }
         /*
         * TODO: more tags here
         */
         case bsqon::TypeTag::TYPE_ENUM: {
             this->generateEnum(static_cast<const bsqon::EnumType*>(t), vc);
+            break;
         }
         /*
         * TODO: more tags here
@@ -173,6 +196,7 @@ void TypeGeneratorRandom::generateType(const bsqon::Type* t, ValueComponent* vc)
        default: {
             //Missing type
             assert(false);
+            break;
         }
     }
 }

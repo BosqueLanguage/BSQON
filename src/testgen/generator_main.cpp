@@ -113,16 +113,17 @@ int main(int argc, char** argv, char **envp)
     ValueSetPartition vspartition = generator.generateType(loadtype, venv);
 
     std::vector<bsqon::Value*> tests;
-    if(argv[3] == "--rnd") {
-        tests = generateRandomTestSuite(&assembly, vspartition, loadtype, 10); //TODO: maybe make this a command parameter --rnd=X
+    auto modestr = std::string(argv[3]);
+    if(modestr == "--rnd") {
+        tests = generateRandomTestSuite(&assembly, vspartition, loadtype, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
     }
-    else if(argv[3] == "--agent") {
-        tests = generateAgentTestSuite(&assembly, vspartition, loadtype, 10); //TODO: maybe make this a command parameter --rnd=X
+    else if(modestr == "--agent") {
+        tests = generateAgentTestSuite(&assembly, vspartition, loadtype, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
     }
-    else if(argv[3] == "--combinatorial") {
+    else if(modestr == "--combinatorial") {
         tests = generateCombinatorialTestSuite(&assembly, vspartition, loadtype);
     }
-    else if(argv[3] == "--all") {
+    else if(modestr == "--all") {
         tests = generateTestSuite(&assembly, vspartition, loadtype);
     }
     else {
