@@ -300,7 +300,7 @@ namespace bsqon
             auto t = Type::parse(tr);
             assembly.typerefs[t->tkey] = t; 
         });
-
+        
         std::for_each(j["recursiveSets"].begin(), j["recursiveSets"].end(), [&assembly](const json &rs) { 
             std::set<TypeKey> rset;
             std::transform(rs.begin(), rs.end(), std::inserter(rset, rset.end()), [](const json& jv) { return jv.get<TypeKey>(); });

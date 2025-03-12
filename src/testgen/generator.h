@@ -22,7 +22,11 @@ public:
     bsqon::Value* generateBool(const bsqon::PrimitiveType* t);
     bsqon::Value* generateNat(const bsqon::PrimitiveType* t);
     bsqon::Value* generateInt(const bsqon::PrimitiveType* t);
+    bsqon::Value* generateBigNat(const bsqon::PrimitiveType *t) ;
+    bsqon::Value* generateString(const bsqon::PrimitiveType* t);
+    bsqon::Value* generateFloat(const bsqon::PrimitiveType *t);
 
+    bsqon::Value* handleConceptType();
     //TODO: more primitives..
 
     bsqon::Value* generatePrimitive(const bsqon::PrimitiveType* t);
@@ -31,6 +35,8 @@ public:
     //More special types here...
 
     bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t);
+    bsqon::Value* generateStdConceptype(const bsqon::StdEntityType* t);
+    bsqon::Value* generateListType(const bsqon::ListType *t);
 
     bsqon::Value* generateType(const bsqon::Type* t);
 };

@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_HOME_MARK_CODE_BSQON_BUILD_OUTPUT_OBJ_BSQON_TAB_H_INCLUDED
-# define YY_YY_HOME_MARK_CODE_BSQON_BUILD_OUTPUT_OBJ_BSQON_TAB_H_INCLUDED
+#ifndef YY_YY_HOME_OP_PROJECTS_BSQON_NEW_BSQON_BUILD_OUTPUT_OBJ_BSQON_TAB_H_INCLUDED
+# define YY_YY_HOME_OP_PROJECTS_BSQON_NEW_BSQON_BUILD_OUTPUT_OBJ_BSQON_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -45,11 +45,11 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 27 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 27 "/home/op/Projects/BSQON_NEW/BSQON/build/../src/fbparser/bsqon.y"
 
 #include "../../../src/fbparser/bsqon_ast.h"
 
-#line 53 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.h"
+#line 53 "/home/op/Projects/BSQON_NEW/BSQON/build/output/obj/bsqon.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -125,7 +125,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 31 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 31 "/home/op/Projects/BSQON_NEW/BSQON/build/../src/fbparser/bsqon.y"
 
    char* str;
    struct ByteString* bstr;
@@ -145,7 +145,7 @@ union YYSTYPE
    struct BSQON_AST_NLIST_OF_VALUES_ENTRY bsqon_named_value_list_entry;
    struct BSQON_AST_NLIST_OF_VALUES* bsqon_named_value_list;
 
-#line 149 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.h"
+#line 149 "/home/op/Projects/BSQON_NEW/BSQON/build/output/obj/bsqon.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -174,4 +174,4 @@ extern YYLTYPE yylloc;
 int yyparse (void);
 
 
-#endif /* !YY_YY_HOME_MARK_CODE_BSQON_BUILD_OUTPUT_OBJ_BSQON_TAB_H_INCLUDED  */
+#endif /* !YY_YY_HOME_OP_PROJECTS_BSQON_NEW_BSQON_BUILD_OUTPUT_OBJ_BSQON_TAB_H_INCLUDED  */
