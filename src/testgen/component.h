@@ -1,13 +1,19 @@
 #pragma once
 
-#include "../../common.h"
+#include "../common.h"
 
-#include "../../info/type_info.h"
-#include "../../info/bsqon.h"
+#include "../info/type_info.h"
+#include "../info/bsqon.h"
+
+#include <random>
 
 typedef std::string VCPath;
 
 bool vcpathCMP(const VCPath& p1, const VCPath& p2);
+
+VCPath pathAccessField(const VCPath& p, const std::string& f);
+VCPath pathAccessIndex(const VCPath& p, size_t i);
+VCPath pathAccessSpecial(const VCPath& p, const std::string& name);
 
 class ValueConstraint
 {
@@ -50,9 +56,9 @@ public:
 class FixedValueConstraint : public ValueConstraint
 {
 public:
-    const bsqon::Value* value;
+    bsqon::Value* value;
 
-    FixedValueConstraint(VCPath path, const bsqon::Value* value) : ValueConstraint(path), value(value) { ; }
+    FixedValueConstraint(VCPath path, bsqon::Value* value) : ValueConstraint(path), value(value) { ; }
 
     virtual std::u8string toString() const override
     {
@@ -184,9 +190,8 @@ public:
         return *this;
     }
 
-    ValueSetGeneratorEnvironment step(const std::string& pathext, const std::vector<ValueConstraint*>& newconstraints, const GenerateContext& updatedcontext) const
+    ValueSetGeneratorEnvironment step(const std::string& npath, const std::vector<ValueConstraint*>& newconstraints, const GenerateContext& updatedcontext) const
     {
-        VCPath npath = this->path + pathext;
         std::vector<ValueConstraint*> nconstraints(this->constraints);
         nconstraints.insert(nconstraints.end(), newconstraints.cbegin(), newconstraints.cend());
         std::stable_sort(nconstraints.begin(), nconstraints.end(), [](const ValueConstraint* v1, const ValueConstraint* v2) { return vcpathCMP(v1->path, v2->path); });
@@ -250,9 +255,9 @@ public:
 class ValueSetGenerator
 {
 public:
-    bsqon::AssemblyInfo assembly;
+    const bsqon::AssemblyInfo* assembly;
 
-    ValueSetGenerator() { ; }
+    ValueSetGenerator(const bsqon::AssemblyInfo* assembly) : assembly(assembly) { ; }
     ~ValueSetGenerator() { ; }
 
     ValueSetPartition generateNone(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
@@ -273,3 +278,36 @@ public:
     ValueSetPartition generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env);
 };
 
+class TestGenerator
+{
+private:
+    bool isRequiredValue(const VCPath& currpath, bsqon::Value*& value);
+    bsqon::Value* selectFromPartition(const VCPath& currpath);
+
+public:
+    const bsqon::AssemblyInfo* assembly;
+    const ValueSetPartition* vspartition;
+
+    std::vector<const ValueConstraint*> constraints;
+    std::mt19937_64 rng;
+
+    TestGenerator(const bsqon::AssemblyInfo* assembly, const ValueSetPartition* vspartition, const std::vector<const ValueConstraint*>& constraints) : assembly(assembly), vspartition(vspartition), constraints(constraints), rng(std::random_device{}()) { ; }
+    ~TestGenerator() { ; }
+
+    bsqon::Value* generateNone(const bsqon::PrimitiveType* t, VCPath currpath);
+
+    bsqon::Value* generateBool(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generateNat(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generateInt(const bsqon::PrimitiveType* t, VCPath currpath);
+
+    //TODO: more primitives..
+
+    bsqon::Value* generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generateEnum(const bsqon::EnumType* t, VCPath currpath);
+
+    //More special types here...
+
+    bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath);
+
+    bsqon::Value* generateType(const bsqon::Type* t, VCPath currpath);
+};

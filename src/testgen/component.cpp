@@ -1,4 +1,4 @@
-#include "vcomponent.h"
+#include "component.h"
 
 bool vcpathCMP(const VCPath& p1, const VCPath& p2)
 {
@@ -11,6 +11,21 @@ bool vcpathCMP(const VCPath& p1, const VCPath& p2)
     else {
         return p1.compare(p2) < 0;
     }
+}
+
+VCPath pathAccessField(const VCPath& p, const std::string& f)
+{
+    return p + "." + f;
+}
+
+VCPath pathAccessIndex(const VCPath& p, size_t i)
+{
+    return p + "[" + std::to_string(i) + "]";
+}
+
+VCPath pathAccessSpecial(const VCPath& p, const std::string& name)
+{
+    return p + "@" + name;
 }
 
 ValueSetPartition ValueSetGenerator::generateNone(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
@@ -161,9 +176,9 @@ ValueSetPartition ValueSetGenerator::generateStdEntityType(const bsqon::StdEntit
 
     std::vector<ValueSetPartition> fieldpaths;
     std::transform(t->fields.cbegin(), t->fields.cend(), std::back_inserter(fieldpaths), [this, &tctx, &env](const bsqon::EntityTypeFieldEntry& f) {
-        auto tenv = env.step("." + f.fname, env.constraints, tctx.extendForField(f));
+        auto tenv = env.step(pathAccessField(env.path, f.fname), env.constraints, tctx.extendForField(f));
 
-        return this->generateType(this->assembly.lookupTypeKey(f.ftype), tenv);
+        return this->generateType(this->assembly->lookupTypeKey(f.ftype), tenv);
     });
 
     return ValueSetPartition::punion(fieldpaths);
@@ -184,6 +199,92 @@ ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const Va
         }
         case bsqon::TypeTag::TYPE_ENUM: {
             return this->generateEnum(static_cast<const bsqon::EnumType*>(t), env);
+        }
+        /*
+        * TODO: more tags here
+        */
+       default: {
+            //Missing type
+            assert(false);
+        }
+    }
+}
+
+static bsqon::SourcePos g_spos = { 0, 0, 0, 0 };
+
+bool TestGenerator::isRequiredValue(const VCPath& currpath, bsqon::Value*& value)
+{
+    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { return vc->path == currpath; });
+    if(ci == this->constraints.cend()) {
+        value = nullptr;
+        return false;
+    }
+    else {
+        auto fvc = dynamic_cast<const FixedValueConstraint*>(*ci);
+
+        value = fvc->value;
+        return true;
+    }
+
+    return false;
+}
+
+bsqon::Value* TestGenerator::selectFromPartition(const VCPath& currpath)
+{
+    auto ci = std::find_if(this->vspartition->components.cbegin(), this->vspartition->components.cend(), [&currpath](const ValueComponent* vc) { return vc->path == currpath; });
+    assert(ci != this->vspartition->components.cend()); //we missed something in the partitioning
+    
+    std::uniform_int_distribution<size_t> unif(0, (*ci)->options.size() - 1);
+    size_t choice = unif(rng);
+
+    return (*ci)->options[choice];
+}
+
+bsqon::Value* TestGenerator::generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath)
+{
+    bsqon::Value* res = nullptr;
+    if(this->isRequiredValue(currpath, res)) {
+        return res;
+    }
+
+    return this->selectFromPartition(currpath);
+}
+
+bsqon::Value* TestGenerator::generateEnum(const bsqon::EnumType* t, VCPath currpath)
+{
+    bsqon::Value* res = nullptr;
+    if(this->isRequiredValue(currpath, res)) {
+        return res;
+    }
+
+    return this->selectFromPartition(currpath);
+}
+
+bsqon::Value* TestGenerator::generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath)
+{
+    std::vector<bsqon::Value*> fieldvals;
+    std::transform(t->fields.cbegin(), t->fields.cend(), std::back_inserter(fieldvals), [this, &currpath](const auto& f) { 
+        return this->generateType(this->assembly->lookupTypeKey(f.ftype), pathAccessField(currpath, f.fname));
+    });
+
+    return new bsqon::EntityValue(t, g_spos, std::move(fieldvals));
+}
+
+bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
+{
+    switch(t->tag) {
+        case bsqon::TypeTag::TYPE_PRIMITIVE: {
+            return this->generatePrimitive(static_cast<const bsqon::PrimitiveType*>(t), currpath);
+        }
+        /*
+        * TODO: more tags here
+        */
+        case bsqon::TypeTag::TYPE_STD_ENTITY:
+        {
+            return this->generateStdEntityType(static_cast<const bsqon::StdEntityType*>(t), currpath);
+        }
+        case bsqon::TypeTag::TYPE_ENUM: {
+            return this->generateEnum(static_cast<const bsqon::EnumType*>(t), currpath);
         }
         /*
         * TODO: more tags here
