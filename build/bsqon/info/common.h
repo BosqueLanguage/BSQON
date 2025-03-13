@@ -21,6 +21,8 @@ typedef nlohmann::json json;
 #include "../build/include/brex/path/path_fragment.h"
 #include "../build/include/brex/path/path_glob.h"
 
+#define MAX_TEST_COLLECTION_COUNT 3
+
 namespace bsqon
 {
     struct TZDateTime

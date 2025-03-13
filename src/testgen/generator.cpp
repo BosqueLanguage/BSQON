@@ -30,10 +30,9 @@ void TypeGeneratorRandom::generateNat(const bsqon::PrimitiveType* t, ValueCompon
     else {
         auto sname = vc->context.forspecial.value();
         if(sname == u8"length") {
-            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
-            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 1));
-            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 2));
-            vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 3));
+            for(size_t i = 0; i <= MAX_TEST_COLLECTION_COUNT; ++i) {
+                vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, i));
+            }
         }
         else {
             assert(false); //unknown special name

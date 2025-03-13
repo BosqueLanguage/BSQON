@@ -7,8 +7,6 @@
 
 #include <random>
 
-#define MAX_COLLECTION_COUNT 3
-
 typedef std::string VCPath;
 
 bool vcpathCMP(const VCPath& p1, const VCPath& p2);
@@ -71,7 +69,7 @@ public:
 class GenerateContext
 {
 private:
-    GenerateContext(const std::optional<const bsqon::Type*> intype, std::optional<bsqon::EntityTypeFieldEntry> forfield, std::optional<size_t> forindex, std::optional<std::u8string> forspecial, const std::optional<const bsqon::TypedeclType*> oftype, const bsqon::Type* valuetype) : intype(intype), forfield(forfield), oftype(oftype), valuetype(valuetype) { ; }
+    GenerateContext(const std::optional<const bsqon::Type*> intype, std::optional<bsqon::EntityTypeFieldEntry> forfield, std::optional<size_t> forindex, std::optional<std::u8string> forspecial, const std::optional<const bsqon::TypedeclType*> oftype, const bsqon::Type* valuetype) : intype(intype), forfield(forfield), forindex(forindex), forspecial(forspecial), oftype(oftype), valuetype(valuetype) { ; }
 
 public:
     std::optional<const bsqon::Type*> intype;

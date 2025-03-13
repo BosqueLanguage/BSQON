@@ -173,11 +173,11 @@ ValueSetPartition ValueSetGenerator::generateList(const bsqon::ListType* t, cons
     auto tctx = env.context.extendWithEnclosingType(t);
     std::vector<ValueSetPartition> partitions;
 
-    auto tenv = env.step(pathAccessSpecial(env.path, "length"), env.constraints, tctx.completeWithValueType(this->assembly->lookupTypeKey("Nat")));
+    auto tenv = env.step(pathAccessSpecial(env.path, "length"), env.constraints, tctx.extendForSpecial(u8"length").completeWithValueType(this->assembly->lookupTypeKey("Nat")));
     auto len = this->generateType(this->assembly->lookupTypeKey("Nat"), tenv);
     partitions.push_back(len);
  
-    for(size_t i = 0; i < MAX_COLLECTION_COUNT - 1; ++i) {
+    for(size_t i = 0; i < MAX_TEST_COLLECTION_COUNT; ++i) {
         std::vector<ValueConstraint*> constraints(env.constraints);
         constraints.push_back(new MinLengthConstraint(pathAccessSpecial(env.path, "length"), i + 1));
         
@@ -215,8 +215,10 @@ ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const Va
         /*
         * TODO: more tags here
         */
-        case bsqon::TypeTag::TYPE_STD_ENTITY:
-        {
+        case bsqon::TypeTag::TYPE_LIST: {
+            return this->generateList(static_cast<const bsqon::ListType*>(t), env);
+        } 
+        case bsqon::TypeTag::TYPE_STD_ENTITY: {
             return this->generateStdEntityType(static_cast<const bsqon::StdEntityType*>(t), env);
         }
         case bsqon::TypeTag::TYPE_ENUM: {
@@ -358,8 +360,10 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
         /*
         * TODO: more tags here
         */
-        case bsqon::TypeTag::TYPE_STD_ENTITY:
-        {
+        case bsqon::TypeTag::TYPE_LIST: {
+            return this->generateList(static_cast<const bsqon::ListType*>(t), currpath);
+        }
+        case bsqon::TypeTag::TYPE_STD_ENTITY: {
             return this->generateStdEntityType(static_cast<const bsqon::StdEntityType*>(t), currpath);
         }
         case bsqon::TypeTag::TYPE_ENUM: {
