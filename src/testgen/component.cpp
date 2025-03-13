@@ -237,17 +237,55 @@ static bsqon::SourcePos g_spos = { 0, 0, 0, 0 };
 bool TestGenerator::isRequiredValue(const VCPath& currpath, bsqon::Value*& value)
 {
     auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { return vc->path == currpath; });
-    if(ci == this->constraints.cend()) {
-        value = nullptr;
-        return false;
-    }
-    else {
+    if(ci != this->constraints.cend()) {
         auto fvc = dynamic_cast<const FixedValueConstraint*>(*ci);
 
         value = fvc->value;
         return true;
     }
 
+    value = nullptr;
+    return false;
+}
+
+bool TestGenerator::isConstrainedLengthValue(const VCPath& currpath, bsqon::Value*& value)
+{
+    auto lc = std::find_if(this->vspartition->components.cbegin(), this->vspartition->components.cend(), [&currpath](const ValueComponent* vc) { return vc->path == currpath; });
+    assert(lc != this->vspartition->components.cend()); //we missed something in the partitioning
+    
+    const std::vector<bsqon::Value*>& lenopts = (*lc)->options;
+
+    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { return vc->path == currpath; });
+    if(ci != this->constraints.cend()) {
+        auto fvc = dynamic_cast<const FixedValueConstraint*>(*ci);
+        if(fvc != nullptr) {
+            value = fvc->value;
+            return true;
+        }
+        
+        auto mlc = dynamic_cast<const MinLengthConstraint*>(*ci);
+        if(mlc != nullptr) {
+            std::vector<bsqon::Value*> minlenopts;
+            std::copy_if(lenopts.cbegin(), lenopts.cend(), std::back_inserter(minlenopts), [mlc](const bsqon::Value* v) { 
+                return static_cast<const bsqon::NatNumberValue*>(v)->cnv >= mlc->minlen;
+            });
+
+            if(minlenopts.empty()) {
+                //It must be at least this big 
+                value = new bsqon::NatNumberValue(this->assembly->lookupTypeKey("Nat"), g_spos, mlc->minlen);
+                return true;
+            }
+            else {
+                std::uniform_int_distribution<size_t> unif(0, minlenopts.size() - 1);
+                size_t choice = unif(rng);
+
+                value = minlenopts[choice];
+                return true;
+            }
+        }
+    }
+
+    value = nullptr;
     return false;
 }
 
@@ -280,6 +318,25 @@ bsqon::Value* TestGenerator::generateEnum(const bsqon::EnumType* t, VCPath currp
     }
 
     return this->selectFromPartition(currpath);
+}
+
+bsqon::Value* TestGenerator::generateList(const bsqon::ListType* t, VCPath currpath)
+{
+    auto lenpath = pathAccessSpecial(currpath, "length");
+    bsqon::Value* len = nullptr;
+    if(!this->isConstrainedLengthValue(lenpath, len)) {
+        len = this->selectFromPartition(lenpath);
+    }
+
+    auto rlen = static_cast<bsqon::NatNumberValue*>(len)->cnv;
+
+    std::vector<bsqon::Value*> fieldvals;
+    for(uint64_t i = 0; i < rlen; ++i) {
+        auto ipath = pathAccessIndex(currpath, i);
+        fieldvals.push_back(this->generateType(this->assembly->lookupTypeKey(t->oftype), ipath));
+    }
+
+    return new bsqon::ListValue(t, g_spos, std::move(fieldvals));
 }
 
 bsqon::Value* TestGenerator::generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath)

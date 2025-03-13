@@ -308,6 +308,7 @@ class TestGenerator
 {
 private:
     bool isRequiredValue(const VCPath& currpath, bsqon::Value*& value);
+    bool isConstrainedLengthValue(const VCPath& currpath, bsqon::Value*& value);
     bsqon::Value* selectFromPartition(const VCPath& currpath);
 
 public:
@@ -331,6 +332,7 @@ public:
     bsqon::Value* generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath);
     bsqon::Value* generateEnum(const bsqon::EnumType* t, VCPath currpath);
 
+    bsqon::Value* generateList(const bsqon::ListType* t, VCPath currpath);
     //More special types here...
 
     bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath);

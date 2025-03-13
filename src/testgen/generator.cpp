@@ -45,11 +45,11 @@ void TypeGeneratorRandom::generateInt(const bsqon::PrimitiveType* t, ValueCompon
 {
     std::uniform_int_distribution<int64_t> iv(-256, 256);
 
-    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, -3));
-    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, -1));
-    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
-    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 1));
-    vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 3));
+    vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, -3));
+    vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, -1));
+    vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, 0));
+    vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, 1));
+    vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, 3));
 
     for(size_t i = 0; i < 3; ++i) {
         vc->options.push_back(new bsqon::IntNumberValue(t, g_spos, iv(rng)));
