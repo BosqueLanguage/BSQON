@@ -1,5 +1,5 @@
+#include "component.h"
 #include "generator.h"
-#include "./vcomponents/vcomponent.h"
 
 #include <iostream>
 #include <fstream>
@@ -19,9 +19,83 @@ void loadAssemblyJSONExplicit(const char* filename, json& jv)
     }
 }
 
+void usage()
+{
+    printf("Usage: generator <assembly.json> <loadtype> <--rnd|--agent|--combinatorial|--smt|--all>\n");
+    exit(1);
+}
+
+const bsqon::Type* loadTypeForGenerate(const bsqon::AssemblyInfo* ainfo, const std::string& tkey)
+{
+    auto t = ainfo->lookupTypeKey(tkey);
+    if(t->isUnresolved()) {
+        printf("Invalid 'loadtype' -- %s\n", tkey.c_str());
+        exit(1);
+    }
+
+    return t;
+}
+
+std::vector<bsqon::Value*> generateRandomTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const bsqon::Type* loadtype, size_t count)
+{
+    TypeGeneratorRandom generator;
+    for(size_t i = 0; i < vspartition.components.size(); ++i) {
+        generator.generateType(vspartition.components[i]->context.valuetype, vspartition.components[i]);
+    }
+
+    TestGenerator tgen(assembly, &vspartition, {});
+
+    std::vector<bsqon::Value*> tests;
+    for(size_t i = 0; i < count; ++i) {
+        auto res = tgen.generateType(loadtype, "var");
+        tests.push_back(res);
+    }
+
+    return tests;
+}
+
+std::vector<bsqon::Value*> generateAgentTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const bsqon::Type* loadtype, size_t count)
+{
+    printf("Agent test suite generation not yet implemented\n");
+    exit(1);
+}
+
+std::vector<bsqon::Value*> generateCombinatorialTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const bsqon::Type* loadtype)
+{
+    auto pstr = vspartition.toString();
+    printf("%s\n", (const char*)pstr.c_str());
+
+    //TODO: fill in the options for each component
+    printf("Combinatorial test suite generation not yet implemented\n");
+    exit(1);
+
+    auto vstr = vspartition.toString();
+    printf("%s\n", (const char*)vstr.c_str());
+    
+
+    std::vector<bsqon::Value*> tests;
+    for(size_t i = 0; i < vspartition.components.size(); ++i) {
+        for(size_t j = i + 1; j < vspartition.components.size(); ++j) {
+            assert(false); //not implemented!!!
+        }
+    }
+
+    return tests;
+}
+
+std::vector<bsqon::Value*> generateTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const bsqon::Type* loadtype)
+{
+    printf("Full test suite generation not yet implemented\n");
+    exit(1);
+}
 
 int main(int argc, char** argv, char **envp)
 {
+    if(argc != 4) {
+        usage();
+        exit(1);
+    }
+
     std::string metadata, type;
     //TODO: arg processing
 
@@ -29,31 +103,38 @@ int main(int argc, char** argv, char **envp)
     json jv = nullptr;
     loadAssemblyJSONExplicit(argv[1], jv);
 
-    TypeGeneratorRandom generator;
-    bsqon::AssemblyInfo::parse(jv, generator.assembly);
+    bsqon::AssemblyInfo assembly;
+    bsqon::AssemblyInfo::parse(jv, assembly);
 
+    ValueSetGenerator generator(&assembly);
+    const bsqon::Type* loadtype = assembly.lookupTypeKey(argv[2]);
 
-    ValueSetGenerator vgenerator;
-    bsqon::AssemblyInfo::parse(jv, vgenerator.assembly);
     ValueSetGeneratorEnvironment venv{"var", {}, GenerateContext{}};
+    ValueSetPartition vspartition = generator.generateType(loadtype, venv);
 
-    //the property loadtype is the type so look it up
-    const bsqon::Type* loadtype = generator.assembly.lookupTypeKey(argv[2]);
-
-    if(loadtype->isUnresolved()) {
-        printf("Invalid 'loadtype' -- %s\n", argv[2]);
-        exit(1);
+    std::vector<bsqon::Value*> tests;
+    auto modestr = std::string(argv[3]);
+    if(modestr == "--rnd") {
+        tests = generateRandomTestSuite(&assembly, vspartition, loadtype, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
+    }
+    else if(modestr == "--agent") {
+        tests = generateAgentTestSuite(&assembly, vspartition, loadtype, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
+    }
+    else if(modestr == "--combinatorial") {
+        tests = generateCombinatorialTestSuite(&assembly, vspartition, loadtype);
+    }
+    else if(modestr == "--all") {
+        tests = generateTestSuite(&assembly, vspartition, loadtype);
+    }
+    else {
+        usage();
     }
 
-    auto pp = vgenerator.generateType(loadtype, venv);
-    auto pstr = pp.toString();
-    printf("%s\n", (const char*)pstr.c_str());
-
-    //finally parse the value
-    bsqon::Value* res = generator.generateType(loadtype);
-
-    std::u8string rstr = res->toString();
-    printf("%s\n", (const char*)rstr.c_str());
+    //Print out tests -- 1 per line
+    for(size_t i = 0; i < tests.size(); ++i) {
+        std::u8string rstr = tests[i]->toString();
+        printf("%s\n", (const char*)rstr.c_str());
+    }
 
     fflush(stdout);
     exit(0);

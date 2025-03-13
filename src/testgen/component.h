@@ -1,13 +1,19 @@
 #pragma once
 
-#include "../../common.h"
+#include "../common.h"
 
-#include "../../info/type_info.h"
-#include "../../info/bsqon.h"
+#include "../info/type_info.h"
+#include "../info/bsqon.h"
+
+#include <random>
 
 typedef std::string VCPath;
 
 bool vcpathCMP(const VCPath& p1, const VCPath& p2);
+
+VCPath pathAccessField(const VCPath& p, const std::string& f);
+VCPath pathAccessIndex(const VCPath& p, size_t i);
+VCPath pathAccessSpecial(const VCPath& p, const std::string& name);
 
 class ValueConstraint
 {
@@ -50,9 +56,9 @@ public:
 class FixedValueConstraint : public ValueConstraint
 {
 public:
-    const bsqon::Value* value;
+    bsqon::Value* value;
 
-    FixedValueConstraint(VCPath path, const bsqon::Value* value) : ValueConstraint(path), value(value) { ; }
+    FixedValueConstraint(VCPath path, bsqon::Value* value) : ValueConstraint(path), value(value) { ; }
 
     virtual std::u8string toString() const override
     {
@@ -63,16 +69,18 @@ public:
 class GenerateContext
 {
 private:
-    GenerateContext(const std::optional<const bsqon::Type*> intype, std::optional<bsqon::EntityTypeFieldEntry> forfield, const std::optional<const bsqon::TypedeclType*> oftype, const bsqon::Type* valuetype) : intype(intype), forfield(forfield), oftype(oftype), valuetype(valuetype) { ; }
+    GenerateContext(const std::optional<const bsqon::Type*> intype, std::optional<bsqon::EntityTypeFieldEntry> forfield, std::optional<size_t> forindex, std::optional<std::u8string> forspecial, const std::optional<const bsqon::TypedeclType*> oftype, const bsqon::Type* valuetype) : intype(intype), forfield(forfield), forindex(forindex), forspecial(forspecial), oftype(oftype), valuetype(valuetype) { ; }
 
 public:
     std::optional<const bsqon::Type*> intype;
     std::optional<bsqon::EntityTypeFieldEntry> forfield;
+    std::optional<size_t> forindex;
+    std::optional<std::u8string> forspecial;
     std::optional<const bsqon::TypedeclType*> oftype;
     const bsqon::Type* valuetype;
 
-    GenerateContext() : intype(), forfield(), oftype(), valuetype(nullptr) { ; }
-    GenerateContext(const GenerateContext& other) : intype(other.intype), forfield(other.forfield), oftype(other.oftype), valuetype(other.valuetype) { ; }
+    GenerateContext() : intype(), forfield(), forindex(), forspecial(), oftype(), valuetype(nullptr) { ; }
+    GenerateContext(const GenerateContext& other) : intype(other.intype), forfield(other.forfield), forindex(other.forindex), forspecial(other.forspecial), oftype(other.oftype), valuetype(other.valuetype) { ; }
 
     GenerateContext& operator=(const GenerateContext& other)
     {
@@ -81,6 +89,9 @@ public:
         }
 
         this->intype = other.intype;
+        this->forfield = other.forfield;
+        this->forindex = other.forindex;
+        this->forspecial = other.forspecial;
         this->oftype = other.oftype;
         this->valuetype = other.valuetype;
         return *this;
@@ -97,6 +108,13 @@ public:
         if(this->forfield.has_value()) {
             ffs = u8", field=" + std::u8string(this->forfield.value().fname.cbegin(), this->forfield.value().fname.cend());
         }
+        if(this->forspecial.has_value()) {
+            ffs = u8", special=" + this->forspecial.value();
+        }
+        if(this->forindex.has_value()) {
+            auto sstr = std::to_string(this->forindex.value());
+            ffs = u8", index=" + std::u8string(sstr.cbegin(), sstr.cend());
+        }
 
         std::u8string ots;
         if(this->oftype.has_value()) {
@@ -111,22 +129,32 @@ public:
 
     GenerateContext extendWithEnclosingType(const bsqon::Type* t) const
     {
-        return GenerateContext{std::make_optional(t), this->forfield, this->oftype, nullptr};
+        return GenerateContext{std::make_optional(t), std::nullopt, std::nullopt, std::nullopt, this->oftype, nullptr};
     }
 
     GenerateContext extendForField(const bsqon::EntityTypeFieldEntry& f) const
     {
-        return GenerateContext{this->intype, std::make_optional(f), this->oftype, nullptr};
+        return GenerateContext{this->intype, std::make_optional(f), std::nullopt, std::nullopt, this->oftype, nullptr};
+    }
+
+    GenerateContext extendForIndex(size_t i) const
+    {
+        return GenerateContext{this->intype, std::nullopt, std::make_optional(i), std::nullopt, this->oftype, nullptr};
+    }
+
+    GenerateContext extendForSpecial(std::u8string special) const
+    {
+        return GenerateContext{this->intype, std::nullopt, std::nullopt, std::make_optional(special), this->oftype, nullptr};
     }
 
     GenerateContext extendForTypedecl(const bsqon::TypedeclType* t) const
     {
-        return GenerateContext{this->intype, this->forfield, std::make_optional(t), nullptr};
+        return GenerateContext{this->intype, this->forfield, this->forindex, std::nullopt, std::make_optional(t), nullptr};
     }
 
     GenerateContext completeWithValueType(const bsqon::Type* t) const
     {
-        return GenerateContext{this->intype, this->forfield, this->oftype, t};
+        return GenerateContext{this->intype, this->forfield, this->forindex, this->forspecial, this->oftype, t};
     }
 };
 
@@ -184,9 +212,8 @@ public:
         return *this;
     }
 
-    ValueSetGeneratorEnvironment step(const std::string& pathext, const std::vector<ValueConstraint*>& newconstraints, const GenerateContext& updatedcontext) const
+    ValueSetGeneratorEnvironment step(const std::string& npath, const std::vector<ValueConstraint*>& newconstraints, const GenerateContext& updatedcontext) const
     {
-        VCPath npath = this->path + pathext;
         std::vector<ValueConstraint*> nconstraints(this->constraints);
         nconstraints.insert(nconstraints.end(), newconstraints.cbegin(), newconstraints.cend());
         std::stable_sort(nconstraints.begin(), nconstraints.end(), [](const ValueConstraint* v1, const ValueConstraint* v2) { return vcpathCMP(v1->path, v2->path); });
@@ -250,9 +277,9 @@ public:
 class ValueSetGenerator
 {
 public:
-    bsqon::AssemblyInfo assembly;
+    const bsqon::AssemblyInfo* assembly;
 
-    ValueSetGenerator() { ; }
+    ValueSetGenerator(const bsqon::AssemblyInfo* assembly) : assembly(assembly) { ; }
     ~ValueSetGenerator() { ; }
 
     ValueSetPartition generateNone(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
@@ -266,10 +293,47 @@ public:
     ValueSetPartition generatePrimitive(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
     ValueSetPartition generateEnum(const bsqon::EnumType* t, const ValueSetGeneratorEnvironment& env);
 
+    ValueSetPartition generateList(const bsqon::ListType* t, const ValueSetGeneratorEnvironment& env);
     //More special types here...
+
 
     ValueSetPartition generateStdEntityType(const bsqon::StdEntityType* t, const ValueSetGeneratorEnvironment& env);
 
     ValueSetPartition generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env);
 };
 
+class TestGenerator
+{
+private:
+    bool isRequiredValue(const VCPath& currpath, bsqon::Value*& value);
+    bool isConstrainedLengthValue(const VCPath& currpath, bsqon::Value*& value);
+    bsqon::Value* selectFromPartition(const VCPath& currpath);
+
+public:
+    const bsqon::AssemblyInfo* assembly;
+    const ValueSetPartition* vspartition;
+
+    std::vector<const ValueConstraint*> constraints;
+    std::mt19937_64 rng;
+
+    TestGenerator(const bsqon::AssemblyInfo* assembly, const ValueSetPartition* vspartition, const std::vector<const ValueConstraint*>& constraints) : assembly(assembly), vspartition(vspartition), constraints(constraints), rng(std::random_device{}()) { ; }
+    ~TestGenerator() { ; }
+
+    bsqon::Value* generateNone(const bsqon::PrimitiveType* t, VCPath currpath);
+
+    bsqon::Value* generateBool(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generateNat(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generateInt(const bsqon::PrimitiveType* t, VCPath currpath);
+
+    //TODO: more primitives..
+
+    bsqon::Value* generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generateEnum(const bsqon::EnumType* t, VCPath currpath);
+
+    bsqon::Value* generateList(const bsqon::ListType* t, VCPath currpath);
+    //More special types here...
+
+    bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath);
+
+    bsqon::Value* generateType(const bsqon::Type* t, VCPath currpath);
+};

@@ -5,6 +5,8 @@
 #include "../info/type_info.h"
 #include "../info/bsqon.h"
 
+#include "component.h"
+
 #include <random>
 
 class TypeGeneratorRandom
@@ -12,25 +14,21 @@ class TypeGeneratorRandom
 public:
     std::mt19937_64 rng;
 
-    bsqon::AssemblyInfo assembly;
-
-    TypeGeneratorRandom() : rng(std::random_device{}()), assembly() { ; }
+    TypeGeneratorRandom() : rng(std::random_device{}()) { ; }
     ~TypeGeneratorRandom() { ; }
 
-    bsqon::Value* generateNone(const bsqon::PrimitiveType* t);
+    void generateNone(const bsqon::PrimitiveType* t, ValueComponent* vc);
 
-    bsqon::Value* generateBool(const bsqon::PrimitiveType* t);
-    bsqon::Value* generateNat(const bsqon::PrimitiveType* t);
-    bsqon::Value* generateInt(const bsqon::PrimitiveType* t);
+    void generateBool(const bsqon::PrimitiveType* t, ValueComponent* vc);
+    void generateNat(const bsqon::PrimitiveType* t, ValueComponent* vc);
+    void generateInt(const bsqon::PrimitiveType* t, ValueComponent* vc);
 
     //TODO: more primitives..
 
-    bsqon::Value* generatePrimitive(const bsqon::PrimitiveType* t);
-    bsqon::Value* generateEnum(const bsqon::EnumType* t);
+    void generatePrimitive(const bsqon::PrimitiveType* t, ValueComponent* vc);
+    void generateEnum(const bsqon::EnumType* t, ValueComponent* vc);
 
     //More special types here...
 
-    bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t);
-
-    bsqon::Value* generateType(const bsqon::Type* t);
+    void generateType(const bsqon::Type* t, ValueComponent* vc);
 };

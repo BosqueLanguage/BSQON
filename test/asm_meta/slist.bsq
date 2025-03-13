@@ -1,0 +1,12 @@
+declare namespace Main;
+
+entity Foo {
+    field v: Nat;
+    field pp: List<Bool>;
+}
+
+public function main(): None {
+    var op: Foo;
+
+    return none;
+}

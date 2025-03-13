@@ -1,0 +1,266 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Foo",
+                    "Main::Foo"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Option",
+                    "Option<ListOps::Node<Bool>>"
+                ],
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Some",
+                    "Some<ListOps::Node<Bool>>"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "List",
+                    "List<Bool>"
+                ]
+            ]
+        },
+        {
+            "istoplevel": false,
+            "imports": [],
+            "ns": "ListOps",
+            "subns": [],
+            "types": [
+                [
+                    "Color",
+                    "ListOps::Color"
+                ],
+                [
+                    "Tree",
+                    "ListOps::Tree<Bool>"
+                ],
+                [
+                    "BBLeaf",
+                    "ListOps::BBLeaf<Bool>"
+                ],
+                [
+                    "Leaf",
+                    "ListOps::Leaf<Bool>"
+                ],
+                [
+                    "Node",
+                    "ListOps::Node<Bool>"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "pp",
+                    "ftype": "List<Bool>",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Foo",
+            "name": "Foo"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<ListOps::Node<Bool>>",
+            "name": "Option",
+            "oftype": "ListOps::Node<Bool>"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<ListOps::Node<Bool>>"
+            ],
+            "tkey": "Some<ListOps::Node<Bool>>",
+            "name": "Some",
+            "oftype": "ListOps::Node<Bool>"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "List",
+            "attributes": {},
+            "tkey": "List<Bool>",
+            "name": "List",
+            "oftype": "Bool"
+        },
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "Red",
+                "Black",
+                "BB",
+                "NB"
+            ],
+            "supertypes": [],
+            "tkey": "ListOps::Color",
+            "name": "Color"
+        },
+        {
+            "tag": "StdConcept",
+            "tkey": "ListOps::Tree<Bool>",
+            "name": "Tree"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "ListOps::Tree<Bool>"
+            ],
+            "fields": [],
+            "hasvalidations": false,
+            "tkey": "ListOps::BBLeaf<Bool>",
+            "name": "BBLeaf"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "ListOps::Tree<Bool>"
+            ],
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Bool",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "ListOps::Leaf<Bool>",
+            "name": "Leaf"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "ListOps::Tree<Bool>"
+            ],
+            "fields": [
+                {
+                    "fname": "c",
+                    "ftype": "ListOps::Color",
+                    "isoptional": false
+                },
+                {
+                    "fname": "count",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "l",
+                    "ftype": "ListOps::Tree<Bool>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "ListOps::Tree<Bool>",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "ListOps::Node<Bool>",
+            "name": "Node"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
