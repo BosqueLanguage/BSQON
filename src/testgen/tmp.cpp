@@ -59,12 +59,13 @@ int main(int argc, char** argv, char **envp)
 {
     std::string metadata, type;
     
-    AITypeGenerator generator;
+    AIValueSetGenerator generator;
 
     //parse the JSON 
     json jv = nullptr;
     loadAssemblyJSONExplicit(argv[1], jv);
     bsqon::AssemblyInfo::parse(jv, generator.assembly);
+    ValueSetGeneratorEnvironment venv{"var", {}, GenerateContext{}};
 
     const bsqon::Type* loadtype = generator.assembly.lookupTypeKey(argv[2]);
     
@@ -73,14 +74,14 @@ int main(int argc, char** argv, char **envp)
         exit(1);
     }
 
-    Context ctx;
-    ctx.typeName = loadtype->tkey;
-    bsqon::Value* res = generator.generateType(loadtype, ctx);
+    GenerateContext ctx;
+    ctx.extendWithEnclosingType(loadtype);
+    auto pp = generator.generateType(loadtype, venv);
 
-    json js = res->toJSON();
+    json js = pp.components[0]->options[0]->toJSON();
     std::cout<<js.dump()<<std::endl;
-    std::string url = "http://localhost:50117/customer/cart";
-    std::cout<<APIRequest(url, js)<<std::endl;
+    // std::string url = "http://localhost:50117/customer/cart";
+    // std::cout<<APIRequest(url, js)<<std::endl;
 
     fflush(stdout);
     exit(0);

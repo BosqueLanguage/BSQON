@@ -4,47 +4,63 @@
 using json = nlohmann::json;
 static bsqon::SourcePos g_spos = {0, 0, 0, 0};
 
-size_t getRandom(size_t size) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<size_t> dis(0, size - 1);
-    return dis(gen);
+ValueSetPartition AIValueSetGenerator::generateNone(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), {})} };
 }
 
-bsqon::Value *AITypeGenerator::generateNone(const bsqon::PrimitiveType *t, Context ctx)
+ValueSetPartition AIValueSetGenerator::generateBool(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::vector<bool> values)
 {
-    return new bsqon::NoneValue(t, g_spos);
+    std::vector<bsqon::Value*> options;
+    for (bool element: values) {
+        options.push_back(new bsqon::BoolValue(t, g_spos, element));
+    }
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), options)} };
 }
 
-bsqon::Value *AITypeGenerator::generateBool(const bsqon::PrimitiveType *t, Context ctx, bool random_value)
+ValueSetPartition AIValueSetGenerator::generateNat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::vector<uint64_t> values)
 {
-    return new bsqon::BoolValue(t, g_spos, random_value);
+    std::vector<bsqon::Value*> options;
+    for (uint64_t element: values) {
+        options.push_back(new bsqon::NatNumberValue(t, g_spos, element));
+    }
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), options)} };
 }
 
-bsqon::Value *AITypeGenerator::generateNat(const bsqon::PrimitiveType *t, Context ctx, uint64_t random_value)
+ValueSetPartition AIValueSetGenerator::generateInt(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::vector<int64_t> values)
 {
-    std::uniform_int_distribution<uint64_t> nv(0, bsqon::Type::MAX_SAFE_NAT);
-    return new bsqon::NatNumberValue(t, g_spos, random_value);
+    std::vector<bsqon::Value*> options;
+    for (int64_t element: values) {
+        options.push_back(new bsqon::IntNumberValue(t, g_spos, element));
+    }
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), options)} };
 }
 
-bsqon::Value *AITypeGenerator::generateInt(const bsqon::PrimitiveType *t, Context ctx, int64_t random_value)
+ValueSetPartition AIValueSetGenerator::generateBigNat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::vector<int64_t> values)
 {
-    return new bsqon::IntNumberValue(t, g_spos, random_value);
+    std::vector<bsqon::Value*> options;
+    for (int64_t element: values) {
+        options.push_back(new bsqon::IntNumberValue(t, g_spos, element));
+    }
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), options)} };
 }
 
-bsqon::Value *AITypeGenerator::generateBigNat(const bsqon::PrimitiveType *t, Context ctx, int64_t random_value)
+ValueSetPartition AIValueSetGenerator::generateString(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::vector<std::string> values)
 {
-    return new bsqon::IntNumberValue(t, g_spos, random_value);
+    std::vector<bsqon::Value*> options;
+    for (std::string element: values) {
+        options.push_back(bsqon::StringValue::createFromParse(t, g_spos, reinterpret_cast<const uint8_t*>(element.c_str()), element.size()));
+    }
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), options)} };
 }
 
-bsqon::Value *AITypeGenerator::generateString(const bsqon::PrimitiveType *t, Context ctx, std::string random_value)
+ValueSetPartition AIValueSetGenerator::generateFloat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::vector<float> values)
 {
-    return bsqon::StringValue::createFromParse(t, g_spos, reinterpret_cast<const uint8_t*>(random_value.c_str()), random_value.size());
-}
-
-bsqon::Value *AITypeGenerator::generateFloat(const bsqon::PrimitiveType *t, Context ctx, float val)
-{
-    return new bsqon::FloatNumberValue(t, g_spos, val);
+    std::vector<bsqon::Value*> options;
+    for (int64_t element: values) {
+        options.push_back(new bsqon::FloatNumberValue(t, g_spos, element));
+    }
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), options)} };
 }
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
@@ -89,30 +105,8 @@ std::string makeAPIRequest(const std::string& apiKey, const std::string& url, co
     return responseString;
 }
 
-int selectRandomValue(const std::vector<int>& values) {
-    if (values.empty()) {
-        throw std::runtime_error("No values available to select.");
-    }
-    
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<size_t> dist(0, values.size() - 1);
-
-    return values[dist(gen)];
-}
-
-std::string combineJsonObjects(const std::vector<json>& jsonArray) {
-    json combined;
-    for (const auto&obj:jsonArray) {
-        for (auto it = obj.begin(); it != obj.end(); ++it) {
-            combined[it.key()] = it.value();
-        }
-    }
-    return combined.dump();
-}
-
 template <typename T>
-T getRandomValueFromJson(const json& extractedData, const std::string& field) {
+std::vector<T> getValuesFromJson(const json& extractedData, const std::string& field) {
     if (!extractedData.contains(field)) {
         std::cout<<"INVALID Fields"<<std::endl;
     }
@@ -121,11 +115,11 @@ T getRandomValueFromJson(const json& extractedData, const std::string& field) {
     if (values.empty()) {
         throw std::runtime_error("No values available for field: " + field);
     }
-    size_t idx = getRandom(values.size());
-    return values[idx];
+   
+    return values;
 }
 
-bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, Context ctx)
+ValueSetPartition AIValueSetGenerator::generatePrimitive(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env)
 {
     auto tk = t->tkey;
     std::unordered_map<std::string, std::string> typeFormatInstructions = {
@@ -168,7 +162,7 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
    const std::string INPUT_SPACE_TEST_PROMPT = R"(
     Act as an expert in REST API input space analysis.
 
-    Given a variable named "{{name}}" with data type "{{type}}" and format "{{format}}", generate a JSON object containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
+    Given a variable with path named "{{path}}" with data type "{{type}}" and format "{{format}}", generate a JSON object containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
 
     Requirements:
     - Each value must represent a distinct, non-overlapping valid input scenario.
@@ -191,8 +185,10 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
         std::cerr << "Failed to determine type format" << std::endl;
     }
 
-    prompt.replace(prompt.find("{{name}}"), 8, ctx.fields);
-    prompt.replace(prompt.find("{{name}}"), 8, ctx.fields);
+    std::string fname = env.context.forfield->fname;
+    std::string path = env.path;
+    prompt.replace(prompt.find("{{path}}"), 8, path);
+    prompt.replace(prompt.find("{{name}}"), 8, fname);
     prompt.replace(prompt.find("{{type}}"), 8, tk);
 
     std::cout<< prompt << std::endl;
@@ -205,12 +201,10 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
     std::string OPENAI_MODEL = "gpt-4o";
     std::string DEEPSEEK_MODEL = "deepseek-chat";
 
-    // Choose which API to use
     std::string apiKey = OPENAI_KEY;
     std::string url = OPENAI_URL;
     std::string model = OPENAI_MODEL;
    
-    // Make the API request
     std::string response = makeAPIRequest(apiKey, url, model, prompt);
     std::cout<<response<<std::endl;
     json responseJson = json::parse(response);
@@ -226,21 +220,14 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
     
     json extractedData = json::parse(extractedJson);
     std::cout<<extractedData.dump(8)<<std::endl;
-    // std::cout << "Response: " << response << std::endl;
-    // std::vector<int> totalItems = extractTotalItems(response, ctx);
-    // if (!totalItems.empty()) {
-    //     int randomValue = selectRandomValue(totalItems);
-    //     std::cout << "Randomly Selected Value: " << randomValue << std::endl;
-    // } else {
-    //     std::cerr << "Failed to extract totalItems." << std::endl;
-    // }
+
     if (tk == "None")
     {
-        return this->generateNone(t, ctx);
+        return this->generateNone(t, env);
     }
     else if (tk == "Bool")
     {
-        auto& data = extractedData[ctx.fields];
+        auto& data = extractedData[fname];
         for (size_t i = 0; i < data.size(); ++i) {
             std::string value = data[i].get<std::string>();
             std::string lowerStr = value;
@@ -248,12 +235,12 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
             data[i] = (lowerStr == "true");
             
         }
-        bool random_val = getRandomValueFromJson<bool>(extractedData, ctx.fields);
-        return this->generateBool(t, ctx, random_val);
+        std::vector<bool> values = getValuesFromJson<bool>(extractedData, fname);
+        return this->generateBool(t, env, values);
     }
     else if (tk == "Nat")
     {
-        auto& data = extractedData[ctx.fields];
+        auto& data = extractedData[fname];
         for (size_t i = 0; i < data.size(); ++i) {
             std::string value = data[i].get<std::string>();
             if (value.empty() || value.back() != 'n') {
@@ -263,12 +250,12 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
             value.pop_back();
             data[i] = std::stoull(value);
         }
-        uint64_t random_val = getRandomValueFromJson<uint64_t>(extractedData, ctx.fields);
-        return this->generateNat(t, ctx, random_val);
+        std::vector<uint64_t> values = getValuesFromJson<uint64_t>(extractedData, fname);
+        return this->generateNat(t, env, values);
     }
     else if (tk == "Int")
     {
-        auto& data = extractedData[ctx.fields];
+        auto& data = extractedData[fname];
         for (size_t i = 0; i < data.size(); ++i) {
             std::string value = data[i].get<std::string>();
             if (value.empty() || value.back() != 'i') {
@@ -278,16 +265,16 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
             value.pop_back();
             data[i] = std::stoll(value);
         }
-        int64_t random_val = getRandomValueFromJson<int64_t>(extractedData, ctx.fields);
-        return this->generateInt(t, ctx, random_val);
+        std::vector<int64_t> values = getValuesFromJson<int64_t>(extractedData, fname);
+        return this->generateInt(t, env, values);
     }
     else if(tk == "String") 
     {
-        std::string random_val = getRandomValueFromJson<std::string>(extractedData, ctx.fields);
-        return this->generateString(t, ctx, random_val);
+        std::vector<std::string> values = getValuesFromJson<std::string>(extractedData, fname);
+        return this->generateString(t, env, values);
     }else if(tk == "Float") 
     {
-        auto& data = extractedData[ctx.fields];
+        auto& data = extractedData[fname];
         for (size_t i = 0; i < data.size(); ++i) {
             std::string value = data[i].get<std::string>();
             if (value.empty() || value.back() != 'f') {
@@ -297,11 +284,11 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
             value.pop_back();
             data[i] = std::stof(value);
         }
-        float random_val = getRandomValueFromJson<float>(extractedData, ctx.fields);
-        return this->generateFloat(t, ctx, random_val);
+        std::vector<float> values = getValuesFromJson<float>(extractedData, fname);
+        return this->generateFloat(t, env, values);
     }else if(tk == "BigNat") {
     
-        auto& data = extractedData[ctx.fields];
+        auto& data = extractedData[fname];
         for (size_t i = 0; i < data.size(); ++i) {
             std::string value = data[i].get<std::string>();
             if (value.empty() || value.back() != 'N') {
@@ -311,8 +298,8 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
             value.pop_back();
             data[i] = std::stoll(value);
         }
-        int64_t random_val = getRandomValueFromJson<int64_t>(extractedData, ctx.fields);
-        return this->generateBigNat(t, ctx, random_val);
+        std::vector<int64_t> values = getValuesFromJson<int64_t>(extractedData, fname);
+        return this->generateBigNat(t, env, values);
     }
     /*
     else if(tk == "BigInt") {
@@ -407,90 +394,86 @@ bsqon::Value *AITypeGenerator::generatePrimitive(const bsqon::PrimitiveType *t, 
     {
         // Missing primitive type
         assert(false);
-        return nullptr;
     }
 }
 
-bsqon::Value *AITypeGenerator::generateEnum(const bsqon::EnumType *t, Context ctx)
-{
-    std::uniform_int_distribution<> ev(0, t->variants.size() - 1);
-    auto evpos = ev(rng);
-    auto variant = t->variants[evpos];
-
-    return new bsqon::EnumValue(t, g_spos, variant, evpos);
-}
-
-bsqon::Value *AITypeGenerator::generateStdEntityType(const bsqon::StdEntityType *t, Context ctx)
-{
-    std::vector<bsqon::Value *> fieldvals;
-
-    std::transform(t->fields.cbegin(), t->fields.cend(), std::back_inserter(fieldvals),
-                   [this, ctx](const auto &f) mutable
-                   {
-                       Context newCtx = ctx.clone();
-                       newCtx.fields = newCtx.fields + f.fname;
-
-                       return this->generateType(this->assembly.lookupTypeKey(f.ftype), newCtx);
-                   });
-
-    return new bsqon::EntityValue(t, g_spos, std::move(fieldvals));
-}
-
-
-// bsqon::Value *TypeGeneratorRandom::generateListType(const bsqon::ListType *t)
+// ValueSetPartition AIValueSetGenerator::generateEnum(const bsqon::EnumType *t, const ValueSetGeneratorEnvironment& env)
 // {
-//     const auto oftype = this->assembly.lookupTypeKey(t->oftype);
-    
+//     std::uniform_int_distribution<> ev(0, t->variants.size() - 1);
+//     auto evpos = ev(rng);
+//     auto variant = t->variants[evpos];
 
-//     return new bsqon::ListValue(t, g_spos, std::move(oftype));
+//     return new bsqon::EnumValue(t, g_spos, variant, evpos);
 // }
 
-// bsqon::Value *TypeGeneratorRandom::handleConceptType()
-// {
-//     std::vector<std::string> subtypes;
-//     std::map<std::string, std::vector<std::string>> supertypesMap;
+std::vector<std::vector<bsqon::Value*>> generateCartesianProduct(
+    const std::vector<std::vector<bsqon::Value*>>& lists,
+    size_t maxResults = 500
+) {
+    std::vector<std::vector<bsqon::Value*>> result;
+    if (lists.empty()) return result;
 
-//     for (const auto &[key, type] : assembly.typerefs)
-//     {
-//         // std::cout << "Key: " << key << ", Type Key: " << type->tkey << std::endl;
-//         if (!type->supertypes.empty())
-//         {
-//             for (const auto &supertype : type->supertypes)
-//             {
-//                 supertypesMap[supertype].push_back(type->tkey);
-//             }
-//         }
-//     }
+    std::vector<size_t> indices(lists.size(), 0);
+    bool done = false;
 
-//     for (const auto &pair : supertypesMap)
-//     {
-//         for (const auto &item : pair.second)
-//         {
-//             const bsqon::Type *loadtype = assembly.lookupTypeKey(item);
+    while (!done && result.size() < maxResults) {
+        std::vector<bsqon::Value*> combination;
+        for (size_t i = 0; i < lists.size(); ++i) {
+            combination.push_back(lists[i][indices[i]]);
+        }
+        result.push_back(combination);
 
-//             if (loadtype->isUnresolved())
-//             {
-//                 printf("Invalid 'loadtype' -- %s\n", item);
-//                 exit(1);
-//             }
-//             return this->generateType(loadtype);
-//         }
-//     }
-// }
+        for (size_t i = lists.size(); i-- > 0;) {
+            if (++indices[i] < lists[i].size()) {
+                break;
+            }
+            indices[i] = 0;
+            if (i == 0) done = true;
+        }
+    }
 
-//Handle partition here
-
-bsqon::Value *AITypeGenerator::generateType(const bsqon::Type *t, Context ctx)
+    return result;
+}
+ValueSetPartition AIValueSetGenerator::generateStdEntityType(const bsqon::StdEntityType *t, const ValueSetGeneratorEnvironment& env)
 {
-    
+    auto tctx = env.context.extendWithEnclosingType(t);
 
+    std::vector<std::vector<bsqon::Value*>> optionLists;
+    
+    for (const auto &f : t->fields) {
+        auto tenv = env.step(pathAccessField(env.path, f.fname), env.constraints, tctx.extendForField(f));
+        const bsqon::Type* fieldType = this->assembly.lookupTypeKey(f.ftype);
+        ValueSetPartition partition = this->generateType(fieldType, tenv);
+
+        std::vector<bsqon::Value*> fieldOptions;
+        for (const auto &component : partition.components) {
+            fieldOptions.insert(fieldOptions.end(), component->options.begin(), component->options.end());
+        }
+
+        optionLists.push_back(fieldOptions);
+    }
+
+    std::vector<std::vector<bsqon::Value*>> entityCombinations = generateCartesianProduct(optionLists);
+
+    std::vector<ValueComponent*> newComponents;
+    for (const auto &combination : entityCombinations) {
+        bsqon::EntityValue* entityValue = new bsqon::EntityValue(t, g_spos, std::move(combination));
+        std::vector<bsqon::Value*> entityOptions = {entityValue};  // Wrap in vector
+
+        newComponents.push_back(new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t), entityOptions));
+    }
+
+    return ValueSetPartition{newComponents};
+}
+
+ValueSetPartition AIValueSetGenerator::generateType(const bsqon::Type *t, const ValueSetGeneratorEnvironment& env)
+{
     switch (t->tag)
     {
 
     case bsqon::TypeTag::TYPE_PRIMITIVE:
     {
-        std::cout << "type received: " << t->tkey << std::endl;
-        return this->generatePrimitive(static_cast<const bsqon::PrimitiveType *>(t), ctx);
+        return this->generatePrimitive(static_cast<const bsqon::PrimitiveType *>(t), env);
     }
 
     /*
@@ -498,31 +481,18 @@ bsqon::Value *AITypeGenerator::generateType(const bsqon::Type *t, Context ctx)
      */
     case bsqon::TypeTag::TYPE_STD_ENTITY:
     {
-        return this->generateStdEntityType(static_cast<const bsqon::StdEntityType *>(t), ctx);
-    }
-    case bsqon::TypeTag::TYPE_ENUM:
-    {
-        return this->generateEnum(static_cast<const bsqon::EnumType *>(t), ctx);
+        return this->generateStdEntityType(static_cast<const bsqon::StdEntityType *>(t), env);
     }
     case bsqon::TypeTag::TYPE_LIST:
     {
-        std::cout << "type received: " << t->tkey << std::endl;
         const auto listType = static_cast<const bsqon::ListType *>(t);
         const auto loadtype = this->assembly.lookupTypeKey(listType->oftype);
-        std::vector<bsqon::Value *> generatedValues;
+        std::vector<ValueSetPartition> generatedValues;
         for (int i = 0; i < 5; ++i) {
-            generatedValues.push_back(this->generateType(loadtype, ctx));
+            generatedValues.push_back(this->generateType(loadtype, env));
         }
-        return new bsqon::ListValue(t, g_spos, std::move(generatedValues));
+        return ValueSetPartition::punion(generatedValues);
     }
-
-    // case bsqon::TypeTag::TYPE_LIST:
-    // {
-    //     std::cout << "type received: " << t->tkey << std::endl;
-    //     const auto listType = static_cast<const bsqon::ListType *>(t);
-    //     const auto loadtype = this->assembly.lookupTypeKey(listType->oftype);
-    //     return this->generateType(loadtype);
-    // }
 
     // case bsqon::TypeTag::TYPE_STD_CONCEPT:
     // {
