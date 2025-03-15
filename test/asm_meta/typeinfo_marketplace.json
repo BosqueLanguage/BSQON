@@ -1,0 +1,357 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "CartDTO",
+                    "Main::CartDTO"
+                ],
+                [
+                    "CartItemDTO",
+                    "Main::CartItemDTO"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Option",
+                    "Option<ListOps::Node<Main::CartItemDTO>>"
+                ],
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Some",
+                    "Some<ListOps::Node<Main::CartItemDTO>>"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "BigNat",
+                    "BigNat"
+                ],
+                [
+                    "Float",
+                    "Float"
+                ],
+                [
+                    "String",
+                    "String"
+                ],
+                [
+                    "List",
+                    "List<Main::CartItemDTO>"
+                ]
+            ]
+        },
+        {
+            "istoplevel": false,
+            "imports": [],
+            "ns": "ListOps",
+            "subns": [],
+            "types": [
+                [
+                    "Color",
+                    "ListOps::Color"
+                ],
+                [
+                    "Tree",
+                    "ListOps::Tree<Main::CartItemDTO>"
+                ],
+                [
+                    "BBLeaf",
+                    "ListOps::BBLeaf<Main::CartItemDTO>"
+                ],
+                [
+                    "Leaf",
+                    "ListOps::Leaf<Main::CartItemDTO>"
+                ],
+                [
+                    "Node",
+                    "ListOps::Node<Main::CartItemDTO>"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "user",
+                    "ftype": "String",
+                    "isoptional": false
+                },
+                {
+                    "fname": "totalItems",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "productsCost",
+                    "ftype": "Float",
+                    "isoptional": false
+                },
+                {
+                    "fname": "deliveryCost",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "deliveryIncluded",
+                    "ftype": "Bool",
+                    "isoptional": false
+                },
+                {
+                    "fname": "totalCost",
+                    "ftype": "Float",
+                    "isoptional": false
+                },
+                {
+                    "fname": "cartItems",
+                    "ftype": "List<Main::CartItemDTO>",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::CartDTO",
+            "name": "CartDTO"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "productId",
+                    "ftype": "BigNat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "quantity",
+                    "ftype": "Int",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": true,
+            "tkey": "Main::CartItemDTO",
+            "name": "CartItemDTO"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<ListOps::Node<Main::CartItemDTO>>",
+            "name": "Option",
+            "oftype": "ListOps::Node<Main::CartItemDTO>"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<ListOps::Node<Main::CartItemDTO>>"
+            ],
+            "tkey": "Some<ListOps::Node<Main::CartItemDTO>>",
+            "name": "Some",
+            "oftype": "ListOps::Node<Main::CartItemDTO>"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive big-integer value. **%"
+            },
+            "tkey": "BigNat",
+            "name": "BigNat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive float value. **%"
+            },
+            "tkey": "Float",
+            "name": "Float"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "String",
+            "name": "String"
+        },
+        {
+            "tag": "List",
+            "attributes": {},
+            "tkey": "List<Main::CartItemDTO>",
+            "name": "List",
+            "oftype": "Main::CartItemDTO"
+        },
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "Red",
+                "Black",
+                "BB",
+                "NB"
+            ],
+            "supertypes": [],
+            "tkey": "ListOps::Color",
+            "name": "Color"
+        },
+        {
+            "tag": "StdConcept",
+            "tkey": "ListOps::Tree<Main::CartItemDTO>",
+            "name": "Tree"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "ListOps::Tree<Main::CartItemDTO>"
+            ],
+            "fields": [],
+            "hasvalidations": false,
+            "tkey": "ListOps::BBLeaf<Main::CartItemDTO>",
+            "name": "BBLeaf"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "ListOps::Tree<Main::CartItemDTO>"
+            ],
+            "fields": [
+                {
+                    "fname": "v",
+                    "ftype": "Main::CartItemDTO",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "ListOps::Leaf<Main::CartItemDTO>",
+            "name": "Leaf"
+        },
+        {
+            "tag": "StdEntity",
+            "supertypes": [
+                "ListOps::Tree<Main::CartItemDTO>"
+            ],
+            "fields": [
+                {
+                    "fname": "c",
+                    "ftype": "ListOps::Color",
+                    "isoptional": false
+                },
+                {
+                    "fname": "count",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "l",
+                    "ftype": "ListOps::Tree<Main::CartItemDTO>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "r",
+                    "ftype": "ListOps::Tree<Main::CartItemDTO>",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "ListOps::Node<Main::CartItemDTO>",
+            "name": "Node"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

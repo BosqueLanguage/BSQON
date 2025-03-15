@@ -167,7 +167,10 @@ public:
     const GenerateContext context;
     std::vector<bsqon::Value*> options;
 
-    ValueComponent(const VCPath path, const std::vector<ValueConstraint*>& constraints, const GenerateContext& context) : path(path), constraints(constraints), context(context) { ; }
+    ValueComponent(const VCPath path, const std::vector<ValueConstraint*>& constraints, const GenerateContext& context)
+        : path(path), constraints(constraints), context(context) { }
+    ValueComponent(const VCPath path, const std::vector<ValueConstraint*>& constraints, const GenerateContext& context, std::vector<bsqon::Value*> options)
+        : path(path), constraints(constraints), context(context), options(std::move(options)) { }
 
     std::u8string toString() const
     {
