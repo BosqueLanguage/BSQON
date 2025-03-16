@@ -8,7 +8,7 @@
 namespace bsqon
 {
     //
-    // TODO: this is not very performant (easy to debug though) we should do a numeric ID map or intern to string pointers later
+    //TODO: this is not very performant (easy to debug though) we should do a numeric ID map or intern to string pointers later
     //
     using TypeKey = std::string;
 
@@ -49,21 +49,19 @@ namespace bsqon
 
         TypeAnnotationInfo(std::string docstring, std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags) : docstring(docstring), sensitivetags(sensitivetags) { ; }
 
-        bool isSensitive() const
-        {
+        bool isSensitive() const {
             return this->sensitivetags.has_value();
         }
 
-        static TypeAnnotationInfo parse(json j)
-        {
+        static TypeAnnotationInfo parse(json j) {
             std::string docstring = j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
 
             std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags = std::nullopt;
-            if (j.contains("sensitive") && !j["sensitive"].is_null())
-            {
+            if(j.contains("sensitive") && !j["sensitive"].is_null()) {
                 std::vector<std::pair<TypeKey, std::string>> tags;
-                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags), [](const json &jv)
-                               { return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>()); });
+                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags), [](const json& jv) { 
+                    return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>()); 
+                });
 
                 sensitivetags = std::make_optional(tags);
             }
@@ -80,21 +78,19 @@ namespace bsqon
 
         FieldAnnotationInfo(std::string docstring, std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags) : docstring(docstring), sensitivetags(sensitivetags) { ; }
 
-        bool isSensitive() const
-        {
+        bool isSensitive() const {
             return this->sensitivetags.has_value();
         }
 
-        static FieldAnnotationInfo parse(json j)
-        {
+        static FieldAnnotationInfo parse(json j) {
             std::string docstring = j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
 
             std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags = std::nullopt;
-            if (j.contains("sensitive") && !j["sensitive"].is_null())
-            {
+            if(j.contains("sensitive") && !j["sensitive"].is_null()) {
                 std::vector<std::pair<TypeKey, std::string>> tags;
-                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags), [](const json &jv)
-                               { return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>()); });
+                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags), [](const json& jv) { 
+                    return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>()); 
+                });
 
                 sensitivetags = std::make_optional(tags);
             }
@@ -113,7 +109,7 @@ namespace bsqon
 
         TypeAnnotationInfo annotations;
 
-        Type(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : tag(tag), tkey(tkey), supertypes(supertypes), annotations(annotations)
+        Type(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : tag(tag), tkey(tkey), supertypes(supertypes), annotations(annotations) 
         {
             std::sort(this->supertypes.begin(), this->supertypes.end());
         }
@@ -125,7 +121,7 @@ namespace bsqon
 
         static const int64_t MAX_SAFE_NAT = 9223372036854775807ll;
 
-        static Type *parse(json j);
+        static Type* parse(json j);
 
         bool isUnresolved() const
         {
@@ -134,7 +130,9 @@ namespace bsqon
 
         bool isConcreteType() const
         {
-            return !(this->tag == TypeTag::TYPE_UNRESOLVED || this->tag == TypeTag::TYPE_OPTION || this->tag == TypeTag::TYPE_RESULT || this->tag == TypeTag::TYPE_STD_CONCEPT || this->tag == TypeTag::TYPE_APIRESULT);
+            return !(this->tag == TypeTag::TYPE_UNRESOLVED 
+                || this->tag == TypeTag::TYPE_OPTION || this->tag == TypeTag::TYPE_RESULT
+                || this->tag == TypeTag::TYPE_STD_CONCEPT || this->tag == TypeTag::TYPE_APIRESULT);
         }
     };
 
@@ -144,7 +142,7 @@ namespace bsqon
         UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {}, {"[UNRESOLVED]", std::nullopt}) { ; }
         virtual ~UnresolvedType() = default;
 
-        static UnresolvedType *singleton;
+        static UnresolvedType* singleton;
     };
 
     class EListType : public Type
@@ -152,11 +150,7 @@ namespace bsqon
     public:
         std::vector<TypeKey> entries;
 
-        EListType(std::vector<TypeKey> entries) : Type(TypeTag::TYPE_ELIST, "(|" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string &&a, TypeKey &b)
-                                                                                                   { return (a == "" ? "" : std::move(a) + ", ") + b; }) +
-                                                                                "|)",
-                                                       {}, {"", {}}),
-                                                  entries(entries) { ; }
+        EListType(std::vector<TypeKey> entries) : Type(TypeTag::TYPE_ELIST, "(|" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) + "|)", {}, {"", {}}), entries(entries) { ; }
         virtual ~EListType() = default;
     };
 
@@ -384,7 +378,7 @@ namespace bsqon
     {
     public:
         bool istoplevel;
-        std::map<std::string, std::string> imports; // copy over if not top-level
+        std::map<std::string, std::string> imports; //copy over if not top-level
 
         FullyQualifiedNamespace fullns;
         std::string ns;
@@ -393,17 +387,15 @@ namespace bsqon
         std::map<std::string, TypeKey> types;
 
         NamespaceDecl(bool istoplevel, std::map<std::string, std::string> imports, FullyQualifiedNamespace fullns, std::string ns, std::map<std::string, FullyQualifiedNamespace> subns, std::map<std::string, TypeKey> types) : istoplevel(istoplevel), imports(imports), fullns(fullns), ns(ns), subns(subns), types(types) { ; }
-        static NamespaceDecl *parse(json j);
+        static NamespaceDecl* parse(json j);
 
-        bool lookupNSReference(const std::string &name, std::string &out) const
+        bool lookupNSReference(const std::string& name, std::string& out) const
         {
             auto ii = this->imports.find(name);
-            if (ii == this->imports.end())
-            {
+            if(ii == this->imports.end()) {
                 return false;
             }
-            else
-            {
+            else {
                 out = ii->second;
                 return true;
             }
@@ -413,99 +405,74 @@ namespace bsqon
     class AssemblyInfo
     {
     public:
-        std::map<std::string, NamespaceDecl *> namespaces;
-        std::map<TypeKey, Type *> typerefs;
+        std::map<std::string, NamespaceDecl*> namespaces;
+        std::map<TypeKey, Type*> typerefs;
 
         std::vector<std::set<TypeKey>> recursiveSets;
 
-        // maps from literal regex representations to their executable forms
-        std::map<std::u8string, brex::UnicodeRegexExecutor *> executableUnicodeRegexMap;
-        std::map<std::u8string, brex::CRegexExecutor *> executableCRegexMap;
+        //maps from literal regex representations to their executable forms
+        std::map<std::u8string, brex::UnicodeRegexExecutor*> executableUnicodeRegexMap;
+        std::map<std::u8string, brex::CRegexExecutor*> executableCRegexMap;
 
-        // maps from namespace const named Foo::bar regex representations to their named regex opt forms
-        std::map<std::string, const brex::RegexOpt *> namedUnicodeRegexMap;
-        std::map<std::string, const brex::RegexOpt *> namedCRegexMap;
+        //maps from namespace const named Foo::bar regex representations to their named regex opt forms
+        std::map<std::string, const brex::RegexOpt*> namedUnicodeRegexMap;
+        std::map<std::string, const brex::RegexOpt*> namedCRegexMap;
         brex::ReNSRemapper nsremapper;
 
         AssemblyInfo() : namespaces(), typerefs(), recursiveSets(), executableUnicodeRegexMap(), executableCRegexMap(), namedUnicodeRegexMap(), namedCRegexMap(), nsremapper()
-        {
-            ;
+        { 
+            ; 
         }
 
         ~AssemblyInfo()
         {
             //
-            // Should only be one assembly when executing -- so just let it hang out and get collected on shutdown
+            //Should only be one assembly when executing -- so just let it hang out and get collected on shutdown
             //
         }
 
-        static void parseRESystem(json j, AssemblyInfo &assembly);
-        static void parse(json j, AssemblyInfo &assembly);
+        static void parseRESystem(json j, AssemblyInfo& assembly);
+        static void parse(json j, AssemblyInfo& assembly);
 
-        Type *lookupTypeKey(TypeKey tkey)
+        Type* lookupTypeKey(TypeKey tkey)
         {
             auto tt = this->typerefs.find(tkey);
-            if (tt != this->typerefs.end())
-            {
+            if(tt != this->typerefs.end()) {
                 return tt->second;
             }
-            else
-            {
+            else {
                 return UnresolvedType::singleton;
             }
         }
 
-        const Type *lookupTypeKey(TypeKey tkey) const
+        const Type* lookupTypeKey(TypeKey tkey) const
         {
             auto tt = this->typerefs.find(tkey);
-            if (tt != this->typerefs.end())
-            {
+            if(tt != this->typerefs.end()) {
                 return tt->second;
             }
-            else
-            {
+            else {
                 return UnresolvedType::singleton;
             }
         }
 
-        bool checkSubtype(const Type *t, const Type *oftype) const
+        bool checkSubtype(const Type* t, const Type* oftype) const
         {
-            if (t->tkey == oftype->tkey)
-            {
+            if (t->tkey == oftype->tkey) {
                 return true;
             }
-            else
-            {
+            else {
                 return std::binary_search(t->supertypes.cbegin(), t->supertypes.cend(), oftype->tkey);
             }
         }
 
-        std::vector<std::string> getAllSubtypes()
-        {
-            std::vector<std::string> supertypes;
-            // if (!t->supertypes.empty())
-            // {
-            //     // std::cout << "vector key" << type->tkey<<std::endl;
-            //     // std::cout << "vector is non empty" << type->supertypes.size()<<std::endl;
-            //     for (const auto &supertype : t->supertypes)
-            //     {
-            //         if (supertype == "Main::Expression")
-            //         {
-            //             supertypes.push_back(t->tkey);
-            //         }
-            //     }
-            // }
-            
-            return supertypes;
-        }
+        std::u8string resolveConstantRegexValue(const std::u8string& reexp, bool isutf) const;
 
-        std::u8string resolveConstantRegexValue(const std::u8string &reexp, bool isutf) const;
+        void processUnicodeRegex(const std::string& inns, const std::u8string& regex);
+        void processCRegex(const std::string& inns, const std::u8string& regex);
 
-        void processUnicodeRegex(const std::string &inns, const std::u8string &regex);
-        void processCRegex(const std::string &inns, const std::u8string &regex);
-
-        bool validateString(const std::u8string &regex, brex::UnicodeString *ustr, const std::string &inns);
-        bool validateCString(const std::u8string &regex, brex::CString *cstr, const std::string &inns);
+        bool validateString(const std::u8string& regex, brex::UnicodeString* ustr, const std::string& inns);
+        bool validateCString(const std::u8string& regex, brex::CString* cstr, const std::string& inns);
 
         bool isKeyType(TypeKey tkey) const;
     };
