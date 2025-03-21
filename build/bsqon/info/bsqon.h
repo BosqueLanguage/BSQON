@@ -2,7 +2,8 @@
 
 #include "../common.h"
 #include "type_info.h"
-
+#include "json.hpp"
+using json = nlohmann::json;
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -87,6 +88,7 @@ namespace bsqon
         virtual ~Value() = default;
 
         virtual std::u8string toString() const = 0;
+        virtual json toJSON() const = 0;
 
         virtual bool isErrorValue() const
         {
@@ -204,6 +206,11 @@ namespace bsqon
         {
             return true;
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class PrimtitiveValue : public Value
@@ -223,6 +230,11 @@ namespace bsqon
         {
             return u8"none";
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class BoolValue : public PrimtitiveValue 
@@ -236,6 +248,10 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return this->tv ? u8"true" : u8"false";
+        }
+
+        virtual json toJSON() const override { 
+            return json(this->tv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -280,6 +296,11 @@ namespace bsqon
         {
             return Value::keyCompareImplScalars(v1->cnv, v2->cnv);
         }
+
+        virtual json toJSON() const override
+        {
+            return json(this->cnv);
+        }
     };
 
     class IntNumberValue : public PrimtitiveValue 
@@ -294,6 +315,11 @@ namespace bsqon
         {
             auto sstr = std::to_string(this->cnv);
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"i";
+        }
+
+        virtual json toJSON() const override
+        {
+            return json(this->cnv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -319,6 +345,11 @@ namespace bsqon
         {
             auto sstr = this->cnv.str();
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"N";
+        }
+
+        virtual json toJSON() const override
+        {
+            return json(this->cnv.str());
         }
 
         virtual bool isValidForTypedecl() const override
@@ -355,6 +386,12 @@ namespace bsqon
         {
             return Value::keyCompareImplScalars(v1->cnv, v2->cnv);
         }
+
+        virtual json toJSON() const override
+        {
+            return json(this->cnv.str());
+        }
+
     };
 
     class FloatNumberValue : public PrimtitiveValue 
@@ -369,6 +406,11 @@ namespace bsqon
         {
             auto sstr = std::to_string(this->cnv);
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"f");
+        }
+
+        virtual json toJSON() const override
+        {
+           return json(this->cnv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -396,6 +438,11 @@ namespace bsqon
         {
             return true;
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class RationalNumberValue : public PrimtitiveValue 
@@ -415,6 +462,11 @@ namespace bsqon
         virtual bool isValidForTypedecl() const override
         {
             return true;
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -436,6 +488,11 @@ namespace bsqon
         virtual bool isValidForTypedecl() const override
         {
             return true;
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -467,6 +524,11 @@ namespace bsqon
         {
             return true;
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class ComplexNumberValue : public PrimtitiveValue 
@@ -497,6 +559,11 @@ namespace bsqon
         {
             return true;
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class StringValue : public PrimtitiveValue 
@@ -512,6 +579,11 @@ namespace bsqon
         {
             auto ustr = brex::escapeUnicodeString(this->sv);
             return u8"\"" + std::u8string(ustr.begin(), ustr.end()) + u8"\"";
+        }
+
+        virtual json toJSON() const override
+        {
+          return json(std::string(reinterpret_cast<const char*>(this->sv.data()), this->sv.size()));
         }
 
         virtual bool isValidForTypedecl() const override
@@ -541,6 +613,11 @@ namespace bsqon
         {
             auto ustr = brex::escapeCString(this->sv);
             return u8"'" + std::u8string(ustr.begin(), ustr.end()) + u8"'";
+        }
+         
+        virtual json toJSON() const override
+        {
+          return json(this->sv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -581,6 +658,11 @@ namespace bsqon
             return u8"0x[" + bstr + u8"]";
         }
 
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
+
     private:
         ByteBufferValue(const Type* vtype, SourcePos spos, std::vector<uint8_t> bytes) : PrimtitiveValue(ValueKind::ByteBufferValueKind, vtype, spos), bytes(bytes) { ; }
     };
@@ -608,6 +690,11 @@ namespace bsqon
         {
             return Value::keyCompareImplStringish(v1->uuidstr, v2->uuidstr);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class UUIDv7Value : public PrimtitiveValue 
@@ -633,6 +720,11 @@ namespace bsqon
         {
             return Value::keyCompareImplStringish(v1->uuidstr, v2->uuidstr);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class SHAContentHashValue : public PrimtitiveValue 
@@ -657,6 +749,11 @@ namespace bsqon
         static int keyCompare(const SHAContentHashValue* v1, const SHAContentHashValue* v2)
         {
             return Value::keyCompareImplStringish(v1->hashstr, v2->hashstr);
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -693,6 +790,12 @@ namespace bsqon
 
             return Value::keyCompareImplArray(v1vs, v2vs, 6);
         }
+
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class TIATimeValue : public PrimtitiveValue 
@@ -722,6 +825,11 @@ namespace bsqon
             uint16_t v2vs[6] = {v2->tv.year, v2->tv.month, v2->tv.day, v2->tv.hour, v2->tv.min, v2->tv.sec};
 
             return Value::keyCompareImplArray(v1vs, v2vs, 6);
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -753,6 +861,11 @@ namespace bsqon
 
             return Value::keyCompareImplArray(v1vs, v2vs, 3);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class PlainTimeValue : public PrimtitiveValue 
@@ -783,6 +896,11 @@ namespace bsqon
 
             return Value::keyCompareImplArray(v1vs, v2vs, 3);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class LogicalTimeValue : public PrimtitiveValue 
@@ -807,6 +925,11 @@ namespace bsqon
         static int keyCompare(const LogicalTimeValue* v1, const LogicalTimeValue* v2)
         {
             return Value::keyCompareImplScalars(v1->tv, v2->tv);
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -838,6 +961,11 @@ namespace bsqon
 
             return Value::keyCompareImplArray(v1vs, v2vs, 7);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class DeltaDateTimeValue : public PrimtitiveValue 
@@ -868,6 +996,11 @@ namespace bsqon
 
             return Value::keyCompareImplArray(v1vs, v2vs, 6);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class DeltaSecondsValue : public PrimtitiveValue 
@@ -896,6 +1029,11 @@ namespace bsqon
         {
             return Value::keyCompareImplScalars(v1->tv, v2->tv);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class DeltaLogicalTimeValue : public PrimtitiveValue 
@@ -923,6 +1061,11 @@ namespace bsqon
         static int keyCompare(const DeltaLogicalTimeValue* v1, const DeltaLogicalTimeValue* v2)
         {
             return Value::keyCompareImplScalars(v1->tv, v2->tv);
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -954,6 +1097,11 @@ namespace bsqon
 
             return Value::keyCompareImplArray(v1vs, v2vs, 6);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class UnicodeRegexValue : public PrimtitiveValue 
@@ -969,6 +1117,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return this->normalizedre;
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
 
     private:
@@ -991,6 +1144,11 @@ namespace bsqon
             return this->normalizedre;
         }
 
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
+
     private:
         CRegexValue(const Type* vtype, SourcePos spos, brex::Regex* tv, std::u8string normalizedre) : PrimtitiveValue(ValueKind::CRegexValueKind, vtype, spos), tv(tv), normalizedre(normalizedre) { ; }
     };
@@ -1010,6 +1168,11 @@ namespace bsqon
             return this->normalizedre;
         }
 
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
+
     private:
         PathRegexValue(const Type* vtype, SourcePos spos, brex::Regex* tv, std::u8string normalizedre) : PrimtitiveValue(ValueKind::PathRegexValueKind, vtype, spos), tv(tv), normalizedre(normalizedre) { ; }
     };
@@ -1026,6 +1189,11 @@ namespace bsqon
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class OkValue : public Value
@@ -1039,6 +1207,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1054,6 +1227,11 @@ namespace bsqon
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class APIRejectedValue : public Value
@@ -1067,6 +1245,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1082,6 +1265,11 @@ namespace bsqon
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class APIErrorValue : public Value
@@ -1096,6 +1284,11 @@ namespace bsqon
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class APISuccessValue : public Value
@@ -1109,6 +1302,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() + u8'}';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1136,6 +1334,11 @@ namespace bsqon
         static int keyCompare(const PathValue* v1, const PathValue* v2)
         {
             return Value::keyCompareImplStringish(v1->normalizedpth, v2->normalizedpth);
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
 
     private:
@@ -1168,6 +1371,11 @@ namespace bsqon
             return Value::keyCompareImplStringish(v1->normalizedfrag, v2->normalizedfrag);
         }
 
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
+
     private:
         PathItemValue(const Type* vtype, SourcePos spos, bpath::PathFragment* fragment, std::u8string normalizedfrag) : Value(ValueKind::PathItemValueKind, vtype, spos), fragment(fragment), normalizedfrag(normalizedfrag) { ; }
     };
@@ -1198,6 +1406,11 @@ namespace bsqon
             return Value::keyCompareImplStringish(v1->normalizedglob, v2->normalizedglob);
         }
 
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
+
     private:
         GlobValue(const Type* vtype, SourcePos spos, bpath::PathGlob* glob, std::u8string normalizedglob) : Value(ValueKind::GlobValueKind, vtype, spos), glob(glob), normalizedglob(normalizedglob) { ; }
     };
@@ -1219,6 +1432,15 @@ namespace bsqon
 
             return ltype + u8'{' + lvalues + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            json jsonVals = json::array();
+            for (const auto& val: vals) {
+                jsonVals.push_back(val->toJSON());
+            }
+            return jsonVals;
+        }
     };
 
     class StackValue : public Value
@@ -1237,6 +1459,11 @@ namespace bsqon
             });
 
             return stype + u8'{' + svalues + u8'}';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1257,6 +1484,11 @@ namespace bsqon
 
             return qtype + u8'{' + qvalues + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class SetValue : public Value
@@ -1276,6 +1508,11 @@ namespace bsqon
 
             return stype + u8'{' + svalues + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class MapEntryValue : public Value
@@ -1290,6 +1527,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->key->toString() + u8", " + this->val->toString() + u8'}';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1309,6 +1551,11 @@ namespace bsqon
             });
 
             return mtype + u8'{' + mvalues + u8'}';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1335,6 +1582,11 @@ namespace bsqon
         {
             return Value::keyCompareImplScalars(v1->ev, v2->ev);
         }
+
+        virtual json toJSON() const override
+        {
+            return json({});
+        }
     };
 
     class TypedeclValue : public Value
@@ -1348,6 +1600,11 @@ namespace bsqon
         virtual std::u8string toString() const override
         {
             return this->pvalue->toString() + u8'<' + std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'>';
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1384,6 +1641,20 @@ namespace bsqon
 
             return etype + u8'{' + efields + u8'}';
         }
+
+        virtual json toJSON() const override
+        {
+            json jsonVals;
+            const std::vector<EntityTypeFieldEntry>& fields = static_cast<const StdEntityType*>(this->vtype)->fields;
+
+            for (size_t i = 0; i < this->fieldvalues.size(); ++i)
+            {
+                const auto& fieldName = fields[i].fname;
+                jsonVals[fieldName] = this->fieldvalues[i]->toJSON();
+                
+            }
+            return jsonVals;
+        }
     };
 
     class EListValue : public Value
@@ -1402,6 +1673,11 @@ namespace bsqon
             });
 
             return u8'<' + ttype + u8">(|" + tvalues + u8"|)";
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
@@ -1456,6 +1732,11 @@ namespace bsqon
             return std::accumulate(this->offsets.cbegin(), this->offsets.cend(), std::move(sroot), [](std::u8string&& a, const SymbolicOffset& v) { 
                 return std::move(a) + v.toString(); 
             });
+        }
+
+        virtual json toJSON() const override
+        {
+            return json({});
         }
     };
 
