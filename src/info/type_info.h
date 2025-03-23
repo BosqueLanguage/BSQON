@@ -408,6 +408,8 @@ namespace bsqon
         std::map<std::string, NamespaceDecl*> namespaces;
         std::map<TypeKey, Type*> typerefs;
 
+        std::map<TypeKey, std::vector<TypeKey>> concreteSubtypesMap;
+
         std::vector<std::set<TypeKey>> recursiveSets;
 
         //maps from literal regex representations to their executable forms
@@ -419,7 +421,7 @@ namespace bsqon
         std::map<std::string, const brex::RegexOpt*> namedCRegexMap;
         brex::ReNSRemapper nsremapper;
 
-        AssemblyInfo() : namespaces(), typerefs(), recursiveSets(), executableUnicodeRegexMap(), executableCRegexMap(), namedUnicodeRegexMap(), namedCRegexMap(), nsremapper()
+        AssemblyInfo() : namespaces(), typerefs(), concreteSubtypesMap(), recursiveSets(), executableUnicodeRegexMap(), executableCRegexMap(), namedUnicodeRegexMap(), namedCRegexMap(), nsremapper()
         { 
             ; 
         }

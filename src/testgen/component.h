@@ -296,8 +296,9 @@ public:
     ValueSetPartition generateList(const bsqon::ListType* t, const ValueSetGeneratorEnvironment& env);
     //More special types here...
 
-
     ValueSetPartition generateStdEntityType(const bsqon::StdEntityType* t, const ValueSetGeneratorEnvironment& env);
+
+    ValueSetPartition generateStdConceptType(const bsqon::StdConceptType* t, const ValueSetGeneratorEnvironment& env);
 
     ValueSetPartition generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env);
 };
@@ -308,6 +309,8 @@ private:
     bool isRequiredValue(const VCPath& currpath, bsqon::Value*& value);
     bool isConstrainedLengthValue(const VCPath& currpath, bsqon::Value*& value);
     bsqon::Value* selectFromPartition(const VCPath& currpath);
+
+    const bsqon::Type* resolveSubtypeChoice(const VCPath& currpath, const bsqon::Type* t);
 
 public:
     const bsqon::AssemblyInfo* assembly;
@@ -331,9 +334,14 @@ public:
     bsqon::Value* generateEnum(const bsqon::EnumType* t, VCPath currpath);
 
     bsqon::Value* generateList(const bsqon::ListType* t, VCPath currpath);
+
     //More special types here...
 
     bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath);
 
+    bsqon::Value* generateStdConceptType(const bsqon::StdConceptType* t, VCPath currpath);
+
     bsqon::Value* generateType(const bsqon::Type* t, VCPath currpath);
+
+    static bool checkConstraintSatisfiability(const std::vector<const ValueConstraint*> constraints);
 };

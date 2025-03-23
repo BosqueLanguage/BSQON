@@ -417,6 +417,22 @@ namespace bsqon
     void loadAssembly(json j)
     {
         AssemblyInfo::parse(j, g_assembly);
+
+        for(auto iter = g_assembly.typerefs.cbegin(); iter != g_assembly.typerefs.cend(); ++iter) {
+            auto asconcept = dynamic_cast<ConceptType*>(iter->second);
+            if(asconcept != nullptr) {
+                g_assembly.concreteSubtypesMap[asconcept->tkey] = std::vector<TypeKey>();
+            }
+        }
+
+        for(auto iter = g_assembly.typerefs.cbegin(); iter != g_assembly.typerefs.cend(); ++iter) {
+            auto asentity = dynamic_cast<EntityType*>(iter->second);
+            if(asentity != nullptr) {
+                for(auto superii = asentity->supertypes.cbegin(); superii != asentity->supertypes.cend(); ++superii) {
+                    g_assembly.concreteSubtypesMap[*superii].push_back(asentity->tkey);
+                }
+            }
+        }
     }
 
     bool isSubtype(TypeKey tkey, TypeKey oftype)
