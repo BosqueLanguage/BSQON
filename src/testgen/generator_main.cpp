@@ -1,5 +1,6 @@
 #include "component.h"
 #include "generator.h"
+#include "ai_generator.h"
 
 #include <iostream>
 #include <fstream>
@@ -109,11 +110,14 @@ int main(int argc, char** argv, char **envp)
     bsqon::AssemblyInfo assembly;
     bsqon::AssemblyInfo::parse(jv, assembly);
 
+    AIValueSetGenerator aigenerator;
     ValueSetGenerator generator(&assembly);
     const bsqon::Type* loadtype = assembly.lookupTypeKey(argv[2]);
 
     ValueSetGeneratorEnvironment venv{"var", {}, GenerateContext{}};
+    ValueSetGeneratorEnvironment aivenv{"var", {}, GenerateContext{}};
     ValueSetPartition vspartition = generator.generateType(loadtype, venv);
+    ValueSetPartition aivspartition = aigenerator.generateType(loadtype, aivenv);
 
     std::vector<bsqon::Value*> tests;
     auto modestr = std::string(argv[3]);
