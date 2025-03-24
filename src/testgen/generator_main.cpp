@@ -62,21 +62,24 @@ std::vector<bsqon::Value*> generateAgentTestSuite(const bsqon::AssemblyInfo* ass
 
 std::vector<bsqon::Value*> generateCombinatorialTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const bsqon::Type* loadtype)
 {
-    auto pstr = vspartition.toString();
-    printf("%s\n", (const char*)pstr.c_str());
-
-    //TODO: fill in the options for each component
-    printf("Combinatorial test suite generation not yet implemented\n");
-    exit(1);
-
-    auto vstr = vspartition.toString();
-    printf("%s\n", (const char*)vstr.c_str());
-    
-
     std::vector<bsqon::Value*> tests;
+
     for(size_t i = 0; i < vspartition.components.size(); ++i) {
         for(size_t j = i + 1; j < vspartition.components.size(); ++j) {
-            assert(false); //not implemented!!!
+        
+            auto pi = vspartition.components[i];
+            auto pj = vspartition.components[j];
+
+            std::vector<const ValueConstraint*> constraints;
+            constraints.insert(constraints.end(), pi->constraints.cbegin(), pi->constraints.cend());
+            constraints.insert(constraints.end(), pj->constraints.cbegin(), pj->constraints.cend());
+
+            if(TestGenerator::checkConstraintSatisfiability(constraints)) {
+                TestGenerator tgen(assembly, &vspartition, constraints);
+                
+                auto res = tgen.generateType(loadtype, "var");
+                tests.push_back(res);
+            }
         }
     }
 

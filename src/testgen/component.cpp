@@ -451,10 +451,48 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
 bool TestGenerator::checkConstraintSatisfiability(const std::vector<const ValueConstraint*> constraints)
 {
     //Make sure all the OfType Constaints on any given path are the same
-    xxxx;
+    std::vector<const ValueConstraint*> oftypeconstraints;
+    std::copy_if(constraints.cbegin(), constraints.cend(), std::back_inserter(oftypeconstraints), [](const ValueConstraint* vc) { return dynamic_cast<const OfTypeConstraint*>(vc) != nullptr; });
+    std::sort(oftypeconstraints.begin(), oftypeconstraints.end(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+        return vc1->path.compare(vc2->path) < 0;
+    });
+
+    auto conflictingtype = std::adjacent_find(oftypeconstraints.cbegin(), oftypeconstraints.cend(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+        auto cc1 = dynamic_cast<const OfTypeConstraint*>(vc1);
+        auto cc2 = dynamic_cast<const OfTypeConstraint*>(vc2);
+
+        return (cc1->path == cc2->path) && (cc1->vtype->tkey != cc2->vtype->tkey);
+    });
+
+    if(conflictingtype != oftypeconstraints.cend()) {
+        return false;
+    }
 
     //Find all the MinLength Constraints on any given path and make sure there isnt a fixed value that is smaller
-    xxxx;
+    std::vector<const ValueConstraint*> minlenconstraints;
+    std::copy_if(constraints.cbegin(), constraints.cend(), std::back_inserter(minlenconstraints), [](const ValueConstraint* vc) { return dynamic_cast<const MinLengthConstraint*>(vc) != nullptr; });
+    std::sort(minlenconstraints.begin(), minlenconstraints.end(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+        return vc1->path.compare(vc2->path) < 0;
+    });
+
+    auto badfixed = std::find_if(minlenconstraints.cbegin(), minlenconstraints.cend(), [&constraints](const ValueConstraint* vc) {
+        auto mlc = dynamic_cast<const MinLengthConstraint*>(vc);
+
+        auto fvci = std::find_if(constraints.cbegin(), constraints.cend(), [&mlc](const ValueConstraint* vc) {
+            return vc->path == mlc->path && dynamic_cast<const FixedValueConstraint*>(vc) != nullptr;
+        });
+
+        if(fvci == constraints.cend()) {
+            return false;
+        }
+
+        auto fvc = dynamic_cast<const FixedValueConstraint*>(*fvci);
+        return static_cast<const bsqon::NatNumberValue*>(fvc->value)->cnv < mlc->minlen;
+    });
+
+    if(badfixed != constraints.cend()) {
+        return false;
+    }
 
     return true;
 }
