@@ -1,0 +1,18 @@
+{
+    "fname": "Main::bond_rating",
+    "args": [
+        {
+            "name": "min",
+            "type": "Int"
+        },
+        {
+            "name": "max",
+            "type": "Int"
+        },
+        {
+            "name": "cusip",
+            "type": "CString"
+        }
+    ],
+    "return": "Bool"
+}
