@@ -48,6 +48,31 @@ ValueSetPartition ValueSetGenerator::generateInt(const bsqon::PrimitiveType* t, 
     return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
 }
 
+ValueSetPartition ValueSetGenerator::generateBigNat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateBigInt(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateFloat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
 //TODO: more primitives..
 
 ValueSetPartition ValueSetGenerator::generatePrimitive(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
@@ -65,19 +90,21 @@ ValueSetPartition ValueSetGenerator::generatePrimitive(const bsqon::PrimitiveTyp
     else if(tk == "Int") {
         return this->generateInt(t, env);
     }
-        /*
-        else if(tk == "BigInt") {
-            return this->parseBigInt(t, node);
-        }
-        else if(tk == "BigNat") {
-            return this->parseBigNat(t, node);
-        }
+    else if(tk == "BigInt") {
+        return this->generateBigInt(t, env);
+    }
+    else if(tk == "BigNat") {
+        return this->generateBigNat(t, env);
+    }
+    /*
         else if(tk == "Rational") {
             return this->parseRational(t, node);
         }
-        else if(tk == "Float") {
-            return this->parseFloat(t, node);
-        }
+    */
+    else if(tk == "Float") {
+        return this->generateFloat(t, env);
+    }
+    /*
         else if(tk == "Decimal") {
             return this->parseDecimal(t, node);
         }
@@ -90,12 +117,14 @@ ValueSetPartition ValueSetGenerator::generatePrimitive(const bsqon::PrimitiveTyp
         else if(tk == "Complex") {
             return this->parseComplex(t, node);
         }
-        else if(tk == "String") {
-            return this->parseString(t, node);
-        }
-        else if(tk == "CString") {
-            return this->parseCString(t, node);
-        }
+    */
+    else if(tk == "String") {
+        return this->generateString(t, env);
+    }
+    else if(tk == "CString") {
+        return this->generateCString(t, env);
+    }
+    /*
         else if(tk == "ByteBuffer") {
             return this->parseByteBuffer(t, node);
         }

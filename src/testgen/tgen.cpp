@@ -139,7 +139,7 @@ std::vector<std::vector<bsqon::Value*>> generateTestSuite(const bsqon::AssemblyI
 
 int main(int argc, char** argv, char **envp)
 {
-    if(argc != 6) {
+    if(argc != 5) {
         usage();
         exit(1);
     }
@@ -196,26 +196,28 @@ int main(int argc, char** argv, char **envp)
         if(i != 0) {
             std::cout << "," << std::endl;
         }
-        std::cout << "[" << std::endl;
+        std::cout << "[";
         for(size_t j = 0; j < tests[i].size(); ++j) {
             std::u8string rstr = tests[i][j]->toString();
             if(j != 0) {
-                std::cout << "," << std::endl;
+                std::cout << ",";
             }
+            std::cout << std::endl;
+
             std::cout << "    " << std::string(rstr.cbegin(), rstr.cend());
         }
-        std::cout << "]" << std::endl;
+        std::cout << std::endl << "]";
     }
 
     //write the json tests, ONE per file, to the output directory
-    auto trgtdir = std::filesystem::canonical(std::string(argv[4]));
+    auto trgtdir = std::string(argv[4]);
     if(std::filesystem::exists(trgtdir)) {
         std::filesystem::remove_all(trgtdir);
     }
     std::filesystem::create_directories(trgtdir);
 
     for(size_t i = 0; i < tests.size(); ++i) {
-        std::string fname = trgtdir.string() + "/test_" + std::to_string(i) + ".json";
+        std::string fname = trgtdir + "/test_" + std::to_string(i) + ".json";
         std::ofstream outfile(fname);
 
         json jargs;

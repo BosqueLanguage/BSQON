@@ -290,6 +290,13 @@ public:
     ValueSetPartition generateBool(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
     ValueSetPartition generateNat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
     ValueSetPartition generateInt(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateBigNat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateBigInt(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
+
+    ValueSetPartition generateFloat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
+
+    ValueSetPartition generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
 
     //TODO: more primitives..
 
@@ -322,7 +329,7 @@ public:
     std::string toString() const
     {
         auto argstr = std::accumulate(this->args.cbegin(), this->args.cend(), std::string{}, [](std::string&& a, const std::pair<std::string, const bsqon::Type*>& v) { 
-            return (a.empty() ? "" : std::move(a) + ", ") + v.first + " : " + v.second->tkey;
+            return (a.empty() ? "" : std::move(a) + ", ") + v.first + ": " + v.second->tkey;
         });
 
         auto ssig = "api " + this->fname + "(" + argstr + ") : " + this->rettype->tkey;

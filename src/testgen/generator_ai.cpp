@@ -25,7 +25,7 @@ static std::string g_std_prompt_instructions = R"(
 )";
 
 static std::string g_prompt_naked_arg = R"(
-    Act as an expert in REST API input space analysis.
+    Act as an expert in API input space analysis for black-box test generation.
 
     Given a variable named "{{name}}" with data type "{{type}}" with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
 
@@ -54,6 +54,24 @@ static std::string g_prompt_member_field_index = R"(
     Given a field, named "{{fname}}" in a type named "{{tname}}", that is an array of type "{{type}}" elements with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified array element type and format, and within acceptable ranges.
         
     {{std_reqs}}
+    )";
+
+static std::string g_api_json = R"(
+    {
+    "contents": 
+        [{
+        "parts": 
+            [{
+            "text": 
+                "[PROMPT]"
+            }] 
+        }],
+    "generationConfig": 
+        { 
+            "response_mime_type": "application/json", 
+            "response_schema": { "type": "array", "items": "[TYPE_INFO]" }
+        }
+    }
     )";
 
 static std::unordered_map<std::string, std::string> g_typeFormatInstructions = {
@@ -121,9 +139,8 @@ std::string makeAPIRequest(const std::string& apiKey, const std::string& url, js
     
     struct curl_slist* headers = nullptr;
     headers = curl_slist_append(headers, "Content-Type: application/json");
-    headers = curl_slist_append(headers, ("Authorization: Bearer " + apiKey).c_str());
-
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    
+    curl_easy_setopt(curl, CURLOPT_URL, (url + "?key=" + apiKey).c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonPayload.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -169,32 +186,25 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
     return prompt;
 }
 
-std::string callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
+json callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
 {
-    std::string apiKey = getenv("GEMINI_API_KEY");
+    std::string apiKey = std::string(getenv("GEMINI_API_KEY"));
     std::string url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-    //TODO: Temp debugging output
-    std::cout << "---- Prompting with ----" << std::endl << prompt << std::endl;
-
-    std::string GEMINI_API_KEY = getenv("GEMINI_API_KEY");
-    std::string GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-    std::string parts = "{\"parts\": [ {\"text\": " +  prompt + "} ] }";
-    std::string jschema = "\"generationConfig\": { \"response_mime_type\": \"application/json\", \"response_schema\": { \"type\": \"array\", \"items\": { \"type\": " + jsontype + "} } }";
-
-    std::string requestJson = "{\"contents\": [" + parts + "], " + jschema + "}";
+    json requestJson = json::parse(g_api_json);
+    requestJson["contents"][0]["parts"][0]["text"] = prompt;
+    requestJson["generationConfig"]["response_schema"]["items"] = json::parse(jsontype);
 
     //TODO: Temp debugging output
-    std::cout << "---- Requesting with ----" << std::endl << requestJson << std::endl;
+    //std::cout << "---- Requesting with ----" << std::endl << requestJson.dump(8) << std::endl;
 
     std::string response = makeAPIRequest(apiKey, url, requestJson);
     json responseJson = json::parse(response);
 
     //TODO: Temp debugging output
-    std::cout << "---- Responded with ----" << std::endl << responseJson.dump(8) << std::endl;
+    //std::cout << "---- Responded with ----" << std::endl << responseJson.dump(8) << std::endl;
 
-    return responseJson;
+    return json::parse(responseJson["candidates"][0]["content"]["parts"][0]["text"].get<std::string>());
 }
 
 json callAPIWithPrompt(std::string prompt)
