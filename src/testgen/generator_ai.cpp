@@ -196,7 +196,7 @@ json callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
     requestJson["generationConfig"]["response_schema"]["items"] = json::parse(jsontype);
 
     //TODO: Temp debugging output
-    //std::cout << "---- Requesting with ----" << std::endl << requestJson.dump(8) << std::endl;
+    std::cout << "---- Requesting with ----" << std::endl << requestJson.dump(8) << std::endl;
 
     std::string response = makeAPIRequest(apiKey, url, requestJson);
     json responseJson = json::parse(response);

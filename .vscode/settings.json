@@ -76,6 +76,5 @@
         "stdfloat": "cpp",
         "*.ipp": "cpp",
         "codecvt": "cpp"
-    },
-    "workbench.productIconTheme": "undoDebugger"
+    }
 }

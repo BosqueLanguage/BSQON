@@ -421,5 +421,5 @@ public:
 
     bsqon::Value* generateType(const bsqon::Type* t, VCPath currpath);
 
-    static bool checkConstraintSatisfiability(const std::vector<const ValueConstraint*> constraints);
+    static bool checkConstraintSatisfiability(const std::vector<const ValueConstraint*>& constraints);
 };

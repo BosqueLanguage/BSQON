@@ -109,22 +109,22 @@ std::vector<std::vector<bsqon::Value*>> generateCombinatorialTestSuite(const bsq
             constraints.insert(constraints.end(), pi->constraints.cbegin(), pi->constraints.cend());
             constraints.insert(constraints.end(), pj->constraints.cbegin(), pj->constraints.cend());
 
-            if(TestGenerator::checkConstraintSatisfiability(constraints)) {
-                for(size_t m = 0; m < pi->options.size(); ++m) {
-                    for(size_t n = 0; n < pj->options.size(); ++n) {
-                        std::vector<const ValueConstraint*> fconstraints;
-                        fconstraints.insert(constraints.end(), constraints.cbegin(), constraints.cend());
+            for(size_t m = 0; m < pi->options.size(); ++m) {
+                for(size_t n = 0; n < pj->options.size(); ++n) {
+                    std::vector<const ValueConstraint*> fconstraints;
+                    fconstraints.insert(fconstraints.end(), constraints.cbegin(), constraints.cend());
 
-                        constraints.push_back(new FixedValueConstraint(pi->path, pi->options[m]));
-                        constraints.push_back(new FixedValueConstraint(pj->path, pj->options[n]));
+                    fconstraints.push_back(new FixedValueConstraint(pi->path, pi->options[m]));
+                    fconstraints.push_back(new FixedValueConstraint(pj->path, pj->options[n]));
 
-                        TestGenerator tgen(assembly, &vspartition, constraints);
+                    if(TestGenerator::checkConstraintSatisfiability(fconstraints)) {
+                        TestGenerator tgen(assembly, &vspartition, fconstraints);
                         tests.emplace_back(generateArgValues(tgen, testsig));
                     }
                 }
-
-                //TODO: do we want to force/ensure an equality and disequality if the types are the same?
             }
+
+            //TODO: do we want to force/ensure an equality and disequality if the types are the same?
         }
     }
 
@@ -192,6 +192,7 @@ int main(int argc, char** argv, char **envp)
     }
 
     //Print out tests -- 1 per line
+    std::cout << "---- Tests ----" << std::endl;
     for(size_t i = 0; i < tests.size(); ++i) {
         if(i != 0) {
             std::cout << "," << std::endl;
@@ -208,6 +209,7 @@ int main(int argc, char** argv, char **envp)
         }
         std::cout << std::endl << "]";
     }
+    std::cout << std::endl;
 
     //write the json tests, ONE per file, to the output directory
     auto trgtdir = std::string(argv[4]);
@@ -221,8 +223,8 @@ int main(int argc, char** argv, char **envp)
         std::ofstream outfile(fname);
 
         json jargs;
-        for(size_t j = 0; j < tests[i].size(); ++j) {
-            jargs.push_back(tests[i][j]->toJSON());
+        for(size_t j = 0; j < testsig.args.size(); ++j) {
+            jargs[testsig.args[j].first] = tests[i][j]->toJSON();
         }
 
         outfile << jargs.dump(4);

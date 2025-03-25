@@ -477,7 +477,7 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
     }
 }
 
-bool TestGenerator::checkConstraintSatisfiability(const std::vector<const ValueConstraint*> constraints)
+bool TestGenerator::checkConstraintSatisfiability(const std::vector<const ValueConstraint*>& constraints)
 {
     //Make sure all the OfType Constaints on any given path are the same
     std::vector<const ValueConstraint*> oftypeconstraints;
@@ -519,7 +519,7 @@ bool TestGenerator::checkConstraintSatisfiability(const std::vector<const ValueC
         return static_cast<const bsqon::NatNumberValue*>(fvc->value)->cnv < mlc->minlen;
     });
 
-    if(badfixed != constraints.cend()) {
+    if(badfixed != minlenconstraints.cend()) {
         return false;
     }
 
