@@ -574,6 +574,7 @@ namespace bsqon
         virtual ~StringValue() = default;
 
         static StringValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length);
+        static StringValue* createFromGenerator(const Type* vtype, SourcePos spos, const std::string& str);
 
         virtual std::u8string toString() const override
         {
@@ -608,6 +609,7 @@ namespace bsqon
         virtual ~CStringValue() = default;
 
         static CStringValue* createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length);
+        static CStringValue* createFromGenerator(const Type* vtype, SourcePos spos, const std::string& str);
 
         virtual std::u8string toString() const override
         {

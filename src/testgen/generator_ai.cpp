@@ -142,7 +142,7 @@ std::string makeAPIRequest(const std::string& apiKey, const std::string& url, js
     return responseString;
 }
 
-std::string buildPromptFor(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
+std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
 {
     std::string prompt;
 
@@ -157,14 +157,14 @@ std::string buildPromptFor(const bsqon::PrimitiveType *t, const ValueSetGenerato
 
         prompt.replace(prompt.find("{{name}}"), 8, env.path);
     }
+
+    prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
     
     prompt.replace(prompt.find("{{path}}"), 8, env.path);
     prompt.replace(prompt.find("{{signature}}"), 13, signature);
 
     prompt.replace(prompt.find("{{format}}"), 10, formatinstructions);
-    
-    prompt.replace(prompt.find("{{type}}"), 8, env.context.oftype.value_or(t)->tkey);
-    prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
+    prompt.replace(prompt.find("{{type}}"), 8, env.context.oftype.has_value() ? env.context.oftype.value()->tkey : t->tkey);
 
     return prompt;
 }
@@ -242,21 +242,17 @@ json callAPIWithPrompt(std::string prompt)
 }
 
 template <typename T>
-std::vector<T> getValuesFromJson(const json& extractedData, const std::string& field) {
-    if (!extractedData.contains(field)) {
-        std::cout<<"INVALID Fields"<<std::endl;
-    }
-    std::vector<T> values = extractedData[field].get<std::vector<T>>();
-   
-    if (values.empty()) {
-        throw std::runtime_error("No values available for field: " + field);
-    }
-   
+std::vector<T> getValuesFromJson(const json& extractedData) {
+    std::vector<T> values;
+    std::transform(extractedData.begin(), extractedData.end(), std::back_inserter(values), [](const json& jv) { 
+        return jv.get<T>(); 
+    });
+
     return values;
 }
 
 template <typename T>
-std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const bsqon::PrimitiveType* t) {
+std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGeneratorEnvironment& env, const bsqon::PrimitiveType* t) {
     auto prompt = buildPromptFor(t, env, g_typeFormatInstructions[t->tkey], aigen->sigstr);
     auto jfmt = g_typeJSONFormat[t->tkey];
 
@@ -284,37 +280,37 @@ void AIValueGenerator::generateBool(const bsqon::PrimitiveType* t, const ValueSe
 
 void AIValueGenerator::generateNat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<uint64_t> values = runAIGenCall<uint64_t>(this, t);
+    std::vector<uint64_t> values = runAIGenCall<uint64_t>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](uint64_t v) { return new bsqon::NatNumberValue(t, g_spos, v); });
 }
 
 void AIValueGenerator::generateInt(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<int64_t> values = runAIGenCall<int64_t>(this, t);
+    std::vector<int64_t> values = runAIGenCall<int64_t>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](int64_t v) { return new bsqon::IntNumberValue(t, g_spos, v); });
 }
 
 void AIValueGenerator::generateBigNat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<uint64_t> values = runAIGenCall<uint64_t>(this, t);
+    std::vector<uint64_t> values = runAIGenCall<uint64_t>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](uint64_t v) { return new bsqon::BigNatNumberValue(t, g_spos, v); });
 }
 
-void AIValueGenerator::generateBigNat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+void AIValueGenerator::generateBigInt(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<int64_t> values = runAIGenCall<int64_t>(this, t);
+    std::vector<int64_t> values = runAIGenCall<int64_t>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](uint64_t v) { return new bsqon::BigIntNumberValue(t, g_spos, v); });
 }
 
 void AIValueGenerator::generateFloat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<double> values = runAIGenCall<double>(this, t);
+    std::vector<double> values = runAIGenCall<double>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](double v) { return new bsqon::FloatNumberValue(t, g_spos, v); });
 }
 
 void AIValueGenerator::generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<std::string> values = runAIGenCall<std::string>(this, t);
+    std::vector<std::string> values = runAIGenCall<std::string>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](const std::string& v) { 
         return bsqon::CStringValue::createFromGenerator(t, g_spos, v);
     });
@@ -322,7 +318,7 @@ void AIValueGenerator::generateCString(const bsqon::PrimitiveType* t, const Valu
 
 void AIValueGenerator::generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<std::string> values = runAIGenCall<std::string>(this, t);
+    std::vector<std::string> values = runAIGenCall<std::string>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](const std::string& v) { 
         return bsqon::StringValue::createFromGenerator(t, g_spos, v);
     });

@@ -63,7 +63,7 @@ BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cp
 
 MAKEFLAGS += -j4
 
-all: $(OUT_EXE)libbsqon.a $(OUT_EXE)bsqon $(OUT_EXE)tgen $(PCKG_DIR)libbsqon.a $(OUT_EXE)ai
+all: $(OUT_EXE)libbsqon.a $(OUT_EXE)bsqon $(OUT_EXE)tgen $(PCKG_DIR)libbsqon.a
 
 $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_EXE)libbsqon.a
 	@mkdir -p $(PCKG_DIR)
@@ -75,11 +75,6 @@ $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_E
 	cp $(CFG_HEADERS) $(PCKG_DIR)fbparser/
 	cp $(BSQON_HEADERS) $(PCKG_DIR)info/
 	cp $(PARSER_HEADERS) $(PCKG_DIR)parser/
-
-
-$(OUT_EXE)ai: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)tmp.cpp
-	@mkdir -p $(OUT_EXE)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)ai $(GEN_OBJS) $(GEN_DIR)tmp.cpp -lbsqon -lbrex -lfl -lgmp -lcurl
 
 $(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)tgen.cpp
 	@mkdir -p $(OUT_EXE)

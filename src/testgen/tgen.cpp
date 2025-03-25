@@ -139,7 +139,7 @@ std::vector<std::vector<bsqon::Value*>> generateTestSuite(const bsqon::AssemblyI
 
 int main(int argc, char** argv, char **envp)
 {
-    if(argc != 5) {
+    if(argc != 6) {
         usage();
         exit(1);
     }

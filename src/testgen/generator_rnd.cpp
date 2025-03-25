@@ -91,13 +91,13 @@ void RandomValueGenerator::generateFloat(const bsqon::PrimitiveType* t, ValueCom
     assert(false);
 }
 
-void generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+void RandomValueGenerator::generateCString(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     //TODO: not implemented yet
     assert(false);
 }
 
-void generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+void RandomValueGenerator::generateString(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     //TODO: not implemented yet
     assert(false);

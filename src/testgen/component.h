@@ -358,7 +358,7 @@ public:
             return std::make_pair(jv["name"].get<std::string>(), assembly.lookupTypeKey(jv["type"].get<std::string>()));
         });
 
-        const bsqon::Type* rettype = assembly.lookupTypeKey(j["rettype"].get<std::string>());
+        const bsqon::Type* rettype = assembly.lookupTypeKey(j["return"].get<std::string>());
 
         std::vector<std::string> preconds;
         if(j.contains("preconds") && !j["preconds"].is_null()) {
