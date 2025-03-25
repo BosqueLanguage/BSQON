@@ -1,19 +1,19 @@
-#include "generator.h"
+#include "generator_rnd.h"
 
 static bsqon::SourcePos g_spos = { 0, 0, 0, 0 };
 
-void TypeGeneratorRandom::generateNone(const bsqon::PrimitiveType* t, ValueComponent* vc)
+void RandomValueGenerator::generateNone(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     vc->options.push_back(new bsqon::NoneValue(t, g_spos));
 }
 
-void TypeGeneratorRandom::generateBool(const bsqon::PrimitiveType* t, ValueComponent* vc)
+void RandomValueGenerator::generateBool(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     vc->options.push_back(new bsqon::BoolValue(t, g_spos, true));
     vc->options.push_back(new bsqon::BoolValue(t, g_spos, false));
 }
 
-void TypeGeneratorRandom::generateNat(const bsqon::PrimitiveType* t, ValueComponent* vc)
+void RandomValueGenerator::generateNat(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     std::uniform_int_distribution<uint64_t> nv(0, 256);
 
@@ -40,7 +40,7 @@ void TypeGeneratorRandom::generateNat(const bsqon::PrimitiveType* t, ValueCompon
     }
 }
 
-void TypeGeneratorRandom::generateInt(const bsqon::PrimitiveType* t, ValueComponent* vc)
+void RandomValueGenerator::generateInt(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     std::uniform_int_distribution<int64_t> iv(-256, 256);
 
@@ -55,7 +55,55 @@ void TypeGeneratorRandom::generateInt(const bsqon::PrimitiveType* t, ValueCompon
     }
 }
 
-void TypeGeneratorRandom::generatePrimitive(const bsqon::PrimitiveType* t, ValueComponent* vc)
+
+void RandomValueGenerator::generateBigNat(const bsqon::PrimitiveType* t, ValueComponent* vc)
+{
+    std::uniform_int_distribution<uint64_t> nv(0, 1024);
+
+    vc->options.push_back(new bsqon::BigNatNumberValue(t, g_spos, 0));
+        vc->options.push_back(new bsqon::BigNatNumberValue(t, g_spos, 1));
+        vc->options.push_back(new bsqon::BigNatNumberValue(t, g_spos, 2));
+        vc->options.push_back(new bsqon::BigNatNumberValue(t, g_spos, 3));
+
+        for(size_t i = 0; i < 3; ++i) {
+            vc->options.push_back(new bsqon::BigNatNumberValue(t, g_spos, nv(rng)));
+        }
+}
+
+void RandomValueGenerator::generateBigInt(const bsqon::PrimitiveType* t, ValueComponent* vc)
+{
+    std::uniform_int_distribution<int64_t> iv(-1024, 1024);
+
+    vc->options.push_back(new bsqon::BigIntNumberValue(t, g_spos, -3));
+    vc->options.push_back(new bsqon::BigIntNumberValue(t, g_spos, -1));
+    vc->options.push_back(new bsqon::BigIntNumberValue(t, g_spos, 0));
+    vc->options.push_back(new bsqon::BigIntNumberValue(t, g_spos, 1));
+    vc->options.push_back(new bsqon::BigIntNumberValue(t, g_spos, 3));
+
+    for(size_t i = 0; i < 3; ++i) {
+        vc->options.push_back(new bsqon::BigIntNumberValue(t, g_spos, iv(rng)));
+    }
+}
+
+void RandomValueGenerator::generateFloat(const bsqon::PrimitiveType* t, ValueComponent* vc)
+{
+    //TODO: not implemented yet
+    assert(false);
+}
+
+void generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+{
+    //TODO: not implemented yet
+    assert(false);
+}
+
+void generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+{
+    //TODO: not implemented yet
+    assert(false);
+}
+
+void RandomValueGenerator::generatePrimitive(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     auto tk = t->tkey;
     if(tk == "None") {
@@ -70,19 +118,21 @@ void TypeGeneratorRandom::generatePrimitive(const bsqon::PrimitiveType* t, Value
     else if(tk == "Int") {
         this->generateInt(t, vc);
     }
-        /*
-        else if(tk == "BigInt") {
-            return this->parseBigInt(t, node);
-        }
-        else if(tk == "BigNat") {
-            return this->parseBigNat(t, node);
-        }
+    else if(tk == "BigInt") {
+        return this->generateBigInt(t, vc);
+    }
+    else if(tk == "BigNat") {
+        return this->generateBigNat(t, vc);
+    }
+    /*
         else if(tk == "Rational") {
             return this->parseRational(t, node);
         }
-        else if(tk == "Float") {
-            return this->parseFloat(t, node);
-        }
+    */
+    else if(tk == "Float") {
+        return this->generateFloat(t, vc);
+    }
+    /*
         else if(tk == "Decimal") {
             return this->parseDecimal(t, node);
         }
@@ -95,12 +145,14 @@ void TypeGeneratorRandom::generatePrimitive(const bsqon::PrimitiveType* t, Value
         else if(tk == "Complex") {
             return this->parseComplex(t, node);
         }
-        else if(tk == "String") {
-            return this->parseString(t, node);
-        }
-        else if(tk == "CString") {
-            return this->parseCString(t, node);
-        }
+    */
+    else if(tk == "String") {
+        return this->generateString(t, vc);
+    }
+    else if(tk == "CString") {
+        return this->generateCString(t, vc);
+    }
+    /*
         else if(tk == "ByteBuffer") {
             return this->parseByteBuffer(t, node);
         }
@@ -168,14 +220,14 @@ void TypeGeneratorRandom::generatePrimitive(const bsqon::PrimitiveType* t, Value
     }   
 }
 
-void TypeGeneratorRandom::generateEnum(const bsqon::EnumType* t, ValueComponent* vc)
+void RandomValueGenerator::generateEnum(const bsqon::EnumType* t, ValueComponent* vc)
 {
     for(size_t i = 0; i < t->variants.size(); ++i) {
         vc->options.push_back(new bsqon::EnumValue(t, g_spos, t->variants[i], i));
     }
 }
 
-void TypeGeneratorRandom::generateType(const bsqon::Type* t, ValueComponent* vc)
+void RandomValueGenerator::generateType(const bsqon::Type* t, ValueComponent* vc)
 {
     switch(t->tag) {
         case bsqon::TypeTag::TYPE_PRIMITIVE: {

@@ -1,6 +1,6 @@
 #include "component.h"
-#include "generator.h"
-#include "ai_generator.h"
+#include "generator_rnd.h"
+#include "generator_ai.h"
 
 #include <iostream>
 #include <fstream>
