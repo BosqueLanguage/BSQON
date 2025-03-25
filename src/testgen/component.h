@@ -306,6 +306,74 @@ public:
     ValueSetPartition generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env);
 };
 
+class APISignature
+{
+public:
+    std::string fname;
+    std::vector<std::pair<std::string, const bsqon::Type*>> args;
+    const bsqon::Type* rettype;
+
+    std::vector<std::string> preconds;
+    std::vector<std::string> postconds;
+
+    APISignature(std::string fname, std::vector<std::pair<std::string, const bsqon::Type*>> args, const bsqon::Type* rettype, std::vector<std::string> preconds, std::vector<std::string> postconds) : fname(fname), args(args), rettype(rettype), preconds(preconds), postconds(postconds) { ; }
+    ~APISignature() { ; }
+
+    std::string toString() const
+    {
+        auto argstr = std::accumulate(this->args.cbegin(), this->args.cend(), std::string{}, [](std::string&& a, const std::pair<std::string, const bsqon::Type*>& v) { 
+            return (a.empty() ? "" : std::move(a) + ", ") + v.first + " : " + v.second->tkey;
+        });
+
+        auto ssig = "api " + this->fname + "(" + argstr + ") : " + this->rettype->tkey;
+
+        auto precondstr = std::accumulate(this->preconds.cbegin(), this->preconds.cend(), std::string{}, [](std::string&& a, const std::string& v) { 
+            return (a.empty() ? "" : std::move(a) + "\n") + ("    requires " + v + ";");
+        });
+        auto postcondstr = std::accumulate(this->postconds.cbegin(), this->postconds.cend(), std::string{}, [](std::string&& a, const std::string& v) { 
+            return (a.empty() ? "" : std::move(a) + ", ") + ("    ensures " + v + ";");
+        });
+        
+        if(precondstr.empty() && postcondstr.empty()) {
+            return ssig + ";";
+        }
+        else {
+            if(!precondstr.empty()) {
+                ssig += "\n" + precondstr;
+            }
+            if(!postcondstr.empty()) {
+                ssig += "\n" + postcondstr;
+            }
+
+            return ssig + "\n;";
+        }
+    }
+
+    static APISignature parse(const bsqon::AssemblyInfo& assembly, const json& j)
+    {
+        std::string fname = j["fname"].get<std::string>();
+
+        std::vector<std::pair<std::string, const bsqon::Type*>> args;
+        std::transform(j["args"].begin(), j["args"].end(), std::back_inserter(args), [&assembly](const json& jv) { 
+            return std::make_pair(jv["name"].get<std::string>(), assembly.lookupTypeKey(jv["type"].get<std::string>()));
+        });
+
+        const bsqon::Type* rettype = assembly.lookupTypeKey(j["rettype"].get<std::string>());
+
+        std::vector<std::string> preconds;
+        if(j.contains("preconds") && !j["preconds"].is_null()) {
+            std::transform(j["preconds"].begin(), j["preconds"].end(), std::back_inserter(preconds), [](const json& jv) { return jv.get<std::string>(); });
+        }
+
+        std::vector<std::string> postconds;
+        if(j.contains("postconds") && !j["postconds"].is_null()) {
+            std::transform(j["postconds"].begin(), j["postconds"].end(), std::back_inserter(postconds), [](const json& jv) { return jv.get<std::string>(); });
+        }
+
+        return APISignature(fname, args, rettype, preconds, postconds);
+    }
+};
+
 class TestGenerator
 {
 private:

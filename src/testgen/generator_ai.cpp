@@ -7,6 +7,11 @@ using json = nlohmann::json;
 static bsqon::SourcePos g_spos = {0, 0, 0, 0};
 
 static std::string g_std_prompt_instructions = R"(
+    Additional Context:
+    - The API that this value is being generated for has the following signature:
+    {{signature}}
+    - The value is on the path: {{path}}
+
     Requirements:
     - Each value must represent a distinct, non-overlapping partition of the valid input values.
     - Do NOT explicitly label or describe scenarios; demonstrate implicit partition coverage through diverse values.
@@ -137,7 +142,7 @@ std::string makeAPIRequest(const std::string& apiKey, const std::string& url, js
     return responseString;
 }
 
-std::string buildPromptFor(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions) 
+std::string buildPromptFor(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
 {
     std::string prompt;
 
@@ -153,9 +158,12 @@ std::string buildPromptFor(const bsqon::PrimitiveType *t, const ValueSetGenerato
         prompt.replace(prompt.find("{{name}}"), 8, env.path);
     }
     
+    prompt.replace(prompt.find("{{path}}"), 8, env.path);
+    prompt.replace(prompt.find("{{signature}}"), 13, signature);
+
     prompt.replace(prompt.find("{{format}}"), 10, formatinstructions);
     
-    prompt.replace(prompt.find("{{type}}"), 8, t->tkey);
+    prompt.replace(prompt.find("{{type}}"), 8, env.context.oftype.value_or(t)->tkey);
     prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
 
     return prompt;
@@ -249,7 +257,7 @@ std::vector<T> getValuesFromJson(const json& extractedData, const std::string& f
 
 template <typename T>
 std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const bsqon::PrimitiveType* t) {
-    auto prompt = buildPromptFor(t, env, g_typeFormatInstructions[t->tkey]);
+    auto prompt = buildPromptFor(t, env, g_typeFormatInstructions[t->tkey], aigen->sigstr);
     auto jfmt = g_typeJSONFormat[t->tkey];
 
     json res;

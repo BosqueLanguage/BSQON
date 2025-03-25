@@ -21,7 +21,10 @@ public:
     std::mt19937_64 rng;
     AIModelOption model;
 
-    AIValueGenerator(AIModelOption model) : rng(std::random_device{}()), model(model) { ; }
+    const APISignature* sig;
+    const std::string sigstr;
+
+    AIValueGenerator(AIModelOption model, const APISignature* sig) : rng(std::random_device{}()), model(model), sig(sig), sigstr(sig->toString()) { ; }
     ~AIValueGenerator() { ; }
 
     void generateNone(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc);
