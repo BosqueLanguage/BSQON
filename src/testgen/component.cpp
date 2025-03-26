@@ -48,6 +48,31 @@ ValueSetPartition ValueSetGenerator::generateInt(const bsqon::PrimitiveType* t, 
     return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
 }
 
+ValueSetPartition ValueSetGenerator::generateBigNat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateBigInt(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateFloat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
+ValueSetPartition ValueSetGenerator::generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+{
+    return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
+}
+
 //TODO: more primitives..
 
 ValueSetPartition ValueSetGenerator::generatePrimitive(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
@@ -65,19 +90,21 @@ ValueSetPartition ValueSetGenerator::generatePrimitive(const bsqon::PrimitiveTyp
     else if(tk == "Int") {
         return this->generateInt(t, env);
     }
-        /*
-        else if(tk == "BigInt") {
-            return this->parseBigInt(t, node);
-        }
-        else if(tk == "BigNat") {
-            return this->parseBigNat(t, node);
-        }
+    else if(tk == "BigInt") {
+        return this->generateBigInt(t, env);
+    }
+    else if(tk == "BigNat") {
+        return this->generateBigNat(t, env);
+    }
+    /*
         else if(tk == "Rational") {
             return this->parseRational(t, node);
         }
-        else if(tk == "Float") {
-            return this->parseFloat(t, node);
-        }
+    */
+    else if(tk == "Float") {
+        return this->generateFloat(t, env);
+    }
+    /*
         else if(tk == "Decimal") {
             return this->parseDecimal(t, node);
         }
@@ -90,12 +117,14 @@ ValueSetPartition ValueSetGenerator::generatePrimitive(const bsqon::PrimitiveTyp
         else if(tk == "Complex") {
             return this->parseComplex(t, node);
         }
-        else if(tk == "String") {
-            return this->parseString(t, node);
-        }
-        else if(tk == "CString") {
-            return this->parseCString(t, node);
-        }
+    */
+    else if(tk == "String") {
+        return this->generateString(t, env);
+    }
+    else if(tk == "CString") {
+        return this->generateCString(t, env);
+    }
+    /*
         else if(tk == "ByteBuffer") {
             return this->parseByteBuffer(t, node);
         }
@@ -206,6 +235,24 @@ ValueSetPartition ValueSetGenerator::generateStdEntityType(const bsqon::StdEntit
     return ValueSetPartition::punion(fieldpaths);
 }
 
+ValueSetPartition ValueSetGenerator::generateStdConceptType(const bsqon::StdConceptType* t, const ValueSetGeneratorEnvironment& env)
+{
+    const std::vector<bsqon::TypeKey>& supertypes = this->assembly->concreteSubtypesMap.at(t->tkey);
+
+    std::vector<ValueSetPartition> optpartitions;
+    std::transform(supertypes.cbegin(), supertypes.cend(), std::back_inserter(optpartitions), [this, &env](const bsqon::TypeKey& st) {
+        auto oftype = this->assembly->lookupTypeKey(st);
+        
+        std::vector<ValueConstraint*> constraints(env.constraints);
+        constraints.push_back(new OfTypeConstraint(pathAccessSpecial(env.path, "oftype"), oftype));
+        
+        auto tenv = env.step(env.path, constraints, env.context);
+        return this->generateType(oftype, tenv);
+    });
+
+    return ValueSetPartition::punion(optpartitions);
+} 
+
 ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env)
 {
     switch(t->tag) {
@@ -224,6 +271,9 @@ ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const Va
         case bsqon::TypeTag::TYPE_ENUM: {
             return this->generateEnum(static_cast<const bsqon::EnumType*>(t), env);
         }
+        case bsqon::TypeTag::TYPE_STD_CONCEPT: {
+            return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), env);
+        }
         /*
         * TODO: more tags here
         */
@@ -238,7 +288,10 @@ static bsqon::SourcePos g_spos = { 0, 0, 0, 0 };
 
 bool TestGenerator::isRequiredValue(const VCPath& currpath, bsqon::Value*& value)
 {
-    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { return vc->path == currpath; });
+    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { 
+        return vc->path == currpath && dynamic_cast<const FixedValueConstraint*>(vc) != nullptr; 
+    });
+
     if(ci != this->constraints.cend()) {
         auto fvc = dynamic_cast<const FixedValueConstraint*>(*ci);
 
@@ -252,39 +305,54 @@ bool TestGenerator::isRequiredValue(const VCPath& currpath, bsqon::Value*& value
 
 bool TestGenerator::isConstrainedLengthValue(const VCPath& currpath, bsqon::Value*& value)
 {
+    //
+    //NOTE: The len constrains are considered before the fixed values!
+    //      So, they will override if we are selecting from a partition at index 2 but have selected a fixed size of 0
+    //
+
     auto lc = std::find_if(this->vspartition->components.cbegin(), this->vspartition->components.cend(), [&currpath](const ValueComponent* vc) { return vc->path == currpath; });
     assert(lc != this->vspartition->components.cend()); //we missed something in the partitioning
     
     const std::vector<bsqon::Value*>& lenopts = (*lc)->options;
 
-    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { return vc->path == currpath; });
-    if(ci != this->constraints.cend()) {
-        auto fvc = dynamic_cast<const FixedValueConstraint*>(*ci);
-        if(fvc != nullptr) {
-            value = fvc->value;
+    std::vector<const ValueConstraint*> lenconstraints;
+    std::copy_if(this->constraints.cbegin(), this->constraints.cend(), std::back_inserter(lenconstraints), [&currpath](const ValueConstraint* vc) {
+        return vc->path == currpath && dynamic_cast<const MinLengthConstraint*>(vc) != nullptr;
+    });
+
+    if(!lenconstraints.empty()) {
+        auto mlci = std::max_element(lenconstraints.cbegin(), lenconstraints.cend(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+            return dynamic_cast<const MinLengthConstraint*>(vc1)->minlen < dynamic_cast<const MinLengthConstraint*>(vc2)->minlen;
+        });
+        auto mlc = dynamic_cast<const MinLengthConstraint*>(*mlci);
+
+        std::vector<bsqon::Value*> minlenopts;
+        std::copy_if(lenopts.cbegin(), lenopts.cend(), std::back_inserter(minlenopts), [mlc](const bsqon::Value* v) { 
+            return static_cast<const bsqon::NatNumberValue*>(v)->cnv >= mlc->minlen;
+        });
+
+        if(minlenopts.empty()) {
+            //It must be at least this big 
+            value = new bsqon::NatNumberValue(this->assembly->lookupTypeKey("Nat"), g_spos, mlc->minlen);
             return true;
         }
-        
-        auto mlc = dynamic_cast<const MinLengthConstraint*>(*ci);
-        if(mlc != nullptr) {
-            std::vector<bsqon::Value*> minlenopts;
-            std::copy_if(lenopts.cbegin(), lenopts.cend(), std::back_inserter(minlenopts), [mlc](const bsqon::Value* v) { 
-                return static_cast<const bsqon::NatNumberValue*>(v)->cnv >= mlc->minlen;
-            });
+        else {
+            std::uniform_int_distribution<size_t> unif(0, minlenopts.size() - 1);
+            size_t choice = unif(rng);
 
-            if(minlenopts.empty()) {
-                //It must be at least this big 
-                value = new bsqon::NatNumberValue(this->assembly->lookupTypeKey("Nat"), g_spos, mlc->minlen);
-                return true;
-            }
-            else {
-                std::uniform_int_distribution<size_t> unif(0, minlenopts.size() - 1);
-                size_t choice = unif(rng);
-
-                value = minlenopts[choice];
-                return true;
-            }
+            value = minlenopts[choice];
+            return true;
         }
+    }
+
+    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&currpath](const ValueConstraint* vc) { 
+        return vc->path == currpath && dynamic_cast<const FixedValueConstraint*>(vc) != nullptr; 
+    });
+    
+    if(ci != this->constraints.cend()) {
+        auto fvc = dynamic_cast<const FixedValueConstraint*>(*ci);
+        value = fvc->value;
+        return true;
     }
 
     value = nullptr;
@@ -300,6 +368,27 @@ bsqon::Value* TestGenerator::selectFromPartition(const VCPath& currpath)
     size_t choice = unif(rng);
 
     return (*ci)->options[choice];
+}
+
+const bsqon::Type* TestGenerator::resolveSubtypeChoice(const VCPath& currpath, const bsqon::Type* t)
+{
+    auto oftypepath = pathAccessSpecial(currpath, "oftype");
+    auto ci = std::find_if(this->constraints.cbegin(), this->constraints.cend(), [&oftypepath](const ValueConstraint* vc) { 
+        return vc->path == oftypepath && dynamic_cast<const OfTypeConstraint*>(vc) != nullptr; 
+    });
+
+    if(ci != this->constraints.cend()) {
+        auto fvc = dynamic_cast<const OfTypeConstraint*>(*ci);
+        return fvc->vtype;
+    }
+    else {
+        const std::vector<bsqon::TypeKey>& supertypes = this->assembly->concreteSubtypesMap.at(t->tkey);
+
+        std::uniform_int_distribution<size_t> unif(0, supertypes.size() - 1);
+        size_t choice = unif(rng);
+
+        return this->assembly->lookupTypeKey(supertypes[choice]);
+    }
 }
 
 bsqon::Value* TestGenerator::generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath)
@@ -351,6 +440,12 @@ bsqon::Value* TestGenerator::generateStdEntityType(const bsqon::StdEntityType* t
     return new bsqon::EntityValue(t, g_spos, std::move(fieldvals));
 }
 
+bsqon::Value* TestGenerator::generateStdConceptType(const bsqon::StdConceptType* t, VCPath currpath)
+{
+    auto tt = this->resolveSubtypeChoice(currpath, t);
+    return this->generateType(tt, currpath);
+}
+
 bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
 {
     switch(t->tag) {
@@ -372,9 +467,61 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
         /*
         * TODO: more tags here
         */
+       case bsqon::TypeTag::TYPE_STD_CONCEPT: {
+            return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), currpath);
+        }
        default: {
             //Missing type
             assert(false);
         }
     }
+}
+
+bool TestGenerator::checkConstraintSatisfiability(const std::vector<const ValueConstraint*>& constraints)
+{
+    //Make sure all the OfType Constaints on any given path are the same
+    std::vector<const ValueConstraint*> oftypeconstraints;
+    std::copy_if(constraints.cbegin(), constraints.cend(), std::back_inserter(oftypeconstraints), [](const ValueConstraint* vc) { return dynamic_cast<const OfTypeConstraint*>(vc) != nullptr; });
+    std::sort(oftypeconstraints.begin(), oftypeconstraints.end(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+        return vc1->path.compare(vc2->path) < 0;
+    });
+
+    auto conflictingtype = std::adjacent_find(oftypeconstraints.cbegin(), oftypeconstraints.cend(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+        auto cc1 = dynamic_cast<const OfTypeConstraint*>(vc1);
+        auto cc2 = dynamic_cast<const OfTypeConstraint*>(vc2);
+
+        return (cc1->path == cc2->path) && (cc1->vtype->tkey != cc2->vtype->tkey);
+    });
+
+    if(conflictingtype != oftypeconstraints.cend()) {
+        return false;
+    }
+
+    //Find all the MinLength Constraints on any given path and make sure there isnt a fixed value that is smaller
+    std::vector<const ValueConstraint*> minlenconstraints;
+    std::copy_if(constraints.cbegin(), constraints.cend(), std::back_inserter(minlenconstraints), [](const ValueConstraint* vc) { return dynamic_cast<const MinLengthConstraint*>(vc) != nullptr; });
+    std::sort(minlenconstraints.begin(), minlenconstraints.end(), [](const ValueConstraint* vc1, const ValueConstraint* vc2) {
+        return vc1->path.compare(vc2->path) < 0;
+    });
+
+    auto badfixed = std::find_if(minlenconstraints.cbegin(), minlenconstraints.cend(), [&constraints](const ValueConstraint* vc) {
+        auto mlc = dynamic_cast<const MinLengthConstraint*>(vc);
+
+        auto fvci = std::find_if(constraints.cbegin(), constraints.cend(), [&mlc](const ValueConstraint* vc) {
+            return vc->path == mlc->path && dynamic_cast<const FixedValueConstraint*>(vc) != nullptr;
+        });
+
+        if(fvci == constraints.cend()) {
+            return false;
+        }
+
+        auto fvc = dynamic_cast<const FixedValueConstraint*>(*fvci);
+        return static_cast<const bsqon::NatNumberValue*>(fvc->value)->cnv < mlc->minlen;
+    });
+
+    if(badfixed != minlenconstraints.cend()) {
+        return false;
+    }
+
+    return true;
 }

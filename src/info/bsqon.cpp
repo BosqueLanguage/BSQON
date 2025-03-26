@@ -12,6 +12,12 @@ namespace bsqon
         return new StringValue(vtype, spos, std::move(sv.first.value()));
     }
 
+    StringValue* StringValue::createFromGenerator(const Type* vtype, SourcePos spos, const std::string& str)
+    {
+        auto sv = brex::UnicodeString(str.cbegin(), str.cend());
+        return new StringValue(vtype, spos, std::move(sv));
+    }
+
     CStringValue* CStringValue::createFromParse(const Type* vtype, SourcePos spos, const uint8_t* bytes, size_t length)
     {
         auto sv = brex::unescapeCString(bytes + 1, length - 2);
@@ -20,6 +26,14 @@ namespace bsqon
         }
 
         return new CStringValue(vtype, spos, std::move(sv.first.value()));
+    }
+
+    CStringValue* CStringValue::createFromGenerator(const Type* vtype, SourcePos spos, const std::string& str)
+    {
+        std::string sv;
+        std::copy_if(str.cbegin(), str.cend(), std::back_inserter(sv), [](char c) { return c < 127 && (std::isprint(c) || std::isspace(c)); });
+
+        return new CStringValue(vtype, spos, std::move(sv));
     }
 
     uint8_t ByteBufferValue::extractByteValue(char hb, char lb)
