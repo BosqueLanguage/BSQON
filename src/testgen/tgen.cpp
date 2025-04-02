@@ -98,33 +98,41 @@ std::vector<std::vector<bsqon::Value*>> generateCombinatorialTestSuite(const bsq
     }
 
     std::vector<std::vector<bsqon::Value*>> tests;
+    if(vspartition.components.size() == 1) {
+        auto tgen = TestGenerator(assembly, &vspartition, {});
 
-    for(size_t i = 0; i < vspartition.components.size(); ++i) {
-        for(size_t j = i + 1; j < vspartition.components.size(); ++j) {
+        xxxx;
+        tests.emplace_back(generateArgValues(tgen, testsig));
+        return tests;
+    }
+    else {
+        for(size_t i = 0; i < vspartition.components.size(); ++i) {
+            for(size_t j = i + 1; j < vspartition.components.size(); ++j) {
         
-            auto pi = vspartition.components[i];
-            auto pj = vspartition.components[j];
+                auto pi = vspartition.components[i];
+                auto pj = vspartition.components[j];
 
-            std::vector<const ValueConstraint*> constraints;
-            constraints.insert(constraints.end(), pi->constraints.cbegin(), pi->constraints.cend());
-            constraints.insert(constraints.end(), pj->constraints.cbegin(), pj->constraints.cend());
+                std::vector<const ValueConstraint*> constraints;
+                constraints.insert(constraints.end(), pi->constraints.cbegin(), pi->constraints.cend());
+                constraints.insert(constraints.end(), pj->constraints.cbegin(), pj->constraints.cend());
 
-            for(size_t m = 0; m < pi->options.size(); ++m) {
-                for(size_t n = 0; n < pj->options.size(); ++n) {
-                    std::vector<const ValueConstraint*> fconstraints;
-                    fconstraints.insert(fconstraints.end(), constraints.cbegin(), constraints.cend());
+                for(size_t m = 0; m < pi->options.size(); ++m) {
+                    for(size_t n = 0; n < pj->options.size(); ++n) {
+                        std::vector<const ValueConstraint*> fconstraints;
+                        fconstraints.insert(fconstraints.end(), constraints.cbegin(), constraints.cend());
 
-                    fconstraints.push_back(new FixedValueConstraint(pi->path, pi->options[m]));
-                    fconstraints.push_back(new FixedValueConstraint(pj->path, pj->options[n]));
+                        fconstraints.push_back(new FixedValueConstraint(pi->path, pi->options[m]));
+                        fconstraints.push_back(new FixedValueConstraint(pj->path, pj->options[n]));
 
-                    if(TestGenerator::checkConstraintSatisfiability(fconstraints)) {
-                        TestGenerator tgen(assembly, &vspartition, fconstraints);
-                        tests.emplace_back(generateArgValues(tgen, testsig));
+                        if(TestGenerator::checkConstraintSatisfiability(fconstraints)) {
+                            TestGenerator tgen(assembly, &vspartition, fconstraints);
+                            tests.emplace_back(generateArgValues(tgen, testsig));
+                        }
                     }
                 }
-            }
 
-            //TODO: do we want to force/ensure an equality and disequality if the types are the same?
+                //TODO: do we want to force/ensure an equality and disequality if the types are the same?
+            }
         }
     }
 
@@ -174,21 +182,23 @@ int main(int argc, char** argv, char **envp)
     //TODO: need flag on agent... to specify which model to use -- right now defaults to GEMINI
 
     std::vector<std::vector<bsqon::Value*>> tests;
-    auto modestr = std::string(argv[3]);
-    if(modestr == "--rnd") {
-        tests = generateRandomTestSuite(&assembly, vspartition, testsig, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
-    }
-    else if(modestr == "--agent") {
-        tests = generateAgentTestSuite(&assembly, vspartition, testsig, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
-    }
-    else if(modestr == "--combinatorial") {
-        tests = generateCombinatorialTestSuite(&assembly, vspartition, testsig);
-    }
-    else if(modestr == "--all") {
-        tests = generateTestSuite(&assembly, vspartition, testsig);
-    }
-    else {
-        usage();
+    if(testsig.args.size() != 0) {
+        auto modestr = std::string(argv[3]);
+        if(modestr == "--rnd") {
+            tests = generateRandomTestSuite(&assembly, vspartition, testsig, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
+        }
+        else if(modestr == "--agent") {
+            tests = generateAgentTestSuite(&assembly, vspartition, testsig, 10); //TODO: maybe make this a command parameter --rnd=X (or computa as a function of # partitions)
+        }
+        else if(modestr == "--combinatorial") {
+            tests = generateCombinatorialTestSuite(&assembly, vspartition, testsig);
+        }
+        else if(modestr == "--all") {
+            tests = generateTestSuite(&assembly, vspartition, testsig);
+        }
+        else {
+            usage();
+        }
     }
 
     //Print out tests -- 1 per line

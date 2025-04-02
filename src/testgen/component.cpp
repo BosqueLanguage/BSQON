@@ -235,6 +235,14 @@ ValueSetPartition ValueSetGenerator::generateStdEntityType(const bsqon::StdEntit
     return ValueSetPartition::punion(fieldpaths);
 }
 
+ValueSetPartition ValueSetGenerator::generateTypeDeclType(const bsqon::TypedeclType* t, const ValueSetGeneratorEnvironment& env)
+{
+    auto npath = pathAccessSpecial(env.path, "value");
+    auto nenv = env.step(npath, env.constraints, env.context.extendForTypedecl(t));
+
+    return this->generateType(this->assembly->lookupTypeKey(t->primitivetype), nenv);
+}
+
 ValueSetPartition ValueSetGenerator::generateStdConceptType(const bsqon::StdConceptType* t, const ValueSetGeneratorEnvironment& env)
 {
     const std::vector<bsqon::TypeKey>& supertypes = this->assembly->concreteSubtypesMap.at(t->tkey);
@@ -270,6 +278,9 @@ ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const Va
         }
         case bsqon::TypeTag::TYPE_ENUM: {
             return this->generateEnum(static_cast<const bsqon::EnumType*>(t), env);
+        }
+        case bsqon::TypeTag::TYPE_TYPE_DECL: {
+            return this->generateTypeDeclType(static_cast<const bsqon::TypedeclType*>(t), env);
         }
         case bsqon::TypeTag::TYPE_STD_CONCEPT: {
             return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), env);
@@ -440,6 +451,11 @@ bsqon::Value* TestGenerator::generateStdEntityType(const bsqon::StdEntityType* t
     return new bsqon::EntityValue(t, g_spos, std::move(fieldvals));
 }
 
+bsqon::Value* TestGenerator::generateTypeDeclType(const bsqon::TypedeclType* t, VCPath currpath)
+{
+    return this->generateType(this->assembly->lookupTypeKey(t->primitivetype), pathAccessSpecial(currpath, "value"));
+}
+
 bsqon::Value* TestGenerator::generateStdConceptType(const bsqon::StdConceptType* t, VCPath currpath)
 {
     auto tt = this->resolveSubtypeChoice(currpath, t);
@@ -464,13 +480,16 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
         case bsqon::TypeTag::TYPE_ENUM: {
             return this->generateEnum(static_cast<const bsqon::EnumType*>(t), currpath);
         }
+        case bsqon::TypeTag::TYPE_TYPE_DECL: {
+            return this->generateTypeDeclType(static_cast<const bsqon::TypedeclType*>(t), currpath);
+        }
         /*
         * TODO: more tags here
         */
-       case bsqon::TypeTag::TYPE_STD_CONCEPT: {
+        case bsqon::TypeTag::TYPE_STD_CONCEPT: {
             return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), currpath);
         }
-       default: {
+        default: {
             //Missing type
             assert(false);
         }
