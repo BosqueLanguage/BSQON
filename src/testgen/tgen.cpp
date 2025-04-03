@@ -99,11 +99,22 @@ std::vector<std::vector<bsqon::Value*>> generateCombinatorialTestSuite(const bsq
 
     std::vector<std::vector<bsqon::Value*>> tests;
     if(vspartition.components.size() == 1) {
-        auto tgen = TestGenerator(assembly, &vspartition, {});
+        auto p0 = vspartition.components[0];
+        
+        std::vector<const ValueConstraint*> constraints;
+        constraints.insert(constraints.end(), p0->constraints.cbegin(), p0->constraints.cend());
+        
+        for(size_t m = 0; m < p0->options.size(); ++m) {
+            std::vector<const ValueConstraint*> fconstraints;
+            fconstraints.insert(fconstraints.end(), constraints.cbegin(), constraints.cend());
 
-        xxxx;
-        tests.emplace_back(generateArgValues(tgen, testsig));
-        return tests;
+            fconstraints.push_back(new FixedValueConstraint(p0->path, p0->options[m]));
+
+            if(TestGenerator::checkConstraintSatisfiability(fconstraints)) {
+                TestGenerator tgen(assembly, &vspartition, fconstraints);
+                tests.emplace_back(generateArgValues(tgen, testsig));
+            }
+        }
     }
     else {
         for(size_t i = 0; i < vspartition.components.size(); ++i) {
