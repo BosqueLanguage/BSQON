@@ -8,16 +8,29 @@ static bsqon::SourcePos g_spos = {0, 0, 0, 0};
 
 static std::string g_std_prompt_instructions = R"(
     Additional Context:
+    - Input Space Partition: A systematic decomposition of the input domain into a set of non-overlapping subsets (partitions), where each subset represents a distinct subset of possible input values that can be tested independently to ensure comprehensive coverage of the input space.
+    - Domain: The complete set of all possible input values for a specific variable or parameter, defined by its data type, format constraints, and acceptable value ranges.
     - The API that this value is being generated for has the following signature:
     {{signature}}
     - The value is on the path: {{path}}
+    Assume the most likely domain-specific interpretation of the variable name and context.
+    Strictly follow inferred semantics, excluding technically valid but unrealistic values.
+    Inference Guidance (implicit, not rigid):
+    - Consider the variable name ( {{path}} ) and function signature ( {{signature}} ) as hints for likely semantics. 
+    - Prioritize values that reflect realistic usage while allowing for generic .  
+    - Cover variations in length, character composition, and edge cases. 
+    Constraints (Self-Imposed):
+    - Test values must match the following regular expression: {{expression}}
+    - If the above hints suggest a **specific structure**, enforce it strictly.  
+    - Never include invalid values 
+    
 
     Requirements:
     - Each value must represent a distinct, non-overlapping partition of the valid input values.
     - Do NOT explicitly label or describe scenarios; demonstrate implicit partition coverage through diverse values.
 
     Your response must ONLY include a valid JSON array structured exactly as follows:
-    ["valid test value 1", "valid test value 2", ...]
+    [valid test value 1, valid test value 2, ...]
 
     STRICT RULES:
     - NEVER include invalid or malformed test values.
@@ -130,7 +143,7 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* out
     return totalSize;
 }
 
-std::string makeAPIRequest(const std::string& apiKey, const std::string& url, json payload) 
+std::string makeAPIRequest(std::string model, const std::string& apiKey, const std::string& url, json payload) 
 {
     CURL* curl = curl_easy_init();
 
@@ -138,9 +151,14 @@ std::string makeAPIRequest(const std::string& apiKey, const std::string& url, js
     std::string jsonPayload = payload.dump();
     
     struct curl_slist* headers = nullptr;
+
     headers = curl_slist_append(headers, "Content-Type: application/json");
-    
-    curl_easy_setopt(curl, CURLOPT_URL, (url + "?key=" + apiKey).c_str());
+    if (model != "Gemini") {
+        headers = curl_slist_append(headers, ("Authorization: Bearer " + apiKey).c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    } else {
+        curl_easy_setopt(curl, CURLOPT_URL, (url + "?key=" + apiKey).c_str());
+    }
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonPayload.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -159,7 +177,7 @@ std::string makeAPIRequest(const std::string& apiKey, const std::string& url, js
     return responseString;
 }
 
-std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
+std::string buildPromptFor(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
 {
     std::string prompt;
 
@@ -177,6 +195,8 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
 
     prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
     
+    prompt.replace(prompt.find("{{path}}"), 8, env.path);
+    prompt.replace(prompt.find("{{signature}}"), 13, signature);
     prompt.replace(prompt.find("{{path}}"), 8, env.path);
     prompt.replace(prompt.find("{{signature}}"), 13, signature);
 
@@ -198,7 +218,7 @@ json callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
     //TODO: Temp debugging output
     std::cout << "---- Requesting with ----" << std::endl << requestJson.dump(8) << std::endl;
 
-    std::string response = makeAPIRequest(apiKey, url, requestJson);
+    std::string response = makeAPIRequest("Gemini", apiKey, url, requestJson);
     json responseJson = json::parse(response);
 
     //TODO: Temp debugging output
@@ -221,9 +241,9 @@ json callAPIWithPrompt(std::string prompt)
     std::string OPENAI_MODEL = "gpt-4o";
     std::string DEEPSEEK_MODEL = "deepseek-chat";
 
-    std::string apiKey = OPENAI_KEY;
-    std::string url = OPENAI_URL;
-    std::string model = OPENAI_MODEL;
+    std::string apiKey = DEEPSEEK_API_KEY;
+    std::string url = DEEPSEEK_URL;
+    std::string model = DEEPSEEK_MODEL;
    
     json requestJson = {
         {"model", model},
@@ -232,7 +252,7 @@ json callAPIWithPrompt(std::string prompt)
         }}
     };
 
-    std::string response = makeAPIRequest(apiKey, url, requestJson);
+    std::string response = makeAPIRequest("DEEPSEEK", apiKey, url, requestJson);
     json responseJson = json::parse(response);
    
     std::string contentString = responseJson["choices"][0]["message"]["content"];
@@ -262,7 +282,7 @@ std::vector<T> getValuesFromJson(const json& extractedData) {
 }
 
 template <typename T>
-std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGeneratorEnvironment& env, const bsqon::PrimitiveType* t) {
+std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGeneratorEnvironment& env, const bsqon::Type* t) {
     auto prompt = buildPromptFor(t, env, g_typeFormatInstructions[t->tkey], aigen->sigstr);
     auto jfmt = g_typeJSONFormat[t->tkey];
 
@@ -290,8 +310,27 @@ void AIValueGenerator::generateBool(const bsqon::PrimitiveType* t, const ValueSe
 
 void AIValueGenerator::generateNat(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
-    std::vector<uint64_t> values = runAIGenCall<uint64_t>(this, env, t);
-    std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](uint64_t v) { return new bsqon::NatNumberValue(t, g_spos, v); });
+    if (!vc->context.forspecial.has_value()) {
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 0));
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 1));
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 2));
+        vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, 3));
+
+        std::vector<uint64_t> values = runAIGenCall<uint64_t>(this, env, t);
+        std::transform(values.begin(), values.end(), std::back_inserter(vc->options),
+                       [t](uint64_t v) { return new bsqon::NatNumberValue(t, g_spos, v); });
+    }
+    else {
+        auto sname = vc->context.forspecial.value();
+        if (sname == u8"length") {
+            for (size_t i = 0; i <= MAX_TEST_COLLECTION_COUNT; ++i) {
+                vc->options.push_back(new bsqon::NatNumberValue(t, g_spos, i));
+            }
+        }
+        else {
+            assert(false);
+        }
+    }
 }
 
 void AIValueGenerator::generateInt(const bsqon::PrimitiveType *t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
@@ -318,7 +357,7 @@ void AIValueGenerator::generateFloat(const bsqon::PrimitiveType* t, const ValueS
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](double v) { return new bsqon::FloatNumberValue(t, g_spos, v); });
 }
 
-void AIValueGenerator::generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+void AIValueGenerator::generateCString(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
     std::vector<std::string> values = runAIGenCall<std::string>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](const std::string& v) { 
@@ -470,6 +509,11 @@ void AIValueGenerator::generateType(const bsqon::Type* t, const ValueSetGenerato
         */
         case bsqon::TypeTag::TYPE_ENUM: {
             this->generateEnum(static_cast<const bsqon::EnumType*>(t), vc);
+            break;
+        }
+
+        case bsqon::TypeTag::TYPE_TYPE_DECL: {
+            this->generateCString(static_cast <const bsqon::TypedeclType*>(t), env, vc);
             break;
         }
         /*

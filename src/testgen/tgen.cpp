@@ -73,7 +73,7 @@ std::vector<std::vector<bsqon::Value*>> generateRandomTestSuite(const bsqon::Ass
 
 std::vector<std::vector<bsqon::Value*>> generateAgentTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const APISignature& testsig, size_t count)
 {
-    AIValueGenerator generator(AIModelOption::GEMINI, &testsig);
+    AIValueGenerator generator(AIModelOption::DEEP_SEEK, &testsig);
     for(size_t i = 0; i < vspartition.components.size(); ++i) {
         auto genv = ValueSetGeneratorEnvironment{vspartition.components[i]->path, vspartition.components[i]->constraints, vspartition.components[i]->context};
         generator.generateType(vspartition.components[i]->context.valuetype, genv, vspartition.components[i]);
@@ -91,7 +91,7 @@ std::vector<std::vector<bsqon::Value*>> generateAgentTestSuite(const bsqon::Asse
 
 std::vector<std::vector<bsqon::Value*>> generateCombinatorialTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const APISignature& testsig)
 {
-    AIValueGenerator generator(AIModelOption::GEMINI, &testsig);
+    AIValueGenerator generator(AIModelOption::DEEP_SEEK, &testsig);
     for(size_t i = 0; i < vspartition.components.size(); ++i) {
         auto genv = ValueSetGeneratorEnvironment{vspartition.components[i]->path, vspartition.components[i]->constraints, vspartition.components[i]->context};
         generator.generateType(vspartition.components[i]->context.valuetype, genv, vspartition.components[i]);
@@ -171,7 +171,7 @@ int main(int argc, char** argv, char **envp)
     
     ValueSetPartition vspartition = ValueSetPartition::punion(argpartitions);
 
-    //TODO: need flag on agent... to specify which model to use -- right now defaults to GEMINI
+    //TODO: need flag on agent... to specify which model to use -- right now defaults to OPEN_AI
 
     std::vector<std::vector<bsqon::Value*>> tests;
     auto modestr = std::string(argv[3]);

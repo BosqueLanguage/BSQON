@@ -37,7 +37,7 @@ public:
 
     void generateFloat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc);
 
-    void generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc);
+    void generateCString(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc);
     void generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc);
 
     //TODO: more primitives..

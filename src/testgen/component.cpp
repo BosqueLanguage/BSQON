@@ -68,7 +68,7 @@ ValueSetPartition ValueSetGenerator::generateString(const bsqon::PrimitiveType* 
     return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
 }
 
-ValueSetPartition ValueSetGenerator::generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env)
+ValueSetPartition ValueSetGenerator::generateCString(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env)
 {
     return ValueSetPartition{ {new ValueComponent(env.path, env.constraints, env.context.completeWithValueType(t))} };
 }
@@ -274,6 +274,10 @@ ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const Va
         case bsqon::TypeTag::TYPE_STD_CONCEPT: {
             return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), env);
         }
+        
+        case bsqon::TypeTag::TYPE_TYPE_DECL: {
+            return this->generateCString(static_cast<const bsqon::TypedeclType*>(t), env);
+        }
         /*
         * TODO: more tags here
         */
@@ -391,7 +395,7 @@ const bsqon::Type* TestGenerator::resolveSubtypeChoice(const VCPath& currpath, c
     }
 }
 
-bsqon::Value* TestGenerator::generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath)
+bsqon::Value* TestGenerator::generatePrimitive(const bsqon::Type* t, VCPath currpath)
 {
     bsqon::Value* res = nullptr;
     if(this->isRequiredValue(currpath, res)) {
@@ -467,8 +471,11 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
         /*
         * TODO: more tags here
         */
-       case bsqon::TypeTag::TYPE_STD_CONCEPT: {
+        case bsqon::TypeTag::TYPE_STD_CONCEPT: {
             return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), currpath);
+        }
+        case bsqon::TypeTag::TYPE_TYPE_DECL: {
+            return this->generatePrimitive(static_cast<const bsqon::TypedeclType*>(t), currpath);
         }
        default: {
             //Missing type
