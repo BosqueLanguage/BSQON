@@ -489,6 +489,9 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
         case bsqon::TypeTag::TYPE_STD_CONCEPT: {
             return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), currpath);
         }
+        case bsqon::TypeTag::TYPE_TYPE_DECL: {
+            return this->generatePrimitive(static_cast<const bsqon::TypedeclType*>(t), currpath);
+        }
         default: {
             //Missing type
             assert(false);
