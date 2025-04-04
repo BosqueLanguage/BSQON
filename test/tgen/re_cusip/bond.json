@@ -1,0 +1,10 @@
+{
+    "fname": "Main::bondchk",
+    "args": [
+        {
+            "name": "bond",
+            "type": "Main::CUSIP"
+        }
+    ],
+    "return": "Bool"
+}
