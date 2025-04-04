@@ -306,6 +306,7 @@ public:
     //More special types here...
 
     ValueSetPartition generateStdEntityType(const bsqon::StdEntityType* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateTypeDeclType(const bsqon::TypedeclType* t, const ValueSetGeneratorEnvironment& env);
 
     ValueSetPartition generateStdConceptType(const bsqon::StdConceptType* t, const ValueSetGeneratorEnvironment& env);
 
@@ -415,6 +416,7 @@ public:
     //More special types here...
 
     bsqon::Value* generateStdEntityType(const bsqon::StdEntityType* t, VCPath currpath);
+    bsqon::Value* generateTypeDeclType(const bsqon::TypedeclType* t, VCPath currpath);
 
     bsqon::Value* generateStdConceptType(const bsqon::StdConceptType* t, VCPath currpath);
 

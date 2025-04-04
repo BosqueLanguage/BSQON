@@ -201,7 +201,21 @@ std::string buildPromptFor(const bsqon::Type* t, const ValueSetGeneratorEnvironm
     prompt.replace(prompt.find("{{signature}}"), 13, signature);
 
     prompt.replace(prompt.find("{{format}}"), 10, formatinstructions);
-    prompt.replace(prompt.find("{{type}}"), 8, env.context.oftype.has_value() ? env.context.oftype.value()->tkey : t->tkey);
+
+    if(!env.context.oftype.has_value()) {
+        prompt.replace(prompt.find("{{type}}"), 8, t->tkey);
+    }
+    else {
+        auto ttype = env.context.oftype.value();
+
+        auto ttinfo = ttype->tkey;
+        if(ttype->optOfValidator.has_value()) {
+            auto vinfo = ttype->optOfValidator.value().first;
+            ttinfo += " that is accepted by the regular expression " + std::string(vinfo.cbegin(), vinfo.cend());
+        }
+
+        prompt.replace(prompt.find("{{type}}"), 8, ttinfo);
+    }
 
     return prompt;
 }
