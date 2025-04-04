@@ -1,0 +1,14 @@
+{
+    "fname": "Bioinformatics::findpattern",
+    "args": [
+        {
+            "name": "dna_sequence",
+            "type": "CString"
+        },
+        {
+            "name": "max_mutations",
+            "type": "Int"
+        }
+    ],
+    "return": "Bool"
+}

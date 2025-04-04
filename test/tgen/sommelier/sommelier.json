@@ -1,0 +1,14 @@
+{
+    "fname": "Main::Sommelier::verify_vintage",
+    "args": [
+        {
+            "name": "chemical_analysis",
+            "type": "List<Float>"
+        },
+        {
+            "name": "uv_light_response",
+            "type": "Bool"
+        }
+    ],
+    "return": "Main::VerificationResult"
+}

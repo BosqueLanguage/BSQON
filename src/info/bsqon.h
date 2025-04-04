@@ -584,7 +584,7 @@ namespace bsqon
 
         virtual json toJSON() const override
         {
-          return json(std::string(reinterpret_cast<const char*>(this->sv.data()), this->sv.size()));
+            return json(std::string(reinterpret_cast<const char*>(this->sv.data()), this->sv.size()));
         }
 
         virtual bool isValidForTypedecl() const override
@@ -619,7 +619,7 @@ namespace bsqon
          
         virtual json toJSON() const override
         {
-          return json(this->sv);
+            return json(this->sv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -1437,11 +1437,22 @@ namespace bsqon
 
         virtual json toJSON() const override
         {
-            json jsonVals = json::array();
-            for (const auto& val: vals) {
-                jsonVals.push_back(val->toJSON());
+            json resultJson;
+            json valuesArray = json::array();
+            std::string commonKey = "UNRESOLVED";
+            for (const auto& val : vals) {
+                json itemJson = val->toJSON();
+                if (val->vtype->tag == bsqon::TypeTag::TYPE_LIST || val->vtype->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
+                    commonKey = itemJson["kind"];
+                    valuesArray.push_back(itemJson["value"]);
+                } else {
+                    commonKey = val->vtype->tkey;
+                    valuesArray.push_back(itemJson);
+                }
             }
-            return jsonVals;
+            resultJson["kind"] = commonKey;
+            resultJson["value"] = valuesArray;
+            return resultJson;
         }
     };
 
@@ -1646,16 +1657,24 @@ namespace bsqon
 
         virtual json toJSON() const override
         {
+            json resultJson;
             json jsonVals;
             const std::vector<EntityTypeFieldEntry>& fields = static_cast<const StdEntityType*>(this->vtype)->fields;
 
             for (size_t i = 0; i < this->fieldvalues.size(); ++i)
             {
                 const auto& fieldName = fields[i].fname;
-                jsonVals[fieldName] = this->fieldvalues[i]->toJSON();
+                json itemJson = this->fieldvalues[i]->toJSON();
+                if (this->fieldvalues[i]->vtype->tag == bsqon::TypeTag::TYPE_LIST || this->fieldvalues[i]->vtype->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
+                    jsonVals[fieldName] = itemJson["value"];
+                } else {
+                    jsonVals[fieldName] = itemJson;
+                }
                 
             }
-            return jsonVals;
+            resultJson["kind"] = this->vtype->tag;
+            resultJson["value"] = jsonVals;
+            return resultJson;
         }
     };
 

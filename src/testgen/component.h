@@ -299,7 +299,6 @@ public:
     ValueSetPartition generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
 
     //TODO: more primitives..
-
     ValueSetPartition generatePrimitive(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
     ValueSetPartition generateEnum(const bsqon::EnumType* t, const ValueSetGeneratorEnvironment& env);
 
@@ -409,7 +408,7 @@ public:
 
     //TODO: more primitives..
 
-    bsqon::Value* generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath);
+    bsqon::Value* generatePrimitive(const bsqon::Type* t, VCPath currpath);
     bsqon::Value* generateEnum(const bsqon::EnumType* t, VCPath currpath);
 
     bsqon::Value* generateList(const bsqon::ListType* t, VCPath currpath);

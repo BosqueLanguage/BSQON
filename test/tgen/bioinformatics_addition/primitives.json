@@ -1,0 +1,124 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "SEQUENCE",
+                    "Bioinformatic::SEQUENCE"
+                ],
+                [
+                    "DNASEQUENCE",
+                    "Bioinformatic::DNASEQUENCE"
+                ]
+            ]
+        },        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "TypeDecl",
+            "ofvalidator": "/^[ACGT]+$/c",
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Bioinformatic::SEQUENCE",
+            "name": "SEQUENCE"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidator": "/^[ACGT]+$/c",
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Bioinformatic::DNASEQUENCE",
+            "name": "DNASEQUENCE"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
