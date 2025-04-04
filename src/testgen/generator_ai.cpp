@@ -371,7 +371,7 @@ void AIValueGenerator::generateFloat(const bsqon::PrimitiveType* t, const ValueS
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](double v) { return new bsqon::FloatNumberValue(t, g_spos, v); });
 }
 
-void AIValueGenerator::generateCString(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
+void AIValueGenerator::generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, ValueComponent* vc)
 {
     std::vector<std::string> values = runAIGenCall<std::string>(this, env, t);
     std::transform(values.begin(), values.end(), std::back_inserter(vc->options), [t](const std::string& v) { 
@@ -523,11 +523,6 @@ void AIValueGenerator::generateType(const bsqon::Type* t, const ValueSetGenerato
         */
         case bsqon::TypeTag::TYPE_ENUM: {
             this->generateEnum(static_cast<const bsqon::EnumType*>(t), vc);
-            break;
-        }
-
-        case bsqon::TypeTag::TYPE_TYPE_DECL: {
-            this->generateCString(static_cast <const bsqon::TypedeclType*>(t), env, vc);
             break;
         }
         /*

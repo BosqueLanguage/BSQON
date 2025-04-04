@@ -1,0 +1,14 @@
+{
+    "fname": "Bioinformatic::findpattern",
+    "args": [
+        {
+            "name": "dna_sequence",
+            "type": "Bioinformatic::DNASEQUENCE"
+        },
+        {
+            "name": "max",
+            "type": "Int"
+        }
+    ],
+    "return": "Bool"
+}

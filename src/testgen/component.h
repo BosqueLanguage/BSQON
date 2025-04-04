@@ -296,7 +296,7 @@ public:
     ValueSetPartition generateFloat(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
 
     ValueSetPartition generateString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
-    ValueSetPartition generateCString(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateCString(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);
 
     //TODO: more primitives..
     ValueSetPartition generatePrimitive(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env);

@@ -1,0 +1,93 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Status",
+                    "Main::Status"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Float",
+                    "Float"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "SAFE",
+                "WARNING",
+                "CRITICAL"
+            ],
+            "supertypes": [],
+            "tkey": "Main::Status",
+            "name": "Status"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive float value. **%"
+            },
+            "tkey": "Float",
+            "name": "Float"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
