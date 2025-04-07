@@ -402,7 +402,7 @@ const bsqon::Type* TestGenerator::resolveSubtypeChoice(const VCPath& currpath, c
     }
 }
 
-bsqon::Value* TestGenerator::generatePrimitive(const bsqon::Type* t, VCPath currpath)
+bsqon::Value* TestGenerator::generatePrimitive(const bsqon::PrimitiveType* t, VCPath currpath)
 {
     bsqon::Value* res = nullptr;
     if(this->isRequiredValue(currpath, res)) {
