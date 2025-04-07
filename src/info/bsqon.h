@@ -1442,7 +1442,7 @@ namespace bsqon
             std::string commonKey = "UNRESOLVED";
             for (const auto& val : vals) {
                 json itemJson = val->toJSON();
-                if (val->vtype->tag == bsqon::TypeTag::TYPE_LIST || val->vtype->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
+                if (val->vtype->isAbstractType()) {
                     commonKey = itemJson["kind"];
                     valuesArray.push_back(itemJson["value"]);
                 } else {
@@ -1665,7 +1665,7 @@ namespace bsqon
             {
                 const auto& fieldName = fields[i].fname;
                 json itemJson = this->fieldvalues[i]->toJSON();
-                if (this->fieldvalues[i]->vtype->tag == bsqon::TypeTag::TYPE_LIST || this->fieldvalues[i]->vtype->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
+                if (this->fieldvalues[i]->vtype->isAbstractType()) {
                     jsonVals[fieldName] = itemJson["value"];
                 } else {
                     jsonVals[fieldName] = itemJson;

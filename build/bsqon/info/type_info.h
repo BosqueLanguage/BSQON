@@ -134,6 +134,11 @@ namespace bsqon
                 || this->tag == TypeTag::TYPE_OPTION || this->tag == TypeTag::TYPE_RESULT
                 || this->tag == TypeTag::TYPE_STD_CONCEPT || this->tag == TypeTag::TYPE_APIRESULT);
         }
+
+       bool isAbstractType() const
+        {
+            return !this->isConcreteType();
+        }
     };
 
     class UnresolvedType : public Type
