@@ -177,7 +177,7 @@ std::string makeAPIRequest(std::string model, const std::string& apiKey, const s
     return responseString;
 }
 
-std::string buildPromptFor(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
+std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
 {
     std::string prompt;
 
@@ -296,7 +296,7 @@ std::vector<T> getValuesFromJson(const json& extractedData) {
 }
 
 template <typename T>
-std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGeneratorEnvironment& env, const bsqon::Type* t) {
+std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGeneratorEnvironment& env, const bsqon::PrimitiveType* t) {
     auto prompt = buildPromptFor(t, env, g_typeFormatInstructions[t->tkey], aigen->sigstr);
     auto jfmt = g_typeJSONFormat[t->tkey];
 
