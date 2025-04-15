@@ -1,0 +1,14 @@
+{
+    "fname": "Main::IoT::calibrate_sensor",
+    "args": [
+        {
+            "name": "calibration_points",
+            "type": "List<Float>"
+        },
+        {
+            "name": "tolerance",
+            "type": "List<Nat>"
+        }
+    ],
+    "return": "List<Float>"
+}

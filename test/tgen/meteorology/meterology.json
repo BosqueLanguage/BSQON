@@ -1,0 +1,14 @@
+{
+    "fname": "Main::check_blizzard_risk",
+    "args": [
+        {
+            "name": "wind_speed_kmh",
+            "type": "Float"
+        },
+        {
+            "name": "visibility_m",
+            "type": "Float"
+        }
+    ],
+    "return": "Main::Status"
+}

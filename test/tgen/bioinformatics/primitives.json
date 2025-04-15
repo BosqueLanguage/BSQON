@@ -1,0 +1,113 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "DNASEQUENCE",
+                    "Main::DNASEQUENCE"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "TypeDecl",
+            "ofvalidator": "/^[ACGT]+$/c",
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::DNASEQUENCE",
+            "name": "DNASEQUENCE"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
