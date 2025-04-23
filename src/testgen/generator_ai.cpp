@@ -17,7 +17,8 @@ static std::string g_std_prompt_instructions = R"(
     Strictly follow inferred semantics, excluding technically valid but unrealistic values.
     Inference Guidance (implicit, not rigid):
     - Consider the variable name ( {{path}} ) and function signature ( {{signature}} ) as hints for likely semantics. 
-    - Prioritize values that reflect realistic usage while allowing for generic .  
+    - Prioritize values that reflect realistic usage while allowing for generic interpretations.
+
     - Cover variations in length, character composition, and edge cases. 
     Constraints (Self-Imposed):
     - Test values must match the following regular expression: {{expression}}
@@ -27,8 +28,11 @@ static std::string g_std_prompt_instructions = R"(
 
     Requirements:
     - Each value must represent a distinct, non-overlapping partition of the valid input values.
-    - Do NOT explicitly label or describe scenarios; demonstrate implicit partition coverage through diverse values.
+    - For each generated value, mentally walk through how it satisfies a different partition of the input space, and select examples accordingly.
+    - You may silently reason through variable semantics, common formats, edge cases, and patterns before outputting the final list.
 
+    Think step-by-step before giving your answer.
+    Use a small but semantically diverse set of values. Assume that bugs can often be exposed by minimal input variations, in line with the small model hypothesis
     Your response must ONLY include a valid JSON array structured exactly as follows:
     [valid test value 1, valid test value 2, ...]
 
@@ -41,7 +45,7 @@ static std::string g_prompt_naked_arg = R"(
     Act as an expert in API input space analysis for black-box test generation.
 
     Given a variable named "{{name}}" with data type "{{type}}" with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
-
+    {{one_shot}}
     {{std_reqs}}
     )";
 
@@ -49,7 +53,8 @@ static std::string g_prompt_naked_arg_index = R"(
     Act as an expert in REST API input space analysis.
     
     Given a variable named "{{name}}" that is an array of type "{{type}}" elements with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified array element type and format, and within acceptable ranges.
-    
+    {{one_shot}}
+
     {{std_reqs}}
     )";
 
@@ -57,7 +62,8 @@ static std::string g_prompt_member_field = R"(
     Act as an expert in REST API input space analysis.
     
     Given a field, named "{{fname}}" in a type named "{{tname}}", with data type "{{type}}" and format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
-    
+    {{one_shot}}
+
     {{std_reqs}}
     )";
 
@@ -65,9 +71,34 @@ static std::string g_prompt_member_field_index = R"(
     Act as an expert in REST API input space analysis.
         
     Given a field, named "{{fname}}" in a type named "{{tname}}", that is an array of type "{{type}}" elements with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified array element type and format, and within acceptable ranges.
-        
+    {{one_shot}}
     {{std_reqs}}
     )";
+
+static std::string one_shot = R"(Q: Variable named "code" with type CustomID and format uppercase letters and digits (regex: /[A-Z0-9]{9}/c)
+A: First, understand the constraint. The regular expression /[A-Z0-9]{9}/c means each value must:
+- Be exactly 9 characters long
+- Contain only uppercase letters (A–Z) and digits (0–9)
+- No lowercase, symbols, or spaces
+
+To create diverse but valid values, we partition based on:
+- Character balance: all letters, all digits, mixed
+- Position variation: letter/digit sequences at different places
+- Common-looking structures vs. random valid ones
+
+Examples:
+- "A1B2C3D4E" — alternating letter/digit
+- "123456789" — all digits
+- "ABCDEFGHI" — all letters
+- "Z9Z9Z9Z9Z" — patterned
+- "9X8Y7Z6W5" — reverse random
+
+All of these:
+- Are exactly 9 characters
+- Use only A–Z and 0–9
+- Show semantic + structural variety
+
+So the answer is: ["A1B2C3D4E", "123456789", "ABCDEFGHI", "Z9Z9Z9Z9Z", "9X8Y7Z6W5"])";
 
 static std::string g_api_json = R"(
     {
@@ -192,6 +223,7 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
 
         prompt.replace(prompt.find("{{name}}"), 8, env.path);
     }
+    prompt.replace(prompt.find("{{one_shot}}"), 12, one_shot);
 
     prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
     
