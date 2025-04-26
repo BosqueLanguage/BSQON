@@ -414,7 +414,7 @@ namespace bsqon
         }
     }
 
-    void loadAssembly(json j)
+    void loadAssembly(json j, AssemblyInfo& g_assembly)
     {
         AssemblyInfo::parse(j, g_assembly);
 

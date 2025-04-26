@@ -171,7 +171,7 @@ int main(int argc, char** argv, char **envp)
     loadAssemblyJSONExplicit(argv[1], jv);
 
     bsqon::AssemblyInfo assembly;
-    bsqon::AssemblyInfo::parse(jv, assembly);
+    bsqon::loadAssembly(jv, assembly);
 
     ValueSetGenerator generator(&assembly);
 
