@@ -283,11 +283,7 @@ ValueSetPartition ValueSetGenerator::generateOption(const bsqon::OptionType* t, 
 ValueSetPartition ValueSetGenerator::generateSome(const bsqon::SomeType* t, const ValueSetGeneratorEnvironment& env)
 {
     auto oftype = this->assembly->lookupTypeKey(t->oftype);
-    std::vector<ValueConstraint*> constraints(env.constraints);
-    constraints.push_back(new OfTypeConstraint(pathAccessSpecial(env.path, "value"), oftype));
-    
-    auto tenv = env.step(env.path, constraints, env.context);
-    return this->generateType(oftype, tenv);
+    return this->generateType(oftype, env);
 }
 
 
