@@ -282,31 +282,12 @@ ValueSetPartition ValueSetGenerator::generateOption(const bsqon::OptionType* t, 
 
 ValueSetPartition ValueSetGenerator::generateSome(const bsqon::SomeType* t, const ValueSetGeneratorEnvironment& env)
 {
-    auto it = this->assembly->concreteSubtypesMap.find(t->tkey);
-    if (it != this->assembly->concreteSubtypesMap.end()) {
-        const std::vector<bsqon::TypeKey>& supertypes = it->second;
-        std::vector<ValueSetPartition> optpartitions;
-        std::transform(supertypes.cbegin(), supertypes.cend(), std::back_inserter(optpartitions), [this, &env](const bsqon::TypeKey& st) {
-            auto oftype = this->assembly->lookupTypeKey(st);
-            
-            std::vector<ValueConstraint*> constraints(env.constraints);
-            constraints.push_back(new OfTypeConstraint(pathAccessSpecial(env.path, "oftype"), oftype));
-            
-            auto tenv = env.step(env.path, constraints, env.context);
-            return this->generateType(oftype, tenv);
-        });
-
-        return ValueSetPartition::punion(optpartitions);
-    }
-    else {
-        auto oftype = this->assembly->lookupTypeKey(t->oftype);
-        std::vector<ValueConstraint*> constraints(env.constraints);
-        constraints.push_back(new OfTypeConstraint(pathAccessSpecial(env.path, "oftype"), oftype));
-        
-        auto tenv = env.step(env.path, constraints, env.context);
-        return this->generateType(oftype, env);
-    }
-   
+    auto oftype = this->assembly->lookupTypeKey(t->oftype);
+    std::vector<ValueConstraint*> constraints(env.constraints);
+    constraints.push_back(new OfTypeConstraint(pathAccessSpecial(env.path, "value"), oftype));
+    
+    auto tenv = env.step(env.path, constraints, env.context);
+    return this->generateType(oftype, tenv);
 }
 
 
@@ -448,17 +429,11 @@ const bsqon::Type* TestGenerator::resolveSubtypeChoice(const VCPath& currpath, c
         return fvc->vtype;
     }
     else {
-        auto it = this->assembly->concreteSubtypesMap.find(t->tkey);
-        if (it != this->assembly->concreteSubtypesMap.end()) {
-            const std::vector<bsqon::TypeKey>& supertypes = it->second;
-            std::uniform_int_distribution<size_t> unif(0, supertypes.size() - 1);
-            size_t choice = unif(rng);
+        const std::vector<bsqon::TypeKey>& supertypes = this->assembly->concreteSubtypesMap.at(t->tkey);
+        std::uniform_int_distribution<size_t> unif(0, supertypes.size() - 1);
+        size_t choice = unif(rng);
 
-            return this->assembly->lookupTypeKey(supertypes[choice]);
-        }
-        else {
-            return this->assembly->lookupTypeKey(t->tkey);
-        }
+        return this->assembly->lookupTypeKey(supertypes[choice]);
     }
 }
 
