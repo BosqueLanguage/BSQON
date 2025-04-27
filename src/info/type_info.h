@@ -484,7 +484,7 @@ namespace bsqon
         bool isKeyType(TypeKey tkey) const;
     };
 
-    void loadAssembly(json j);
+    void loadAssembly(json j, AssemblyInfo & g_assembly);
 
     bool isSubtype(TypeKey tkey, TypeKey oftype);
 }

@@ -309,6 +309,8 @@ public:
     ValueSetPartition generateTypeDeclType(const bsqon::TypedeclType* t, const ValueSetGeneratorEnvironment& env);
 
     ValueSetPartition generateStdConceptType(const bsqon::StdConceptType* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateOption(const bsqon::OptionType* t, const ValueSetGeneratorEnvironment& env);
+    ValueSetPartition generateSome(const bsqon::SomeType* t, const ValueSetGeneratorEnvironment& env);
 
     ValueSetPartition generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env);
 };
@@ -419,6 +421,8 @@ public:
     bsqon::Value* generateTypeDeclType(const bsqon::TypedeclType* t, VCPath currpath);
 
     bsqon::Value* generateStdConceptType(const bsqon::StdConceptType* t, VCPath currpath);
+    bsqon::Value* generateOption(const bsqon::OptionType* t, VCPath currpath);
+    bsqon::Value* generateSome(const bsqon::SomeType* t, VCPath currpath);
 
     bsqon::Value* generateType(const bsqon::Type* t, VCPath currpath);
 

@@ -261,6 +261,32 @@ ValueSetPartition ValueSetGenerator::generateStdConceptType(const bsqon::StdConc
     return ValueSetPartition::punion(optpartitions);
 } 
 
+ValueSetPartition ValueSetGenerator::generateOption(const bsqon::OptionType* t, const ValueSetGeneratorEnvironment& env)
+{
+
+    const std::vector<bsqon::TypeKey>& supertypes = this->assembly->concreteSubtypesMap.at(t->tkey);
+
+    std::vector<ValueSetPartition> optpartitions;
+    std::transform(supertypes.cbegin(), supertypes.cend(), std::back_inserter(optpartitions), [this, &env](const bsqon::TypeKey& st) {
+        auto oftype = this->assembly->lookupTypeKey(st);
+        
+        std::vector<ValueConstraint*> constraints(env.constraints);
+        constraints.push_back(new OfTypeConstraint(pathAccessSpecial(env.path, "oftype"), oftype));
+        
+        auto tenv = env.step(env.path, constraints, env.context);
+        return this->generateType(oftype, tenv);
+    });
+
+    return ValueSetPartition::punion(optpartitions);
+}
+
+ValueSetPartition ValueSetGenerator::generateSome(const bsqon::SomeType* t, const ValueSetGeneratorEnvironment& env)
+{
+    auto oftype = this->assembly->lookupTypeKey(t->oftype);
+    return this->generateType(oftype, env);
+}
+
+
 ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const ValueSetGeneratorEnvironment& env)
 {
     switch(t->tag) {
@@ -284,6 +310,12 @@ ValueSetPartition ValueSetGenerator::generateType(const bsqon::Type* t, const Va
         }
         case bsqon::TypeTag::TYPE_STD_CONCEPT: {
             return this->generateStdConceptType(static_cast<const bsqon::StdConceptType*>(t), env);
+        }
+        case bsqon::TypeTag::TYPE_OPTION: {
+            return this->generateOption(static_cast<const bsqon::OptionType*>(t), env);
+        }
+        case bsqon::TypeTag::TYPE_SOME: {
+            return this->generateSome(static_cast<const bsqon::SomeType*>(t), env);
         }
         /*
         * TODO: more tags here
@@ -394,7 +426,6 @@ const bsqon::Type* TestGenerator::resolveSubtypeChoice(const VCPath& currpath, c
     }
     else {
         const std::vector<bsqon::TypeKey>& supertypes = this->assembly->concreteSubtypesMap.at(t->tkey);
-
         std::uniform_int_distribution<size_t> unif(0, supertypes.size() - 1);
         size_t choice = unif(rng);
 
@@ -462,6 +493,18 @@ bsqon::Value* TestGenerator::generateStdConceptType(const bsqon::StdConceptType*
     return this->generateType(tt, currpath);
 }
 
+bsqon::Value* TestGenerator::generateOption(const bsqon::OptionType* t, VCPath currpath)
+{
+    auto tt = this->resolveSubtypeChoice(currpath, t);
+    return this->generateType(tt, currpath);
+}
+
+bsqon::Value* TestGenerator::generateSome(const bsqon::SomeType* t, VCPath currpath)
+{
+    auto tt = this->assembly->lookupTypeKey(t->oftype);
+    return this->generateType(tt, currpath);
+}
+
 bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
 {
     switch(t->tag) {
@@ -482,6 +525,12 @@ bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
         }
         case bsqon::TypeTag::TYPE_TYPE_DECL: {
             return this->generateTypeDeclType(static_cast<const bsqon::TypedeclType*>(t), currpath);
+        }
+        case bsqon::TypeTag::TYPE_OPTION: {
+            return this->generateOption(static_cast<const bsqon::OptionType*>(t), currpath);
+        }
+        case bsqon::TypeTag::TYPE_SOME: {
+            return this->generateSome(static_cast<const bsqon::SomeType*>(t), currpath);
         }
         /*
         * TODO: more tags here
