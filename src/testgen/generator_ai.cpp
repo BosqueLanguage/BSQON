@@ -21,7 +21,7 @@ static std::string g_std_prompt_instructions = R"(
 
     - Cover variations in length, character composition, and edge cases. 
     Constraints (Self-Imposed):
-    - Test values must match the following regular expression: {{expression}}
+    {{reexpression}}
     - If the above hints suggest a **specific structure**, enforce it strictly.  
     - Never include invalid values 
     
@@ -240,13 +240,17 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
     else {
         auto ttype = env.context.oftype.value();
 
-        auto ttinfo = ttype->tkey;
+        std::string ttinfo = ttype->tkey;
+        std::string reexpression = "";
         if(ttype->optOfValidator.has_value()) {
             auto vinfo = ttype->optOfValidator.value().first;
             ttinfo += " that is accepted by the regular expression " + std::string(vinfo.cbegin(), vinfo.cend());
+
+            reexpression = "- Test values must match the following regular expression: " + std::string(vinfo.cbegin(), vinfo.cend());
         }
 
         prompt.replace(prompt.find("{{type}}"), 8, ttinfo);
+        prompt.replace(prompt.find("{{reexpression}}"), 16, reexpression);
     }
 
     return prompt;
