@@ -202,7 +202,7 @@ ValueSetPartition ValueSetGenerator::generateList(const bsqon::ListType* t, cons
     auto tctx = env.context.extendWithEnclosingType(t);
     std::vector<ValueSetPartition> partitions;
 
-    auto tenv = env.step(pathAccessSpecial(env.path, "length"), env.constraints, tctx.extendForSpecial(u8"length").completeWithValueType(this->assembly->lookupTypeKey("Nat")));
+    auto tenv = env.step(pathAccessSpecial(env.path, "length"), env.constraints, tctx.extendForSpecial(u8"length"));
     auto len = this->generateType(this->assembly->lookupTypeKey("Nat"), tenv);
     partitions.push_back(len);
  
@@ -283,7 +283,10 @@ ValueSetPartition ValueSetGenerator::generateOption(const bsqon::OptionType* t, 
 ValueSetPartition ValueSetGenerator::generateSome(const bsqon::SomeType* t, const ValueSetGeneratorEnvironment& env)
 {
     auto oftype = this->assembly->lookupTypeKey(t->oftype);
-    return this->generateType(oftype, env);
+    bsqon::EntityTypeFieldEntry svfield("value", oftype->tkey, false, {"", {}});
+
+    auto tenv = env.step(pathAccessSpecial(env.path, "value"), env.constraints, env.context.extendForField(svfield));
+    return this->generateType(oftype, tenv);
 }
 
 
@@ -502,7 +505,7 @@ bsqon::Value* TestGenerator::generateOption(const bsqon::OptionType* t, VCPath c
 bsqon::Value* TestGenerator::generateSome(const bsqon::SomeType* t, VCPath currpath)
 {
     auto tt = this->assembly->lookupTypeKey(t->oftype);
-    return this->generateType(tt, currpath);
+    return this->generateType(tt, pathAccessField(currpath, "value"));
 }
 
 bsqon::Value* TestGenerator::generateType(const bsqon::Type* t, VCPath currpath)
