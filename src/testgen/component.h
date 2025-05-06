@@ -129,22 +129,22 @@ public:
 
     GenerateContext extendWithEnclosingType(const bsqon::Type* t) const
     {
-        return GenerateContext{std::make_optional(t), std::nullopt, std::nullopt, std::nullopt, this->oftype, nullptr};
+        return GenerateContext{std::make_optional(t), std::nullopt, std::nullopt, std::nullopt, std::nullopt, nullptr};
     }
 
     GenerateContext extendForField(const bsqon::EntityTypeFieldEntry& f) const
     {
-        return GenerateContext{this->intype, std::make_optional(f), std::nullopt, std::nullopt, this->oftype, nullptr};
+        return GenerateContext{this->intype, std::make_optional(f), std::nullopt, std::nullopt, std::nullopt, nullptr};
     }
 
     GenerateContext extendForIndex(size_t i) const
     {
-        return GenerateContext{this->intype, std::nullopt, std::make_optional(i), std::nullopt, this->oftype, nullptr};
+        return GenerateContext{this->intype, std::nullopt, std::make_optional(i), std::nullopt, std::nullopt, nullptr};
     }
 
     GenerateContext extendForSpecial(std::u8string special) const
     {
-        return GenerateContext{this->intype, std::nullopt, std::nullopt, std::make_optional(special), this->oftype, nullptr};
+        return GenerateContext{this->intype, std::nullopt, std::nullopt, std::make_optional(special), std::nullopt, nullptr};
     }
 
     GenerateContext extendForTypedecl(const bsqon::TypedeclType* t) const
