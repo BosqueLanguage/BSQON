@@ -78,7 +78,7 @@ $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_E
 
 $(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)tgen.cpp
 	@mkdir -p $(OUT_EXE)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)tgen.cpp -lbsqon -lbrex -lfl -lgmp -lcurl
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)tgen.cpp -lbsqon -lbrex -lgmp -lcurl #-lfl, caused build err.
 
 $(OUT_OBJ)component.o: $(GEN_HEADERS) $(GEN_SOURCES)
 	@mkdir -p $(OUT_OBJ)

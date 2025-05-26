@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 1 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,7 +93,7 @@ int errorcount = 0;
 
 #define YYDEBUG 1
 
-#line 97 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 97 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1934,763 +1934,763 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* bsqontypel: bsqontypel bsqontypel_entry  */
-#line 148 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 148 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                { (yyval.bsqon_type_list) = BSQON_AST_LIST_OF_TYPES_Push((yyvsp[0].bsqon_type_node), (yyvsp[-1].bsqon_type_list)); }
-#line 1940 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1940 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 3: /* bsqontypel: bsqontypel_entry  */
-#line 149 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 149 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                       { (yyval.bsqon_type_list) = BSQON_AST_LIST_OF_TYPES_Singleton((yyvsp[0].bsqon_type_node)); }
-#line 1946 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1946 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 4: /* bsqontypel_entry: bsqontype ","  */
-#line 153 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 153 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                        { (yyval.bsqon_type_node) = (yyvsp[-1].bsqon_type_node); }
-#line 1952 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1952 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 5: /* bsqontypel_entry: error ","  */
-#line 154 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 154 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                      { (yyval.bsqon_type_node) = BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))); yyerrok; }
-#line 1958 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1958 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 6: /* bsqonnametypel: bsqonnametypel bsqonnametypel_entry  */
-#line 158 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 158 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                        { (yyval.bsqon_named_type_list) = BSQON_AST_NLIST_OF_TYPES_Push((yyvsp[0].bsqon_named_type_list_entry), (yyvsp[-1].bsqon_named_type_list)); }
-#line 1964 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1964 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 7: /* bsqonnametypel: bsqonnametypel_entry  */
-#line 159 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 159 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                           { (yyval.bsqon_named_type_list) = BSQON_AST_NLIST_OF_TYPES_Singleton((yyvsp[0].bsqon_named_type_list_entry)); }
-#line 1970 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1970 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 8: /* bsqonnametypel_entry: "identifier" ":" bsqontype ","  */
-#line 163 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 163 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                   { (yyval.bsqon_named_type_list_entry) = BSQON_AST_NLIST_OF_TYPES_ENTRY_Create((yyvsp[-3].str), (yyvsp[-1].bsqon_type_node)); }
-#line 1976 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1976 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 9: /* bsqonnametypel_entry: "identifier" ":" error ","  */
-#line 164 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 164 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                 { (yyval.bsqon_named_type_list_entry) = BSQON_AST_NLIST_OF_TYPES_ENTRY_Create((yyvsp[-3].str), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))); yyerrok; }
-#line 1982 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1982 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 10: /* bsqonnominaltype: "type name"  */
-#line 168 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 168 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                         { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(NominalType, BSQON_AST_TAG_NominalType, MK_SPOS_S((yylsp[0])), (yyvsp[0].str), NULL); }
-#line 1988 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1988 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 11: /* bsqonnominaltype: "type name" bsqontermslist  */
-#line 169 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 169 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                          { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(NominalType, BSQON_AST_TAG_NominalType, MK_SPOS_S((yylsp[-1])), (yyvsp[-1].str), (yyvsp[0].bsqon_type_list)); }
-#line 1994 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 1994 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 12: /* bsqonnominaltype: bsqonnominaltype "::" "type name"  */
-#line 170 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 170 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                             { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(NominalScopedType, BSQON_AST_TAG_NominalScopedType, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_type_node), (yyvsp[0].str)); }
-#line 2000 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2000 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 13: /* bsqontermslist: '<' bsqontype '>'  */
-#line 174 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 174 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                      { (yyval.bsqon_type_list) = BSQON_AST_LIST_OF_TYPES_Singleton((yyvsp[-1].bsqon_type_node)); }
-#line 2006 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2006 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 14: /* bsqontermslist: '<' bsqontypel bsqontype '>'  */
-#line 175 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 175 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                   { (yyval.bsqon_type_list) = BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push((yyvsp[-1].bsqon_type_node), (yyvsp[-2].bsqon_type_list))); }
-#line 2012 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2012 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 15: /* bsqontermslist: '<' error '>'  */
-#line 176 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 176 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                    { (yyval.bsqon_type_list) = BSQON_AST_LIST_OF_TYPES_Singleton(BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))); yyerrok; }
-#line 2018 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2018 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 16: /* bsqontermslist: '<' bsqontypel error '>'  */
-#line 177 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 177 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_type_list) = BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push(BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), (yyvsp[-2].bsqon_type_list))); yyerrok; }
-#line 2024 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2024 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 17: /* bsqonelisttype: "(|" "|)"  */
-#line 181 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 181 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                   { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R((yylsp[-1]), (yylsp[0])), NULL); }
-#line 2030 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2030 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 18: /* bsqonelisttype: "(|" bsqontype "|)"  */
-#line 182 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 182 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                               { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_LIST_OF_TYPES_Singleton((yyvsp[-1].bsqon_type_node))); }
-#line 2036 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2036 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 19: /* bsqonelisttype: "(|" bsqontypel bsqontype "|)"  */
-#line 183 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 183 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                          { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push((yyvsp[-1].bsqon_type_node), (yyvsp[-2].bsqon_type_list)))); }
-#line 2042 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2042 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 20: /* bsqonelisttype: "(|" error "|)"  */
-#line 184 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 184 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                           { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_LIST_OF_TYPES_Singleton(BSQON_AST_ERROR(MK_SPOS_S((yylsp[-2]))))); yyerrok; }
-#line 2048 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2048 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 21: /* bsqonelisttype: "(|" bsqontypel error "|)"  */
-#line 185 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 185 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                      { (yyval.bsqon_type_node) = BSQON_AST_NODE_CONS(EListType, BSQON_AST_TAG_EListType, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_LIST_OF_TYPES_Reverse(BSQON_AST_LIST_OF_TYPES_Push(BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), (yyvsp[-2].bsqon_type_list)))); yyerrok; }
-#line 2054 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2054 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 22: /* bsqontype: bsqonnominaltype  */
-#line 189 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 189 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                     { (yyval.bsqon_type_node) = (yyvsp[0].bsqon_type_node); }
-#line 2060 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2060 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 23: /* bsqontype: bsqonelisttype  */
-#line 190 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 190 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                     { (yyval.bsqon_type_node) = (yyvsp[0].bsqon_type_node); }
-#line 2066 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2066 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 24: /* bsqontype: '(' bsqontype ')'  */
-#line 191 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 191 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                        { (yyval.bsqon_type_node) = (yyvsp[-1].bsqon_type_node); }
-#line 2072 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2072 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 25: /* bsqontype: '(' error ')'  */
-#line 192 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 192 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                    { (yyval.bsqon_type_node) = BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))); yyerrok; }
-#line 2078 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2078 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 26: /* bsqonliteral: "none"  */
-#line 196 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 196 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_NoneValue, MK_SPOS_S((yylsp[0]))); }
-#line 2084 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2084 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 27: /* bsqonliteral: "true"  */
-#line 197 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 197 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_TrueValue, MK_SPOS_S((yylsp[0]))); }
-#line 2090 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2090 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 28: /* bsqonliteral: "false"  */
-#line 198 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 198 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SingletonValue, BSQON_AST_TAG_FalseValue, MK_SPOS_S((yylsp[0]))); }
-#line 2096 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2096 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 29: /* bsqonliteral: "nat literal"  */
-#line 199 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 199 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_NatValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2102 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2102 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 30: /* bsqonliteral: "int literal"  */
-#line 200 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 200 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_IntValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2108 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2108 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 31: /* bsqonliteral: "big nat literal"  */
-#line 201 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 201 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_BigNatValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2114 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2114 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 32: /* bsqonliteral: "big int literal"  */
-#line 202 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 202 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_BigIntValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2120 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2120 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 33: /* bsqonliteral: "rational literal"  */
-#line 203 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 203 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_RationalValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2126 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2126 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 34: /* bsqonliteral: "float literal"  */
-#line 204 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 204 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_FloatValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2132 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2132 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 35: /* bsqonliteral: "decimal literal"  */
-#line 205 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 205 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DecimalValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2138 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2138 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 36: /* bsqonliteral: "decimal degree literal"  */
-#line 206 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 206 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DecimalDegreeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2144 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2144 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 37: /* bsqonliteral: "complex literal"  */
-#line 207 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 207 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_ComplexValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2150 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2150 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 38: /* bsqonliteral: "geo coordinate literal"  */
-#line 208 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 208 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_LatLongValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2156 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2156 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 39: /* bsqonliteral: "byte buffer"  */
-#line 209 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 209 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_ByteBufferValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2162 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2162 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 40: /* bsqonliteral: "uuid (v4)"  */
-#line 210 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 210 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_UUIDv4Value, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2168 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2168 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 41: /* bsqonliteral: "uuid (v7)"  */
-#line 211 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 211 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_UUIDv7Value, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2174 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2174 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 42: /* bsqonliteral: "sha3 hashcode (512 bits)"  */
-#line 212 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 212 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_SHAHashcodeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2180 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2180 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 43: /* bsqonliteral: "string"  */
-#line 213 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 213 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_StringValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].bstr)); }
-#line 2186 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2186 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 44: /* bsqonliteral: "cstring"  */
-#line 214 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 214 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_CStringValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].bstr)); }
-#line 2192 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2192 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 45: /* bsqonliteral: "regular expression"  */
-#line 215 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 215 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStringValue, BSQON_AST_TAG_RegexValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].bstr)); }
-#line 2198 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2198 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 46: /* bsqonliteral: "path item"  */
-#line 216 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 216 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralPathValue, BSQON_AST_TAG_PathValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].bstr)); }
-#line 2204 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2204 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 47: /* bsqonliteral: "date & time with timezone"  */
-#line 217 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 217 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_TZDateTimeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2210 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2210 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 48: /* bsqonliteral: "date & time in TIA"  */
-#line 218 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 218 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_TIATimeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2216 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2216 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 49: /* bsqonliteral: "plain date"  */
-#line 219 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 219 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_PlainDateValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2222 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2222 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 50: /* bsqonliteral: "plain time"  */
-#line 220 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 220 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_PlainTimeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2228 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2228 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 51: /* bsqonliteral: "logical time"  */
-#line 221 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 221 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_LogicalTimeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2234 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2234 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 52: /* bsqonliteral: "ISO timestamp"  */
-#line 222 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 222 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_TimestampValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2240 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2240 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 53: /* bsqonliteral: "date & time delta"  */
-#line 223 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 223 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DeltaDateTimeValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2246 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2246 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 54: /* bsqonliteral: "delta in seconds"  */
-#line 224 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 224 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DeltaSecondsValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2252 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2252 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 55: /* bsqonliteral: "timestamp delta"  */
-#line 225 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 225 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DeltaISOTimeStampValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2258 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2258 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 56: /* bsqonliteral: "logical time delta"  */
-#line 226 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 226 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LiteralStandardValue, BSQON_AST_TAG_DeltaLogicalValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2264 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2264 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 57: /* bsqonunspecvar: "unspec identifier"  */
-#line 230 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 230 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                            { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(NameValue, BSQON_AST_TAG_UnspecIdentifierValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2270 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2270 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 58: /* bsqonidentifier: "$src"  */
-#line 234 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 234 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(NameValue, BSQON_AST_TAG_IdentifierValue, MK_SPOS_S((yylsp[0])), "$src"); }
-#line 2276 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2276 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 59: /* bsqonidentifier: "$npos"  */
-#line 235 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 235 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(NameValue, BSQON_AST_TAG_IdentifierValue, MK_SPOS_S((yylsp[0])), "$npos"); }
-#line 2282 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2282 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 60: /* bsqonidentifier: "$i"  */
-#line 236 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 236 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(NameValue, BSQON_AST_TAG_IdentifierValue, MK_SPOS_S((yylsp[0])), "$i"); }
-#line 2288 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2288 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 61: /* bsqonidentifier: "$key"  */
-#line 237 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 237 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(NameValue, BSQON_AST_TAG_IdentifierValue, MK_SPOS_S((yylsp[0])), "$key"); }
-#line 2294 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2294 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 62: /* bsqonidentifier: "identifier"  */
-#line 238 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 238 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(NameValue, BSQON_AST_TAG_IdentifierValue, MK_SPOS_S((yylsp[0])), (yyvsp[0].str)); }
-#line 2300 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2300 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 63: /* bsqonscopedidentifier: bsqonnominaltype "::" "identifier"  */
-#line 242 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 242 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(ScopedNameValue, BSQON_AST_TAG_ScopedNameValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_type_node), (yyvsp[0].str)); }
-#line 2306 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2306 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 64: /* bsqonscopedidentifier: bsqonnominaltype "#" "identifier"  */
-#line 243 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 243 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                 { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(EnumAccessValue, BSQON_AST_TAG_EnumAccessValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_type_node), (yyvsp[0].str)); }
-#line 2312 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2312 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 65: /* bsqonscopedidentifier: bsqonnominaltype "#" "type name"  */
-#line 244 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 244 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                     { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(EnumAccessValue, BSQON_AST_TAG_EnumAccessValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_type_node), (yyvsp[0].str)); }
-#line 2318 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2318 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 66: /* bsqontypeliteral: bsqonliteral '<' bsqonnominaltype '>'  */
-#line 248 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 248 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                          { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(TypedLiteralValue, BSQON_AST_TAG_TypedLiteralValue, MK_SPOS_R((yylsp[-3]), (yylsp[-1])), (yyvsp[-3].bsqon_value_node), (yyvsp[-1].bsqon_type_node)); }
-#line 2324 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2324 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 67: /* bsqonenvaccess: "env" "[|" "cstring" "|]"  */
-#line 252 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 252 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                       { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(EnvAccessValue, BSQON_AST_TAG_EnvAccessValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), (yyvsp[-1].bstr), NULL); }
-#line 2330 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2330 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 68: /* bsqonenvaccess: "env" '<' bsqontype '>' "[|" "cstring" "[|"  */
-#line 253 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 253 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                           { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(EnvAccessValue, BSQON_AST_TAG_EnvAccessValue, MK_SPOS_R((yylsp[-6]), (yylsp[0])), (yyvsp[-1].bstr), (yyvsp[-4].bsqon_type_node)); }
-#line 2336 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2336 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 74: /* bsqonterminal: bsqonenvaccess  */
-#line 257 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 257 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                                                                { (yyval.bsqon_value_node) = (yyvsp[0].bsqon_value_node); }
-#line 2342 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2342 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 75: /* bsqon_mapentry: bsqonval "=>" bsqonval  */
-#line 261 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 261 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(MapEntryValue, BSQON_AST_TAG_MapEntryValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_value_node), (yyvsp[0].bsqon_value_node)); }
-#line 2348 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2348 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 76: /* bsqon_mapentry: error "=>" bsqonval  */
-#line 262 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 262 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(MapEntryValue, BSQON_AST_TAG_MapEntryValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-2]))), (yyvsp[0].bsqon_value_node)); yyerrok; }
-#line 2354 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2354 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 77: /* bsqon_mapentry: bsqonval "=>" error  */
-#line 263 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 263 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(MapEntryValue, BSQON_AST_TAG_MapEntryValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_value_node), BSQON_AST_ERROR(MK_SPOS_S((yylsp[0])))); yyerrok; }
-#line 2360 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2360 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 78: /* bsqon_mapentry: error "=>" error  */
-#line 264 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 264 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                            { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(MapEntryValue, BSQON_AST_TAG_MapEntryValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-2]))), BSQON_AST_ERROR(MK_SPOS_S((yylsp[0])))); yyerrok; }
-#line 2366 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2366 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 79: /* bsqonvall: bsqonvall bsqonl_entry  */
-#line 268 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 268 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                           { (yyval.bsqon_value_list) = BSQON_AST_LIST_OF_VALUES_Push((yyvsp[0].bsqon_value_node), (yyvsp[-1].bsqon_value_list)); }
-#line 2372 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2372 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 80: /* bsqonvall: bsqonl_entry  */
-#line 269 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 269 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                   { (yyval.bsqon_value_list) = BSQON_AST_LIST_OF_VALUES_Singleton((yyvsp[0].bsqon_value_node)); }
-#line 2378 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2378 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 81: /* bsqonl_entry: bsqon_braceval ","  */
-#line 273 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 273 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                             { (yyval.bsqon_value_node) = (yyvsp[-1].bsqon_value_node); }
-#line 2384 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2384 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 82: /* bsqonl_entry: error ","  */
-#line 274 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 274 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                      { (yyval.bsqon_value_node) = BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))); yyerrok; }
-#line 2390 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2390 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 83: /* bsqonbracketvalue: "(|" "|)"  */
-#line 278 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 278 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                   { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R((yylsp[-1]), (yylsp[0])), NULL); }
-#line 2396 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2396 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 84: /* bsqonbracketvalue: "(|" bsqonval "|)"  */
-#line 279 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 279 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_LIST_OF_VALUES_Singleton((yyvsp[-1].bsqon_value_node))); }
-#line 2402 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2402 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 85: /* bsqonbracketvalue: "(|" bsqonvall bsqonval "|)"  */
-#line 280 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 280 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                        { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_LIST_OF_VALUES_Reverse(BSQON_AST_LIST_OF_VALUES_Push((yyvsp[-1].bsqon_value_node), (yyvsp[-2].bsqon_value_list)))); }
-#line 2408 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2408 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 86: /* bsqonbracketvalue: "(|" error "|)"  */
-#line 281 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 281 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                           { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_LIST_OF_VALUES_Singleton(BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))))); yyerrok; }
-#line 2414 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2414 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 87: /* bsqonbracketvalue: "(|" bsqonvall error "|)"  */
-#line 282 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 282 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                     { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BracketValue, BSQON_AST_TAG_BracketValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_LIST_OF_VALUES_Reverse(BSQON_AST_LIST_OF_VALUES_Push(BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), (yyvsp[-2].bsqon_value_list)))); yyerrok; }
-#line 2420 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2420 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 88: /* bsqonnamevall: bsqonnamevall bsqonnameval_entry  */
-#line 286 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 286 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                     { (yyval.bsqon_named_value_list) = BSQON_AST_NLIST_OF_VALUES_Push((yyvsp[0].bsqon_named_value_list_entry), (yyvsp[-1].bsqon_named_value_list)); }
-#line 2426 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2426 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 89: /* bsqonnamevall: bsqonnameval_entry  */
-#line 287 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 287 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                         { (yyval.bsqon_named_value_list) = BSQON_AST_NLIST_OF_VALUES_Singleton((yyvsp[0].bsqon_named_value_list_entry)); }
-#line 2432 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2432 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 91: /* bsqon_braceval: bsqon_mapentry  */
-#line 291 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 291 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = (yyvsp[0].bsqon_value_node); }
-#line 2438 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2438 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 92: /* bsqonnameval_entry: "identifier" "=" bsqonval ","  */
-#line 295 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 295 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                   { (yyval.bsqon_named_value_list_entry) = BSQON_AST_NLIST_OF_VALUES_ENTRY_Create((yyvsp[-3].str), (yyvsp[-1].bsqon_value_node)); }
-#line 2444 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2444 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 93: /* bsqonnameval_entry: "identifier" "=" error ","  */
-#line 296 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 296 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                  { (yyval.bsqon_named_value_list_entry) = BSQON_AST_NLIST_OF_VALUES_ENTRY_Create((yyvsp[-3].str), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))); yyerrok; }
-#line 2450 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2450 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 94: /* bsqonnameval_entry: bsqon_braceval ","  */
-#line 297 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 297 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                               { (yyval.bsqon_named_value_list_entry) = BSQON_AST_NLIST_OF_VALUES_ENTRY_Create(NULL, (yyvsp[-1].bsqon_value_node)); }
-#line 2456 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2456 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 95: /* bsqonnameval_entry: error ","  */
-#line 298 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 298 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                      { (yyval.bsqon_named_value_list_entry) = BSQON_AST_NLIST_OF_VALUES_ENTRY_Create(NULL, BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))); yyerrok; }
-#line 2462 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2462 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 96: /* bsqonbracevalue: '{' '}'  */
-#line 302 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 302 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
            { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-1]), (yylsp[0])), NULL); }
-#line 2468 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2468 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 97: /* bsqonbracevalue: '{' "identifier" "=" bsqonval '}'  */
-#line 303 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 303 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                   { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-4]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Singleton(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create((yyvsp[-3].str), (yyvsp[-1].bsqon_value_node)))); }
-#line 2474 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2474 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 98: /* bsqonbracevalue: '{' bsqonnamevall "identifier" "=" bsqonval '}'  */
-#line 304 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 304 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                 { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-5]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Reverse(BSQON_AST_NLIST_OF_VALUES_Push(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create((yyvsp[-3].str), (yyvsp[-1].bsqon_value_node)), (yyvsp[-4].bsqon_named_value_list)))); }
-#line 2480 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2480 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 99: /* bsqonbracevalue: '{' "identifier" "=" error '}'  */
-#line 305 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 305 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-4]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Singleton(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create((yyvsp[-3].str), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))))); yyerrok; }
-#line 2486 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2486 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 100: /* bsqonbracevalue: '{' bsqonnamevall "identifier" "=" error '}'  */
-#line 306 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 306 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-5]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Reverse(BSQON_AST_NLIST_OF_VALUES_Push(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create((yyvsp[-3].str), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))), (yyvsp[-4].bsqon_named_value_list)))); yyerrok; }
-#line 2492 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2492 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 101: /* bsqonbracevalue: '{' bsqon_braceval '}'  */
-#line 307 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 307 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                             { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Singleton(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create(NULL, (yyvsp[-1].bsqon_value_node)))); }
-#line 2498 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2498 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 102: /* bsqonbracevalue: '{' bsqonnamevall bsqon_braceval '}'  */
-#line 308 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 308 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                           { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Reverse(BSQON_AST_NLIST_OF_VALUES_Push(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create(NULL, (yyvsp[-1].bsqon_value_node)), (yyvsp[-2].bsqon_named_value_list)))); }
-#line 2504 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2504 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 103: /* bsqonbracevalue: '{' error '}'  */
-#line 309 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 309 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                    { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Singleton(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create(NULL, BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))))); yyerrok; }
-#line 2510 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2510 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 104: /* bsqonbracevalue: '{' bsqonnamevall error '}'  */
-#line 310 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 310 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                  { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(BraceValue, BSQON_AST_TAG_BraceValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_NLIST_OF_VALUES_Reverse(BSQON_AST_NLIST_OF_VALUES_Push(BSQON_AST_NLIST_OF_VALUES_ENTRY_Create(NULL, BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1])))), (yyvsp[-2].bsqon_named_value_list)))); yyerrok; }
-#line 2516 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2516 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 106: /* bsqonbracketbracevalue: bsqonbracevalue  */
-#line 314 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 314 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                        { (yyval.bsqon_value_node) = (yyvsp[0].bsqon_value_node); }
-#line 2522 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2522 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 107: /* bsqontypedvalue: '<' bsqontype '>' '(' bsqonbracketbracevalue ')'  */
-#line 318 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 318 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                      { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(TypedValue, BSQON_AST_TAG_TypedValue, MK_SPOS_R((yylsp[-5]), (yylsp[-2])), (yyvsp[-1].bsqon_value_node), (yyvsp[-4].bsqon_type_node), true); }
-#line 2528 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2528 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 108: /* bsqontypedvalue: bsqonnominaltype bsqonbracketbracevalue  */
-#line 319 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 319 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(TypedValue, BSQON_AST_TAG_TypedValue, MK_SPOS_R((yylsp[-1]), (yylsp[0])), (yyvsp[0].bsqon_value_node), (yyvsp[-1].bsqon_type_node), false); }
-#line 2534 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2534 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 109: /* bsqontypedvalue: error '(' bsqonbracketbracevalue ')'  */
-#line 320 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 320 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(TypedValue, BSQON_AST_TAG_TypedValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), (yyvsp[-1].bsqon_value_node), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-2]))), true); }
-#line 2540 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2540 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 110: /* bsqontypedvalue: error bsqonbracketbracevalue  */
-#line 321 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 321 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(TypedValue, BSQON_AST_TAG_TypedValue, MK_SPOS_R((yylsp[-1]), (yylsp[0])), (yyvsp[0].bsqon_value_node), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), false); }
-#line 2546 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2546 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 112: /* bsqonstructvalue: bsqontypedvalue  */
-#line 325 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 325 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                             { (yyval.bsqon_value_node) = (yyvsp[0].bsqon_value_node); }
-#line 2552 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2552 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 113: /* bsqonspecialcons: "some" '(' bsqonval ')'  */
-#line 329 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 329 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SpecialConsValue, BSQON_AST_TAG_SomeConsValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), (yyvsp[-1].bsqon_value_node), "some"); }
-#line 2558 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2558 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 114: /* bsqonspecialcons: "some" '(' error ')'  */
-#line 330 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 330 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SpecialConsValue, BSQON_AST_TAG_SomeConsValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), "some"); yyerrok; }
-#line 2564 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2564 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 115: /* bsqonspecialcons: "ok" '(' bsqonval ')'  */
-#line 331 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 331 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SpecialConsValue, BSQON_AST_TAG_OkConsValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), (yyvsp[-1].bsqon_value_node), "ok"); }
-#line 2570 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2570 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 116: /* bsqonspecialcons: "ok" '(' error ')'  */
-#line 332 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 332 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SpecialConsValue, BSQON_AST_TAG_OkConsValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), "ok"); yyerrok; }
-#line 2576 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2576 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 117: /* bsqonspecialcons: "err" '(' bsqonval ')'  */
-#line 333 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 333 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SpecialConsValue, BSQON_AST_TAG_ErrConsValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), (yyvsp[-1].bsqon_value_node), "err"); }
-#line 2582 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2582 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 118: /* bsqonspecialcons: "err" '(' error ')'  */
-#line 334 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 334 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                              { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(SpecialConsValue, BSQON_AST_TAG_ErrConsValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))), "err"); yyerrok; }
-#line 2588 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2588 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 123: /* bsqonval: bsqonaccess  */
-#line 338 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 338 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                                   { (yyval.bsqon_value_node) = (yyvsp[0].bsqon_value_node); }
-#line 2594 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2594 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 124: /* bsqonletexp: '(' "let" "identifier" ":" bsqontype "=" bsqonval "in" bsqonval ')'  */
-#line 342 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 342 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                                          { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(LetInValue, BSQON_AST_TAG_LetInValue, MK_SPOS_R((yylsp[-9]), (yylsp[0])), (yyvsp[-7].str), (yyvsp[-5].bsqon_type_node), (yyvsp[-3].bsqon_value_node), (yyvsp[-1].bsqon_value_node)); }
-#line 2600 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2600 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 127: /* bsqonref: bsqonaccess  */
-#line 346 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 346 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                          { (yyval.bsqon_value_node) = (yyvsp[0].bsqon_value_node); }
-#line 2606 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2606 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 128: /* bsqonaccess: bsqonref "." "identifier"  */
-#line 350 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 350 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                             { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(AccessNameValue, BSQON_AST_TAG_AccessNameValue, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].bsqon_value_node), (yyvsp[0].str)); }
-#line 2612 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2612 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 129: /* bsqonaccess: bsqonref "[|" "numberino" "|]"  */
-#line 351 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 351 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                             { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(AccessIndexValue, BSQON_AST_TAG_AccessIndexValue, MK_SPOS_R((yylsp[-3]), (yylsp[-1])), (yyvsp[-3].bsqon_value_node), (yyvsp[-1].str)); }
-#line 2618 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2618 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 130: /* bsqonaccess: bsqonref "[|" bsqonterminal "|]"  */
-#line 352 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 352 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                             { (yyval.bsqon_value_node) = BSQON_AST_NODE_CONS(AccessKeyValue, BSQON_AST_TAG_AccessKeyValue, MK_SPOS_R((yylsp[-3]), (yylsp[0])), (yyvsp[-3].bsqon_value_node), (yyvsp[-1].bsqon_value_node)); }
-#line 2624 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2624 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 131: /* bsqonenvlist: "env" '{' '}'  */
-#line 356 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 356 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                   { (yyval.bsqon_named_type_list) = NULL; }
-#line 2630 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2630 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 132: /* bsqonenvlist: "env" '{' "identifier" ":" bsqontype '}'  */
-#line 357 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 357 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                          { (yyval.bsqon_named_type_list) = BSQON_AST_NLIST_OF_TYPES_Singleton(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create((yyvsp[-3].str), (yyvsp[-1].bsqon_type_node))); }
-#line 2636 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2636 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 133: /* bsqonenvlist: "env" '{' bsqonnametypel "identifier" ":" bsqontype '}'  */
-#line 358 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 358 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                         { (yyval.bsqon_named_type_list) = BSQON_AST_NLIST_OF_TYPES_Reverse(BSQON_AST_NLIST_OF_TYPES_Push(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create((yyvsp[-3].str), (yyvsp[-1].bsqon_type_node)), (yyvsp[-4].bsqon_named_type_list))); }
-#line 2642 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2642 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 134: /* bsqonenvlist: "env" '{' "identifier" ":" error '}'  */
-#line 359 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 359 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                      { (yyval.bsqon_named_type_list) = BSQON_AST_NLIST_OF_TYPES_Singleton(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create((yyvsp[-3].str), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-1]))))); yyerrok; }
-#line 2648 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2648 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 135: /* bsqonenvlist: "env" '{' bsqonnametypel "identifier" ":" error '}'  */
-#line 360 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 360 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                                                     { (yyval.bsqon_named_type_list) = BSQON_AST_NLIST_OF_TYPES_Reverse(BSQON_AST_NLIST_OF_TYPES_Push(BSQON_AST_NLIST_OF_TYPES_ENTRY_Create((yyvsp[-3].str), BSQON_AST_ERROR(MK_SPOS_S((yylsp[-3])))), (yyvsp[-4].bsqon_named_type_list))); yyerrok; }
-#line 2654 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2654 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 136: /* bsqoncomponent: bsqonval  */
-#line 364 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 364 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
             { (yyval.bsqon_decl) = BSQON_AST_NODE_CONS(BsqonDeclBody, BSQON_AST_TAG_BsqonDeclBody, MK_SPOS_S((yylsp[0])), NULL, NULL, (yyvsp[0].bsqon_value_node)); }
-#line 2660 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2660 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 137: /* bsqoncomponent: bsqonenvlist bsqonval  */
-#line 365 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 365 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                            { (yyval.bsqon_decl) = BSQON_AST_NODE_CONS(BsqonDeclBody, BSQON_AST_TAG_BsqonDeclBody, MK_SPOS_R((yylsp[-1]), (yylsp[0])), NULL, (yyvsp[-1].bsqon_named_type_list), (yyvsp[0].bsqon_value_node)); }
-#line 2666 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2666 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 138: /* bsqoncomponent: "shebang line" bsqonval  */
-#line 366 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 366 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                  { (yyval.bsqon_decl) = BSQON_AST_NODE_CONS(BsqonDeclBody, BSQON_AST_TAG_BsqonDeclBody, MK_SPOS_R((yylsp[-1]), (yylsp[0])), (yyvsp[-1].str), NULL, (yyvsp[0].bsqon_value_node)); }
-#line 2672 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2672 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 139: /* bsqoncomponent: "shebang line" bsqonenvlist bsqonval  */
-#line 367 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 367 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                                               { (yyval.bsqon_decl) = BSQON_AST_NODE_CONS(BsqonDeclBody, BSQON_AST_TAG_BsqonDeclBody, MK_SPOS_R((yylsp[-2]), (yylsp[0])), (yyvsp[-2].str), (yyvsp[-1].bsqon_named_type_list), (yyvsp[0].bsqon_value_node)); }
-#line 2678 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2678 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 140: /* bsqonroot: bsqoncomponent  */
-#line 371 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 371 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
                   { yybsqonval = (yyvsp[0].bsqon_decl); (yyval.bsqon_decl) = (yyvsp[0].bsqon_decl); }
-#line 2684 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2684 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
   case 141: /* bsqonroot: error  */
-#line 372 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 372 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
            {yybsqonval = BSQON_AST_ERROR(MK_SPOS_S((yylsp[0]))); (yyval.bsqon_decl) = BSQON_AST_ERROR(MK_SPOS_S((yylsp[0]))); }
-#line 2690 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2690 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
     break;
 
 
-#line 2694 "/home/mark/Code/BSQON/build/output/obj/bsqon.tab.c"
+#line 2694 "/home/karidus/work/BSQON/build/output/obj/bsqon.tab.c"
 
       default: break;
     }
@@ -2919,7 +2919,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 374 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.y"
+#line 374 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.y"
 
 
 extern FILE* yyin;

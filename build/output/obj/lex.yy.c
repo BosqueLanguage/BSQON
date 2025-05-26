@@ -1,6 +1,6 @@
-#line 2 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 1 "/home/karidus/work/BSQON/build/output/obj/lex.yy.c"
 
-#line 4 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 3 "/home/karidus/work/BSQON/build/output/obj/lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1723,9 +1723,9 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 1 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 #define YY_NO_INPUT 1
-#line 4 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 4 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 #include "bsqon.tab.h"
 
 #include "../../../src/fbparser/bytestring.h"
@@ -1756,9 +1756,9 @@ void yyerror(const char* s, ...);
   yylloc.first_line = start_line; yylloc.first_column = start_column;    \
   yylloc.last_line = yylineno; yylloc.last_column = yycolumn;              
 
-#line 1760 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 1759 "/home/karidus/work/BSQON/build/output/obj/lex.yy.c"
 
-#line 1762 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 1761 "/home/karidus/work/BSQON/build/output/obj/lex.yy.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -1978,15 +1978,15 @@ YY_DECL
 		}
 
 	{
-#line 55 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 55 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 
 
-#line 58 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 58 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
   int start_line, start_column;
   int prev_yylineno = yylineno;
 
  /* standard parens */
-#line 1990 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 1989 "/home/karidus/work/BSQON/build/output/obj/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -2054,489 +2054,489 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
-#line 63 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 63 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 2:
-#line 64 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 64 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 3:
-#line 65 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 65 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 4:
-#line 66 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 66 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 5:
-#line 67 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 67 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 6:
-#line 68 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 68 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 7:
-#line 69 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 69 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 8:
-#line 70 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 70 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 9:
-#line 71 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 71 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 10:
-#line 72 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 72 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 11:
-#line 73 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 73 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 case 12:
 YY_RULE_SETUP
-#line 73 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 73 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return yytext[0]; }
 	YY_BREAK
 /* symbols */
 case 13:
 YY_RULE_SETUP
-#line 76 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 76 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_DOUBLE_COLON; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 77 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 77 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_HASH; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 78 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 78 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_ENTRY; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 80 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 80 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_COLON; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 81 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 81 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_COMMA; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 82 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 82 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_EQUALS; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 83 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 83 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return SYM_DOT; }
 	YY_BREAK
 /* keywords */
 case 20:
 YY_RULE_SETUP
-#line 87 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 87 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_NPOS; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 88 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 88 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_SRC; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 89 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 89 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_NONE; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 90 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 90 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_TRUE; } 
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 91 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 91 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_FALSE; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 93 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 93 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_SOME; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 94 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 94 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_OK; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 95 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 95 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_ERR; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 96 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 96 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_LET; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 97 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 97 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_IN; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 99 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 99 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return KW_ENV; }
 	YY_BREAK
 /* numbers */
 case 31:
 YY_RULE_SETUP
-#line 102 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 102 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 103 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 103 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero as divisor"); return YYerror; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 105 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 105 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_NAT; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 106 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 106 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_INT; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 107 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 107 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_BIG_NAT; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 108 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 108 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_BIG_INT; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 110 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 110 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_RATIONAL; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 111 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 111 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_RATIONAL; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 113 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 113 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 115 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 115 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_FLOAT; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 116 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 116 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DECIMAL; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 117 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 117 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DECIMAL_DEGREE; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 120 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 120 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 121 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 121 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 123 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 123 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_LAT_LONG; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 125 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 125 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 126 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 126 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Zero cannot be negative"); return YYerror; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 128 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 128 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_COMPLEX; }
 	YY_BREAK
 /* numberinos */
 case 49:
 YY_RULE_SETUP
-#line 131 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 131 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Cannot have sign on indexer"); return YYerror; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 133 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 133 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_NUMBERINO; }
 	YY_BREAK
 /* strings */
 case 51:
 YY_RULE_SETUP
-#line 136 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 136 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_BYTE_BUFFER; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 137 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 137 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_UUID_V4; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 138 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 138 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_UUID_V7; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 139 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 139 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_SHA_HASH; }
 	YY_BREAK
 case 55:
 /* rule 55 can match eol */
 YY_RULE_SETUP
-#line 141 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 141 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid buffer contents"); return YYerror; }
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
 YY_RULE_SETUP
-#line 142 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 142 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid UUID value"); return YYerror; }
 	YY_BREAK
 case 57:
 /* rule 57 can match eol */
 YY_RULE_SETUP
-#line 143 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 143 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid SHA3 value"); return YYerror; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 145 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 145 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Missing close bracket"); return YYerror; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 146 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 146 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Missing close bracket"); return YYerror; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 147 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 147 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Missing close bracket"); return YYerror; }
 	YY_BREAK
 
 case 61:
 YY_RULE_SETUP
-#line 150 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 150 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(STRING); string_buf_bs.len = 0; ByteStringStoreChar('"'); }
 	YY_BREAK
 
 
 case 62:
 YY_RULE_SETUP
-#line 153 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 153 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreChar('"'); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_STRING; }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 154 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 154 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yyerror("Unclosed String"); return YYEOF; }
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-#line 155 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 155 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
 	YY_BREAK
 case 64:
 /* rule 64 can match eol */
 YY_RULE_SETUP
-#line 156 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 156 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
 
 
 case 65:
 YY_RULE_SETUP
-#line 160 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 160 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(CSTRING); string_buf_bs.len = 0; ByteStringStoreChar('\''); }
 	YY_BREAK
 
 
 case 66:
 YY_RULE_SETUP
-#line 163 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 163 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreChar('\''); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_CSTRING; }
 	YY_BREAK
 case YY_STATE_EOF(CSTRING):
-#line 164 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 164 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yyerror("Unclosed ASCIIString"); return YYEOF; }
 	YY_BREAK
 case 67:
 /* rule 67 can match eol */
 YY_RULE_SETUP
-#line 165 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 165 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { ByteStringStoreChar('\n'); /*ignore whitespace till alignment on multi-line string*/ }
 	YY_BREAK
 case 68:
 /* rule 68 can match eol */
 YY_RULE_SETUP
-#line 166 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 166 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 167 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 167 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 
 case 70:
 YY_RULE_SETUP
-#line 171 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 171 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(REGEX); string_buf_bs.len = 0; ByteStringStoreChar('/'); }
 	YY_BREAK
 
 
 case 71:
 YY_RULE_SETUP
-#line 174 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 174 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreText(yytext, yyleng); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_REGEX; }
 	YY_BREAK
 case YY_STATE_EOF(REGEX):
-#line 175 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 175 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yyerror("Unclosed Regex"); return YYEOF; }
 	YY_BREAK
 case 72:
 /* rule 72 can match eol */
 YY_RULE_SETUP
-#line 176 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 176 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Newline in Regex"); return YYerror; }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 177 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 177 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 178 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 178 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 
 case 75:
 YY_RULE_SETUP
-#line 182 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 182 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(PATH_ITEM); string_buf_bs.len = 0; ByteStringStoreText(yytext, yyleng); }
 	YY_BREAK
 
 
 case 76:
 YY_RULE_SETUP
-#line 185 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 185 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); ByteStringStoreChar('\\'); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_PATH_ITEM; }
 	YY_BREAK
 case YY_STATE_EOF(PATH_ITEM):
-#line 186 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 186 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yyerror("Unclosed Path Item"); return YYEOF; }
 	YY_BREAK
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 187 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 187 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Whitespace in Path Item"); return YYerror; }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 188 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 188 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { ByteStringStoreChar(yytext[0]); }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 189 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 189 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 /* dates */
 case 80:
 YY_RULE_SETUP
-#line 193 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 193 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_TZ_DATE_TIME; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 194 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 194 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_TIA_TIME; }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 195 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 195 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_DATE; }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 196 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 196 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_PLAIN_TIME; }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 198 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 198 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_LOGICAL_TIME; }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 200 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 200 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Cannot have sign/negative time"); return YYerror; }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 201 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 201 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Cannot have sign/negative time"); return YYerror; }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 202 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 202 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Leading zero is not allowed"); return YYerror; }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 203 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 203 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Leading zero is not allowed"); return YYerror; }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 205 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 205 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_TIMESTAMP; }
 	YY_BREAK
 /* deltas */
 case 90:
 YY_RULE_SETUP
-#line 208 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 208 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_DATE_TIME; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 209 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 209 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_SECONDS; }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 210 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 210 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_LOGICAL; }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 211 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 211 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_DELTA_ISOTIMESTAMP; }
 	YY_BREAK
 
 case 94:
 YY_RULE_SETUP
-#line 215 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 215 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(SHEBANG_LINE); string_buf_bs.len = 0; ByteStringStoreText(yytext, yyleng); }
 	YY_BREAK
 
@@ -2544,58 +2544,58 @@ YY_RULE_SETUP
 case 95:
 /* rule 95 can match eol */
 YY_RULE_SETUP
-#line 218 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 218 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_SHEBANG_LINE; }
 	YY_BREAK
 case YY_STATE_EOF(SHEBANG_LINE):
-#line 219 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 219 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { BEGIN(INITIAL); yylval.bstr = bstrAlloc(string_buf_bs); return TOKEN_SHEBANG_LINE; }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 220 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 220 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yyerror("Invalid character (ignoring)"); return YYerror;}
 	YY_BREAK
 
 /* names */
 case 97:
 YY_RULE_SETUP
-#line 224 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 224 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_IDENTIFIER; } 
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 225 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 225 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_UNSPEC_IDENTIFIER; }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 226 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 226 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { yylval.str = AST_STRDUP(yytext); return TOKEN_TYPE_COMPONENT; }
 	YY_BREAK
 /* comments */
 case 100:
 YY_RULE_SETUP
-#line 229 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 229 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { } /* line comment */
 	YY_BREAK
 case 101:
 /* rule 101 can match eol */
 YY_RULE_SETUP
-#line 231 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 231 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { } /* ignore white space */ 
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 233 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 233 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 { return yytext[0]; } /* catch all and error in parser */
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 235 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 235 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 2599 "/home/mark/Code/BSQON/build/output/obj/lex.yy.c"
+#line 2598 "/home/karidus/work/BSQON/build/output/obj/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -3571,7 +3571,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 235 "/home/mark/Code/BSQON/build/../src/fbparser/bsqon.l"
+#line 235 "/home/karidus/work/BSQON/build/../src/fbparser/bsqon.l"
 
 
 void ByteStringStoreChar(char c)
