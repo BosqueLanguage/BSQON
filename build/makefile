@@ -7,6 +7,7 @@ PARSER_GEN_DIR=$(SRC_DIR)fbparser/
 INFO_DIR=$(SRC_DIR)info/
 PARSER_DIR=$(SRC_DIR)parser/
 GEN_DIR=$(SRC_DIR)testgen/
+SMT_DIR=$(SRC_DIR)smtextract/
 
 OUT_EXE=$(BUILD_DIR)output/
 OUT_OBJ=$(BUILD_DIR)output/obj/
@@ -15,6 +16,8 @@ PCKG_DIR=$(BUILD_DIR)bsqon/
 JSON_INCLUDES=-I $(BUILD_DIR)include/json/
 BREX_INCLUDES=-I $(BUILD_DIR)include/brex/
 BREX_PATH=$(BUILD_DIR)include/brex/
+Z3_INCLUDES=-I $(BUILD_DIR)include/z3/
+Z3_PATH=$(BUILD_DIR)include/z3/
 LIB_PATH=$(OUT_EXE)
 
 BSQON_TEST_DIR=$(MAKE_PATH)/../test/
@@ -59,11 +62,15 @@ GEN_HEADERS=$(GEN_DIR)component.h $(GEN_DIR)generator_rnd.h $(GEN_DIR)/generator
 GEN_SOURCES=$(GEN_DIR)component.cpp $(GEN_DIR)generator_rnd.cpp $(GEN_DIR)/generator_ai.cpp
 GEN_OBJS=$(OUT_OBJ)component.o $(OUT_OBJ)generator_rnd.o $(OUT_OBJ)generator_ai.o
 
+SMT_HEADERS=$(SMT_DIR)smt_utils.h
+# SMT_SOURCES=$(SMT_DIR)smt_main.cpp
+# SMT_OBJS=$(OUT_OBJ)
+
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
 MAKEFLAGS += -j4
 
-all: $(OUT_EXE)libbsqon.a $(OUT_EXE)bsqon $(OUT_EXE)tgen $(PCKG_DIR)libbsqon.a
+all: $(OUT_EXE)libbsqon.a $(OUT_EXE)bsqon $(OUT_EXE)tgen $(OUT_EXE)smtextract $(PCKG_DIR)libbsqon.a
 
 $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_EXE)libbsqon.a
 	@mkdir -p $(PCKG_DIR)
@@ -79,6 +86,10 @@ $(PCKG_DIR)libbsqon.a: $(BSQON_HEADERS) $(PARSER_HEADERS) $(CFG_HEADERS) $(OUT_E
 $(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)tgen.cpp
 	@mkdir -p $(OUT_EXE)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)tgen.cpp -lbsqon -lbrex -lgmp -lcurl #-lfl, caused build err.
+
+$(OUT_EXE)smtextract: $(SMT_HEADERS) $(OUT_EXE)libbsqon.a $(SMT_DIR)smt_main.cpp #$(SMT_OBJS) $(SMT_SOURCES)
+	@mkdir -p $(OUT_EXE)
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -L$(Z3_PATH) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)smtextract $(SMT_DIR)smt_main.cpp -lbsqon -lbrex -lgmp -lcurl -lz3 #-lfl, caused build err.
 
 $(OUT_OBJ)component.o: $(GEN_HEADERS) $(GEN_SOURCES)
 	@mkdir -p $(OUT_OBJ)
