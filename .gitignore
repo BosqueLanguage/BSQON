@@ -33,7 +33,9 @@
 
 bin/*
 build/output/*
+build/output/obj/*
 build/bsqon/*
+build/bsqon/parser/*
 .vscode/launch.json
 
 # allow bin lib
