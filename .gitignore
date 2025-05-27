@@ -33,6 +33,7 @@
 
 bin/*
 build/output/*
+build/output/obj/*
 build/bsqon/*
 .vscode/launch.json
 
