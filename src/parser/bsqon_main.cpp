@@ -60,7 +60,8 @@ bool processArgs(int argc, char** argv, std::string& metadata, std::string& type
     return true;
 }
 
-std::map<std::string, std::pair<const BSQON_AST_Node*, const uint8_t*>> loadEnvironmentValues(char** envp, std::map<std::string, const BSQON_AST_Node*>& envkeys)
+std::map<std::string, std::pair<const BSQON_AST_Node*, const uint8_t*>> loadEnvironmentValues(
+    char** envp, std::map<std::string, const BSQON_AST_Node*>& envkeys)
 {
     std::map<std::string, std::pair<const BSQON_AST_Node*, const uint8_t*>> envmap;
     for(auto ii = envkeys.cbegin(); ii != envkeys.cend(); ++ii) {
@@ -77,13 +78,11 @@ std::map<std::string, std::pair<const BSQON_AST_Node*, const uint8_t*>> loadEnvi
 
 void loadAssemblyJSONExplicit(const char* filename, json& jv)
 {
-    try
-    {
+    try {
         std::ifstream infile(filename);
         infile >> jv;
     }
-    catch(const std::exception& e)
-    {
+    catch(const std::exception& e) {
         printf("Error parsing JSON: %s\n", e.what());
         exit(1);
     }
@@ -96,14 +95,14 @@ void loadAssemblyJSONImplicit(std::string resolvestr, json& jv)
         loadAssemblyJSONExplicit(filename.c_str(), jv);
     }
     else {
-        //TODO: should handle http: and git as well
+        // TODO: should handle http: and git as well
 
         printf("Unhandled or invalid assembly resolver -- \"%s\"\n", resolvestr.c_str());
         exit(1);
     }
 }
 
-int main(int argc, char** argv, char **envp)
+int main(int argc, char** argv, char** envp)
 {
     std::string metadata, type, data;
     bool loadenv = false;
@@ -111,7 +110,7 @@ int main(int argc, char** argv, char **envp)
         return 1;
     }
 
-    //the property value is the BSQON value (as a JSON string) so parse it
+    // the property value is the BSQON value (as a JSON string) so parse it
     const BSQON_AST_Node* node = argc == 3 ? BSQON_AST_parse_from_stdin() : BSQON_AST_parse_from_file(argv[3]);
     char** errorInfo = (char**)malloc(sizeof(char*) * 128);
     size_t errorInfoCount = BSQON_AST_getErrorInfo(errorInfo);
@@ -125,12 +124,13 @@ int main(int argc, char** argv, char **envp)
         exit(1);
     }
 
-    //parse the JSON 
+    // parse the JSON
     json jv = nullptr;
     auto metainfo = bsqon::Parser::getAssemblyAndType(node);
     if(metainfo.first.has_value()) {
         if(metadata != "<implicit>") {
-            printf("Assembly info specified on BOTH command line and as she-bang in package -- using she-bang version\n");
+            printf(
+                "Assembly info specified on BOTH command line and as she-bang in package -- using she-bang version\n");
         }
 
         loadAssemblyJSONImplicit(metainfo.first.value(), jv);
@@ -144,17 +144,18 @@ int main(int argc, char** argv, char **envp)
         loadAssemblyJSONExplicit(argv[1], jv);
     }
 
-    //the property assembly is the code so load it
+    // the property assembly is the code so load it
     bsqon::AssemblyInfo assembly;
     bsqon::AssemblyInfo::parse(jv, assembly);
 
     bsqon::Parser parser(&assembly);
 
-    //the property loadtype is the type so look it up
+    // the property loadtype is the type so look it up
     const bsqon::Type* loadtype = nullptr;
     if(metainfo.second.has_value()) {
         if(metadata != "<implicit>") {
-            printf("Assembly info specified on BOTH command line and as she-bang in package -- using she-bang version\n");
+            printf(
+                "Assembly info specified on BOTH command line and as she-bang in package -- using she-bang version\n");
         }
 
         loadtype = assembly.lookupTypeKey(metainfo.second.value());
@@ -172,7 +173,7 @@ int main(int argc, char** argv, char **envp)
         printf("Invalid 'loadtype'\n");
         exit(1);
     }
-    
+
     auto ccpos = loadtype->tkey.find("::");
     if(ccpos == std::string::npos) {
         parser.defaultns = "Core";
@@ -181,7 +182,7 @@ int main(int argc, char** argv, char **envp)
         parser.defaultns = loadtype->tkey.substr(0, ccpos);
     }
 
-    //load up any environment variables that we need
+    // load up any environment variables that we need
     auto envkeys = bsqon::Parser::getEnvironmentBindKeys(node);
     auto envmap = loadEnvironmentValues(envp, envkeys);
     for(auto ii = envmap.cbegin(); ii != envmap.cend(); ++ii) {
@@ -192,7 +193,7 @@ int main(int argc, char** argv, char **envp)
         while(envvalue[envlen] != 0) {
             envlen++;
         }
-        
+
         const bsqon::Type* etype = parser.parseType(envtype);
         if(etype->isUnresolved()) {
             printf("Invalid environment type\n");
@@ -214,7 +215,7 @@ int main(int argc, char** argv, char **envp)
         }
     }
 
-    //finally parse the value
+    // finally parse the value
     bsqon::BsqonDecl* res = parser.parseBSQON(metadata, loadtype, node);
 
     if(parser.errors.empty() && errorInfoCount == 0) {
