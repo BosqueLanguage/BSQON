@@ -1,95 +1,99 @@
 #include "smt_utils.h"
 #include <cstddef>
-#include <iterator>
 #include <cstdio>
 #include <string.h>
-#include <regex>
 #include <cstdlib>
 #include <string.h>
 #include <cstring>
 #include <fstream>
-#include <iostream>
 #include <optional>
 #include <string>
 #include <z3_api.h>
 
-void badArgs(const char* msg)
+Result* solveInt(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
 {
-    const char* usage = "USAGE: smtextract <formula.smt2> <assembly.json> <types>\n\nTYPES:\n  --Int\n  --Entity\n";
-    printf("%s\n", usage);
-    printf("%s\n", msg);
-    exit(1);
 }
 
-bool validPath(const char* filepath, const char* extension)
-{
-    char* og;
-    char* tokens;
-    char* track;
-    bool valid = false;
-
-    og = strdup(filepath);
-    track = og;
-
-    while((tokens = strtok_r(track, ".", &track))) {
-        if(strcmp(tokens, extension) == 0) {
-            valid = true;
-        }
-    }
-
-    return valid;
-}
-
-bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
-{
-    std::string og = tk;
-    std::regex bsq_name("::");
-    std::string smt_tk = std::regex_replace(og, bsq_name, "@");
-
-    return bsqon::TypeKey(smt_tk);
-}
-
-std::optional<std::string> solvePrimitive(bsqon::PrimitiveType* bsq_t, z3::solver& s)
+Result* solvePrimitive(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
 {
     auto tk = bsq_t->tkey;
-    if(tk == "Int") {
-        return "GOT INTEGER";
+    if(tk == "Int" || fn.sort.is_int()) {
+        // auto res = solveInt(fn);
     }
-    return std::nullopt;
+    else if(tk == "Bool" || fn.sort.is_bool()) {
+        // auto res = solveBool(fn);
+    }
+    else if(tk == "CString" && fn.sort.is_seq()) {
+        // auto res = solveCString(fn);
+    }
+    else if(tk == "String" && fn.sort.is_seq()) {
+        // auto res = solveString(fn);
+    }
+
+    return NULL;
 }
 
-// Use Type* to find the func_decl in the z3::model.
-std::optional<z3::func_decl> getFuncDecl(bsqon::Type* bsq_t, z3::solver& s)
+z3::expr solveAccessors(SmtFunc acc, size_t total)
 {
-    bsqon::TypeKey smt_tk = bsqonToSmt(bsq_t->tkey);
-    z3::model m = s.get_model();
-    for(size_t i = 0; i < m.num_consts(); i++) {
-        std::string wth = m.get_const_decl(i).range().name().str();
-        if(strcmp(wth.c_str(), smt_tk.c_str()) == 0) {
-            return m.get_const_decl(i);
+    acc.s.push();
+
+    Result* res = solveValue(NULL, acc);
+
+    auto rr = acc.s.check();
+    acc.s.pop();
+    if(rr == z3::sat) {
+    }
+}
+
+Result* solveEntity(bsqon::StdEntityType* bsq_t, SmtFunc fn)
+{
+    //-----------NEW Stack
+    fn.s.push();
+
+    // uint size = fn.sort.constructors().size();
+    z3::func_decl_vector constructs = fn.decl.range().constructors();
+
+    for(size_t i = 0; i < constructs.size(); i++) {
+        z3::func_decl c = constructs[i];
+        z3::expr_vector args(fn.s.ctx());
+        size_t args_len = c.accessors().size();
+
+        for(size_t j = 0; j < args_len; j++) {
+            // Should be z3::expr here.
+            SmtFunc acc = {
+                .s = fn.s,
+                .decl = c, // NOTE: This field is not used in solveValue the next time.
+                .sort = c.domain(j),
+            };
+            z3::expr try_arg = solveAccessors(acc, args_len);
+            args.push_back(try_arg);
         }
+        fn.s.add(c(args));
+        fn.s.add(fn.decl() == c());
     }
-    return std::nullopt;
+
+    z3::check_result rr = fn.s.check();
+    //-----------DEL Stack
+    fn.s.pop();
+
+    if(rr == z3::sat) {
+    }
+    else {
+    }
 }
 
-std::optional<std::string> solveEntity(bsqon::StdEntityType* bsq_t, z3::solver& s)
+Result* solveValue(bsqon::Type* bsq_t, SmtFunc fn)
 {
+    Result* res;
 
-    return std::nullopt;
-}
-
-std::optional<std::string> solveValue(bsqon::Type* bsq_t, z3::solver& s)
-{
-    std::optional<std::string> res;
-
-    if(bsq_t->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
-        res = solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), s);
+    if(isDatatype(bsq_t, fn)) {
+        res = solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), fn);
     }
-    else if(bsq_t->tag == bsqon::TypeTag::TYPE_PRIMITIVE) {
-        res = solvePrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), s);
+    else if(isPrimitive(bsq_t, fn)) {
+        res = solvePrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), fn);
     }
 
-    return std::nullopt;
+    return res;
 }
 
 int main(int argc, char** argv)
@@ -144,24 +148,20 @@ int main(int argc, char** argv)
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // Look for type in assembly.
+    // Find Type in asm_info
     bsqon::Type* bsq_t = asm_info.lookupTypeKey(tar_t);
     if(bsq_t == nullptr) {
         badArgs("Unable to find TypeKey");
     }
-
     // Find for const in smt.
     auto bsq_func = getFuncDecl(bsq_t, s);
-    if(bsq_func.has_value()) {
-        std::cout << bsq_func.value() << "\n";
-    }
+
+    SmtFunc fn = {
+        .s = s,
+        .decl = bsq_func.value(),
+        .sort = bsq_func.value().range(),
+    };
 
     // TODO: Make it return Value*. At the moment just string.
-    auto value = solveValue(bsq_t, s);
-    if(value.has_value()) {
-        std::cout << "GOT VALUE: " << value.value() << "\n";
-    }
-    else {
-        std::cout << "NO VALUE :3" << "\n";
-    }
+    bsqon::Value* value = solveValue(bsq_t, fn);
 };
