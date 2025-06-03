@@ -10,15 +10,36 @@
 #include <string>
 #include <z3_api.h>
 
-Result* solveInt(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
+bsqon::IntNumberValue* solveInt(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
 {
+    std::vector<int> choices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    bsqon::IntNumberValue* res;
+
+    for(int i : choices) {
+        fn.s.push();
+        z3::expr int_tmp = fn.s.ctx().int_val(i);
+
+        fn.s.add(fn.decl() == int_tmp);
+
+        z3::check_result rr = fn.s.check();
+        fn.s.pop();
+
+        if(rr == z3::sat) {
+            res = new bsqon::IntNumberValue();
+            return res;
+        }
+    }
+
+    return NULL;
 }
 
-Result* solvePrimitive(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
+bsqon::Value* solvePrimitive(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
 {
+    bsqon::Value* res;
     auto tk = bsq_t->tkey;
     if(tk == "Int" || fn.sort.is_int()) {
-        // auto res = solveInt(fn);
+        printf("Solving Int\n");
+        res = solveInt(bsq_t, fn);
     }
     else if(tk == "Bool" || fn.sort.is_bool()) {
         // auto res = solveBool(fn);
@@ -33,58 +54,60 @@ Result* solvePrimitive(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
     return NULL;
 }
 
-z3::expr solveAccessors(SmtFunc acc, size_t total)
+bsqon::Value* solveEntity(bsqon::StdEntityType* bsq_t, SmtFunc fn)
 {
-    acc.s.push();
-
-    Result* res = solveValue(NULL, acc);
-
-    auto rr = acc.s.check();
-    acc.s.pop();
-    if(rr == z3::sat) {
-    }
-}
-
-Result* solveEntity(bsqon::StdEntityType* bsq_t, SmtFunc fn)
-{
-    //-----------NEW Stack
+    // TODO: Only handles one constructor at the moment.
     fn.s.push();
 
     // uint size = fn.sort.constructors().size();
     z3::func_decl_vector constructs = fn.decl.range().constructors();
 
-    for(size_t i = 0; i < constructs.size(); i++) {
-        z3::func_decl c = constructs[i];
-        z3::expr_vector args(fn.s.ctx());
-        size_t args_len = c.accessors().size();
+    if(constructs.size() > 1) {
+        // Not Possible
+    }
+    z3::func_decl c = constructs[0];
 
-        for(size_t j = 0; j < args_len; j++) {
-            // Should be z3::expr here.
-            SmtFunc acc = {
-                .s = fn.s,
-                .decl = c, // NOTE: This field is not used in solveValue the next time.
-                .sort = c.domain(j),
-            };
-            z3::expr try_arg = solveAccessors(acc, args_len);
-            args.push_back(try_arg);
-        }
-        fn.s.add(c(args));
-        fn.s.add(fn.decl() == c());
+    z3::expr_vector args(fn.s.ctx());
+    size_t args_len = c.accessors().size();
+    initArgs(args, args_len, c, fn.s);
+
+    for(size_t j = 0; j < args_len; j++) {
+        fn.s.push();
+
+        fn.s.add(args);
+        //  Should be z3::expr here.
+        SmtFunc acc = {
+            .s = fn.s,
+            .decl = c,
+            .sort = c.domain(j),
+        };
+
+        bsqon::EntityTypeFieldEntry* arg_tk = bsq_t->fields[j];
+        std::cout << arg_tk->ftype << "\n";
+
+        bsqon::Value* sat_arg = solveValue(arg_tk, acc);
+        // args[j] = sat_arg.expr;
+        // args[j] = bsqonValueToExpr(try_arg);
+
+        fn.s.pop();
     }
 
+    fn.s.add(fn.decl() == c(args));
     z3::check_result rr = fn.s.check();
-    //-----------DEL Stack
+
     fn.s.pop();
 
     if(rr == z3::sat) {
+        return NULL;
     }
     else {
+        return NULL;
     }
 }
 
-Result* solveValue(bsqon::Type* bsq_t, SmtFunc fn)
+bsqon::Value* solveValue(bsqon::Type* bsq_t, SmtFunc fn)
 {
-    Result* res;
+    bsqon::Value* res;
 
     if(isDatatype(bsq_t, fn)) {
         res = solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), fn);
@@ -138,7 +161,6 @@ int main(int argc, char** argv)
         printf("Error parsing JSON: %s\n", e.what());
         exit(1);
     }
-    bsqon::AssemblyInfo assembly;
     bsqon::AssemblyInfo::parse(jv, asm_info);
 
     // TODO: Check type is passed in correct format of --<TYPE>
@@ -154,14 +176,17 @@ int main(int argc, char** argv)
         badArgs("Unable to find TypeKey");
     }
     // Find for const in smt.
-    auto bsq_func = getFuncDecl(bsq_t, s);
 
-    SmtFunc fn = {
+    auto bsq_func = getFuncDecl(bsq_t, s);
+    ValueSolver sol = {
+        .asm_info = asm_info,
         .s = s,
         .decl = bsq_func.value(),
         .sort = bsq_func.value().range(),
     };
 
-    // TODO: Make it return Value*. At the moment just string.
-    bsqon::Value* value = solveValue(bsq_t, fn);
+    // TODO: Should assert that result here should be value.
+    // bsqon::Value* value =
+    solveValue(bsq_t, fn);
+    // std::cout << value->val->toString() << "\n";
 };
