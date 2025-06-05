@@ -65,10 +65,11 @@ GEN_HEADERS=$(GEN_DIR)component.h $(GEN_DIR)generator_rnd.h $(GEN_DIR)/generator
 GEN_SOURCES=$(GEN_DIR)component.cpp $(GEN_DIR)generator_rnd.cpp $(GEN_DIR)/generator_ai.cpp
 GEN_OBJS=$(OUT_OBJ)component.o $(OUT_OBJ)generator_rnd.o $(OUT_OBJ)generator_ai.o
 
-SMT_HEADERS=$(SMT_DIR)smt_utils.h
-SMT_SOURCES=$(SMT_DIR)smt_utils.cpp
+SMT_HEADERS=$(SMT_DIR)smt_utils.h $(SMT_DIR)smt_extract.h
+SMT_SOURCES=$(SMT_DIR)smt_utils.cpp $(SMT_DIR)smt_extract.cpp
 # SMT_OBJS=$(OUT_OBJ)
 
+SMT_TEST_SOURCES= $(BSQON_TEST_DIR)test_driver.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)main.cpp 
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
 MAKEFLAGS += -j4
@@ -154,15 +155,16 @@ $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	flex --warn -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
 
-smt_test_files:
+smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)test_driver.h $(SMT_TEST_SOURCES)
 	@rm -rf $(BIN_DIR)
 	@mkdir -p $(BIN_DIR)
+	cp -r $(SMT_TEST_DIR)asm_meta $(BIN_DIR)asm_meta
 	cp -r $(SMT_TEST_DIR)asm_meta/smt/ $(BIN_DIR)asm_meta/smt/
 	cp -r $(SMT_TEST_DIR)smtextract/ $(BIN_DIR)smtextract/
-	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)smtextract_test $(SMT_TEST_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -lfl -lgmp -lboost_unit_test_framework
+	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)smtextract_test $(SMT_TEST_SOURCES) $(SMT_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -lgmp -lz3 -lboost_unit_test_framework #-lfl
 
 test_smt: smt_test_files
-	$(BIN_DIR)smtextract_test --report_level=short --color_ouput
+	$(BIN_DIR)smtextract_test --report_level=short --color_output
 
 testfiles: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)test_driver.h $(BSQON_TEST_SOURCES)
 	@rm -rf $(BIN_DIR)

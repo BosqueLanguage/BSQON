@@ -2,40 +2,19 @@
 
 #include "../test_driver.h"
 
-#define TEST_IT(TYPE, BSQ)                                                                                             \
+#define TEST_IT(TYPE, SMT, BSQ, EXPECT)                                                                                \
     {                                                                                                                  \
         std::u8string result;                                                                                          \
-        std::u8string expected;                                                                                        \
-        tround(createMetaPathName("datatype"), TYPE, createBSQONPathName("datatype", BSQ), expected, result);          \
+        std::u8string expected = EXPECT;                                                                               \
+        smt_tround(createSmtPathName("smt_dt"), createSmtBSQONPathName("smt_dt"), TYPE, result);                       \
         checkAndReport(result, expected);                                                                              \
     }
 
 BOOST_AUTO_TEST_SUITE(DataType)
 
-////
-// BaseOps
-BOOST_AUTO_TEST_SUITE(BaseOps)
-BOOST_AUTO_TEST_CASE(bar_direct)
+BOOST_AUTO_TEST_CASE(int_entity)
 {
-    TEST_IT("Main::Bar", "datatype_bar.bsqon");
+    TEST_IT("--Main::Foo", "smt_dt.smt2", "smt_dt.json", u8"Main::Foo{0i, 0i}");
 }
-BOOST_AUTO_TEST_CASE(baz_direct)
-{
-    TEST_IT("Main::Baz", "datatype_baz.bsqon");
-}
-BOOST_AUTO_TEST_SUITE_END() // BaseOps
-
-////
-// Foo
-BOOST_AUTO_TEST_SUITE(Foo)
-BOOST_AUTO_TEST_CASE(bar_general)
-{
-    TEST_IT("Main::Foo", "datatype_bar.bsqon");
-}
-BOOST_AUTO_TEST_CASE(baz_general)
-{
-    TEST_IT("Main::Foo", "datatype_baz.bsqon");
-}
-BOOST_AUTO_TEST_SUITE_END() // Foo
 
 BOOST_AUTO_TEST_SUITE_END() // DataType
