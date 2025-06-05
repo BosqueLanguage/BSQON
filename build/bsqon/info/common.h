@@ -9,7 +9,7 @@
 #include <set>
 #include <vector>
 
-#include "json.hpp"
+#include "../build/include/json/json.hpp"
 typedef nlohmann::json json;
 
 #include "../build/include/brex/regex/brex.h"
