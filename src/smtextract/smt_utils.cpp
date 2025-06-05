@@ -53,54 +53,28 @@ std::optional<z3::func_decl> getFuncDecl(bsqon::Type* bsq_t, z3::solver& s)
     return std::nullopt;
 }
 
-bool isDatatype(bsqon::Type* bsq_t, SmtFunc fn)
-{
-    if(bsq_t != NULL) {
-        if(bsq_t->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
-            return true;
-        }
-    }
-    else {
-        if(fn.decl().is_datatype()) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool isPrimitive(bsqon::Type* bsq_t, SmtFunc fn)
-{
-    if(bsq_t != NULL) {
-        if(bsq_t->tag == bsqon::TypeTag::TYPE_PRIMITIVE) {
-            return true;
-        }
-    }
-    else {
-        if(fn.sort.is_seq()) {
-            return true;
-        }
-        else if(fn.sort.is_bool()) {
-            return true;
-        }
-        else if(fn.sort.is_int()) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 // Fills function args with constants of their respective sorts.
 void initArgs(z3::expr_vector& args, size_t args_len, z3::func_decl f, z3::solver& s)
 {
     for(size_t i = 0; i < args_len; i++) {
         std::string sym = "arg_tmp" + std::to_string(i);
 
-        z3::sort arg_t = f.accessors()[i].range();
+        z3::sort arg_t = f.domain(i);
         z3::symbol arg_sym = s.ctx().str_symbol(sym.c_str());
 
         z3::expr arg_tmp = s.ctx().constant(arg_sym, arg_t);
         args.push_back(arg_tmp);
     }
+}
+
+z3::expr ValueSolver::getExprFromVal(bsqon::Value* v)
+{
+
+    auto vk = v->kind;
+    if(vk == bsqon::ValueKind::IntNumberValueKind) {
+        bsqon::IntNumberValue* nv = static_cast<bsqon::IntNumberValue*>(v);
+        return this->s.ctx().int_val(nv->cnv);
+    }
+
+    return this->s.ctx().int_val(9999);
 }

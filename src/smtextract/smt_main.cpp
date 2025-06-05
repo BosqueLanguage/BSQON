@@ -6,26 +6,31 @@
 #include <string.h>
 #include <cstring>
 #include <fstream>
-#include <optional>
 #include <string>
+#include <vector>
 #include <z3_api.h>
 
-bsqon::IntNumberValue* solveInt(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
+bsqon::IntNumberValue* ValueSolver::solveInt(const bsqon::PrimitiveType* bsq_t, z3::func_decl fn)
 {
     std::vector<int> choices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     bsqon::IntNumberValue* res;
 
-    for(int i : choices) {
-        fn.s.push();
-        z3::expr int_tmp = fn.s.ctx().int_val(i);
+    z3::expr_vector args(this->s.ctx());
+    // NOTE:We do not care about the input just the ouput for here.
+    initArgs(args, fn.arity(), fn, this->s);
 
-        fn.s.add(fn.decl() == int_tmp);
+    for(size_t i = 0; i < choices.size(); i++) {
+        this->s.push();
+        z3::expr int_tmp = this->s.ctx().int_val(i);
 
-        z3::check_result rr = fn.s.check();
-        fn.s.pop();
+        this->s.add(fn(args) == int_tmp);
 
+        z3::check_result rr = this->s.check();
+        this->s.pop();
+
+        // TODO: Suspicious unsat ...
         if(rr == z3::sat) {
-            res = new bsqon::IntNumberValue();
+            res = new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, int64_t(i));
             return res;
         }
     }
@@ -33,90 +38,103 @@ bsqon::IntNumberValue* solveInt(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
     return NULL;
 }
 
-bsqon::Value* solvePrimitive(bsqon::PrimitiveType* bsq_t, SmtFunc fn)
+bsqon::Value* ValueSolver::solvePrimitive(bsqon::PrimitiveType* bsq_t, z3::func_decl fn)
 {
-    bsqon::Value* res;
     auto tk = bsq_t->tkey;
-    if(tk == "Int" || fn.sort.is_int()) {
-        printf("Solving Int\n");
-        res = solveInt(bsq_t, fn);
+    if(tk == "Int") {
+        // printf("Solving Int\n");
+        return solveInt(bsq_t, fn);
     }
-    else if(tk == "Bool" || fn.sort.is_bool()) {
-        // auto res = solveBool(fn);
+    else if(tk == "Bool") {
+        printf("Solving Bool\n");
+        // res = solveBool(fn);
     }
-    else if(tk == "CString" && fn.sort.is_seq()) {
-        // auto res = solveCString(fn);
+    else if(tk == "CString") {
+        printf("Solving CString\n");
+        // return  solveCString(fn);
     }
-    else if(tk == "String" && fn.sort.is_seq()) {
-        // auto res = solveString(fn);
+    else if(tk == "String") {
+        printf("Solving String\n");
+        // return solveString(fn);
     }
 
     return NULL;
 }
 
-bsqon::Value* solveEntity(bsqon::StdEntityType* bsq_t, SmtFunc fn)
+bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::func_decl fn)
 {
-    // TODO: Only handles one constructor at the moment.
-    fn.s.push();
 
-    // uint size = fn.sort.constructors().size();
-    z3::func_decl_vector constructs = fn.decl.range().constructors();
-
+    z3::func_decl_vector constructs = fn.range().constructors();
     if(constructs.size() > 1) {
-        // Not Possible
+        printf("Something really bad happened in Bosque\n");
+        exit(1);
     }
+
     z3::func_decl c = constructs[0];
+    z3::func_decl_vector c_accs = c.accessors();
 
-    z3::expr_vector args(fn.s.ctx());
+    z3::expr_vector args(this->s.ctx());
     size_t args_len = c.accessors().size();
-    initArgs(args, args_len, c, fn.s);
+    // const std::vector<Value*>&& fieldvalues
 
+    std::vector<bsqon::Value*> fieldvalues;
+
+    this->s.push();
     for(size_t j = 0; j < args_len; j++) {
-        fn.s.push();
 
-        fn.s.add(args);
-        //  Should be z3::expr here.
-        SmtFunc acc = {
-            .s = fn.s,
-            .decl = c,
-            .sort = c.domain(j),
-        };
+        bsqon::EntityTypeFieldEntry arg_tk = bsq_t->fields[j];
 
-        bsqon::EntityTypeFieldEntry* arg_tk = bsq_t->fields[j];
-        std::cout << arg_tk->ftype << "\n";
+        bsqon::Type* arg_t = this->asm_info->lookupTypeKey(arg_tk.ftype);
 
-        bsqon::Value* sat_arg = solveValue(arg_tk, acc);
-        // args[j] = sat_arg.expr;
-        // args[j] = bsqonValueToExpr(try_arg);
+        bsqon::Value* arg_val = this->solveValue(arg_t, c_accs[j]);
+        if(arg_val == NULL) {
+            printf("GOT NULL: From solveInt");
+            exit(1);
+        }
 
-        fn.s.pop();
+        z3::expr arg_expr = getExprFromVal(arg_val);
+        // this->s.add(c_accs[j] == sat_expr);
+        args.push_back(arg_expr);
+        fieldvalues.push_back(arg_val);
     }
+    this->s.pop();
 
-    fn.s.add(fn.decl() == c(args));
-    z3::check_result rr = fn.s.check();
-
-    fn.s.pop();
+    this->s.add(fn() == c(args));
+    z3::check_result rr = this->s.check();
 
     if(rr == z3::sat) {
-        return NULL;
+        return new bsqon::EntityValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, std::move(fieldvalues));
     }
     else {
         return NULL;
     }
 }
 
-bsqon::Value* solveValue(bsqon::Type* bsq_t, SmtFunc fn)
+bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::func_decl fn)
 {
     bsqon::Value* res;
 
-    if(isDatatype(bsq_t, fn)) {
+    if(bsq_t->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
         res = solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), fn);
     }
-    else if(isPrimitive(bsq_t, fn)) {
+    else if(bsq_t->tag == bsqon::TypeTag::TYPE_PRIMITIVE) {
         res = solvePrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), fn);
     }
 
     return res;
+}
+
+ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& solver)
+    : asm_info(asm_info), bsq_t(bsq_t), s(solver), fn([&]() {
+          auto tmp = getFuncDecl(bsq_t, solver);
+          if(!tmp.has_value()) {
+              printf("Function Declaration not found with provided bosque type\n");
+              exit(1);
+          }
+          return tmp.value();
+      }())
+{
+    ;
 }
 
 int main(int argc, char** argv)
@@ -175,18 +193,13 @@ int main(int argc, char** argv)
     if(bsq_t == nullptr) {
         badArgs("Unable to find TypeKey");
     }
-    // Find for const in smt.
 
-    auto bsq_func = getFuncDecl(bsq_t, s);
-    ValueSolver sol = {
-        .asm_info = asm_info,
-        .s = s,
-        .decl = bsq_func.value(),
-        .sort = bsq_func.value().range(),
-    };
-
-    // TODO: Should assert that result here should be value.
-    // bsqon::Value* value =
-    solveValue(bsq_t, fn);
-    // std::cout << value->val->toString() << "\n";
+    ValueSolver sol(&asm_info, bsq_t, s);
+    bsqon::Value* result = sol.solveValue(sol.bsq_t, sol.fn);
+    if(result == NULL) {
+        printf("GOT NULL: From first call of solveValue.\n");
+        exit(1);
+    }
+    std::u8string rstr = result->toString();
+    printf("%s\n", (const char*)rstr.c_str());
 };
