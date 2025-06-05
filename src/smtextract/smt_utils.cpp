@@ -1,8 +1,6 @@
 #include "smt_utils.h"
 #include "smt_extract.h"
-#include <iterator>
 #include <regex>
-#include <iostream>
 
 void badArgs(const char* msg)
 {
