@@ -6,8 +6,7 @@
 
 void checkAndReport(const std::u8string& result, const std::u8string& expected);
 
-std::string createMetaPathName(std::string tcc);
-std::string createBSQONPathName(std::string tcc, std::string bsq);
+std::string createSmtPathName(std::string tcc);
+std::string createSmtBSQONPathName(std::string tcc);
 
-void tround(std::string metafile, const char* type, std::string datafile, std::u8string& contents,
-            std::u8string& result);
+void smt_tround(std::string smt_in, std::string meta_file, const char* t_in, std::u8string& result);

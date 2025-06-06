@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
-#include "../test_driver.h"
+#include "../smt_test_driver.h"
 
 #define TEST_IT(TYPE, SMT, BSQON, EXPECT)                                                                              \
     {                                                                                                                  \

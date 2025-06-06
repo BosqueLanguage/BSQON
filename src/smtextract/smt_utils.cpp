@@ -44,7 +44,6 @@ std::optional<z3::func_decl> getFuncDecl(bsqon::Type* bsq_t, z3::solver& s)
 {
     bsqon::TypeKey smt_tk = bsqonToSmt(bsq_t->tkey);
     z3::model m = s.get_model();
-    std::cout << m << "\n";
     for(size_t i = 0; i < m.num_consts(); i++) {
         std::string const_name = m.get_const_decl(i).range().name().str();
         std::cout << "Comparing.. " << smt_tk << " with... " << const_name << "\n";

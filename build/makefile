@@ -69,7 +69,7 @@ SMT_HEADERS=$(SMT_DIR)smt_utils.h $(SMT_DIR)smt_extract.h
 SMT_SOURCES=$(SMT_DIR)smt_utils.cpp $(SMT_DIR)smt_extract.cpp
 # SMT_OBJS=$(OUT_OBJ)smt_utils.o	$(OUT_OBJ)smt_extract.o
 
-SMT_TEST_SOURCES= $(BSQON_TEST_DIR)test_driver.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)main.cpp 
+SMT_TEST_SOURCES= $(BSQON_TEST_DIR)smt_test_driver.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)main.cpp 
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
 MAKEFLAGS += -j4
@@ -155,7 +155,7 @@ $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	flex --warn -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
 
-smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)test_driver.h $(SMT_TEST_SOURCES)
+smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)smt_test_driver.h $(SMT_TEST_SOURCES)
 	@rm -rf $(BIN_DIR)
 	@mkdir -p $(BIN_DIR)
 	cp -r $(SMT_TEST_DIR)asm_meta $(BIN_DIR)asm_meta
