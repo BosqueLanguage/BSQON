@@ -67,7 +67,7 @@ GEN_OBJS=$(OUT_OBJ)component.o $(OUT_OBJ)generator_rnd.o $(OUT_OBJ)generator_ai.
 
 SMT_HEADERS=$(SMT_DIR)smt_utils.h $(SMT_DIR)smt_extract.h
 SMT_SOURCES=$(SMT_DIR)smt_utils.cpp $(SMT_DIR)smt_extract.cpp
-# SMT_OBJS=$(OUT_OBJ)
+# SMT_OBJS=$(OUT_OBJ)smt_utils.o	$(OUT_OBJ)smt_extract.o
 
 SMT_TEST_SOURCES= $(BSQON_TEST_DIR)test_driver.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)main.cpp 
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
@@ -91,7 +91,7 @@ $(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)tgen.c
 	@mkdir -p $(OUT_EXE)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)tgen.cpp -lbsqon -lbrex -lgmp -lcurl #-lfl, caused build err.
 
-$(OUT_EXE)smtextract: $(SMT_HEADERS) $(OUT_EXE)libbsqon.a $(SMT_DIR)smt_main.cpp #$(SMT_OBJS)
+$(OUT_EXE)smtextract: $(SMT_HEADERS) $(OUT_EXE)libbsqon.a $(SMT_DIR)smt_main.cpp $(SMT_SOURCES)
 	@mkdir -p $(OUT_EXE)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -L$(Z3_PATH) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)smtextract  $(SMT_SOURCES) $(SMT_DIR)smt_main.cpp -lbsqon -lbrex -lgmp -lcurl -lz3 #-lfl, caused build err.
 

@@ -1,4 +1,5 @@
 #include "smt_utils.h"
+#include "smt_extract.h"
 #include <cstddef>
 #include <cstdio>
 #include <string.h>

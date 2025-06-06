@@ -19,6 +19,7 @@ class ValueSolver
     bool isDatatype(bsqon::Type* bsq_t, z3::func_decl fn);
     bool isPrimitive(bsqon::Type* bsq_t, z3::func_decl fn);
 
+    // bsqon::CStringValue* solveCString(const bsqon::PrimitiveType* bsq_t, z3::func_decl fn);
     bsqon::IntNumberValue* solveInt(const bsqon::PrimitiveType* bsq_t, z3::func_decl fn);
     bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::func_decl fn);
     bsqon::Value* solveEntity(bsqon::StdEntityType* t, z3::func_decl fn);

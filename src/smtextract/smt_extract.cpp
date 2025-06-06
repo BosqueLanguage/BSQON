@@ -19,7 +19,6 @@ bsqon::IntNumberValue* ValueSolver::solveInt(const bsqon::PrimitiveType* bsq_t, 
         z3::check_result rr = this->s.check();
         this->s.pop();
 
-        // TODO: Suspicious unsat ...
         if(rr == z3::sat) {
             res = new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, int64_t(i));
             return res;
@@ -119,7 +118,7 @@ ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::
     : asm_info(asm_info), bsq_t(bsq_t), s(solver), fn([&]() {
           auto tmp = getFuncDecl(bsq_t, solver);
           if(!tmp.has_value()) {
-              printf("Function Declaration not found with provided bosque type\n");
+              std::cout << "Provided type " << bsq_t->tkey << " not found in .smt2 file" << "\n";
               exit(1);
           }
           return tmp.value();
