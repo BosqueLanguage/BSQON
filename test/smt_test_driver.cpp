@@ -1,24 +1,35 @@
-#include "smt_utils.h"
-#include "smt_extract.h"
-#include <cstddef>
-#include <cstdio>
-#include <string.h>
-#include <cstdlib>
-#include <string.h>
-#include <cstring>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <z3_api.h>
+#include "test_driver.h"
 
-int main(int argc, char** argv)
+#include <fstream>
+
+#ifndef TEST_PATH
+#define TEST_PATH "./"
+#endif
+
+void checkAndReport(const std::u8string& result, const std::u8string& expected)
 {
-    if(argc != 4) {
-        badArgs("");
+    if(result != expected) {
+        std::cout << "Expected: " << std::string(expected.cbegin(), expected.cend()) << std::endl;
+        std::cout << "Got: " << std::string(result.cbegin(), result.cend()) << std::endl;
     }
 
+    BOOST_ASSERT(result == expected);
+}
+
+std::string createSmtPathName(std::string tcc)
+{
+    return std::string(TEST_PATH) + "asm_meta/smt/" + tcc + ".smt2";
+}
+
+std::string createSmtBSQONPathName(std::string tcc)
+{
+    return std::string(TEST_PATH) + "asm_meta/smt/" + tcc + ".json";
+}
+
+void smt_tround(std::string smt_in, std::string meta_file, const char* t_in, std::u8string& result)
+{
     // BSQ SMT INIT
-    const char* smt_path = argv[1];
+    const char* smt_path = smt_in.c_str();
     if(validPath(smt_path, "smt2") == false) {
         badArgs("Incorrect .smt2 file");
     }
@@ -36,7 +47,7 @@ int main(int argc, char** argv)
     }
 
     // BSQ ASSEMBLY INIT
-    const char* asm_path = argv[2];
+    const char* asm_path = meta_file.c_str();
     if(validPath(asm_path, "json") == false) {
         badArgs("Incorrect .json file");
     }
@@ -56,7 +67,7 @@ int main(int argc, char** argv)
     bsqon::AssemblyInfo::parse(jv, asm_info);
 
     // TODO: Check type is passed in correct format of --<TYPE>
-    const char* tar_t = argv[3] + 2; /*Just move ptr to get past '--'.*/
+    const char* tar_t = t_in + 2; /*Just move ptr to get past '--'.*/
     if(!(tar_t[0] >= 'A' || tar_t[0] <= 'Z')) {
         badArgs("Incorrect Type format.");
     }
@@ -69,11 +80,13 @@ int main(int argc, char** argv)
     }
 
     ValueSolver sol(&asm_info, bsq_t, s);
-    bsqon::Value* result = sol.solveValue(sol.bsq_t, sol.fn);
-    if(result == NULL) {
+    bsqon::Value* res = sol.solveValue(sol.bsq_t, sol.fn);
+    if(res == NULL) {
         printf("GOT NULL: From first call of solveValue.\n");
         exit(1);
     }
-    std::u8string rstr = result->toString();
-    printf("%s\n", (const char*)rstr.c_str());
-};
+    std::u8string rstr = res->toString();
+    // printf("%s\n", (const char*)rstr.c_str());
+    result = rstr;
+    return;
+}
