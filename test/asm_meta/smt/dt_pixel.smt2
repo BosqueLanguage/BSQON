@@ -8,6 +8,17 @@
     (@Result-ok (@Result-value T))
 )))
 
+(declare-datatypes (
+    (@EList-2 2)
+    (@EList-3 3)
+    (@EList-4 4)
+    ) (
+        (par (T1 T2) ((@EList-2-mk (_1 T1) (_2 T2))) )
+        (par (T1 T2 T3) ((@EList-3-mk (_1 T1) (_2 T2) (_3 T3))) )
+        (par (T1 T2 T3 T4) ((@EList-4-mk (_1 T1) (_2 T2) (_3 T3) (_4 T4))) )
+    )
+)
+
 ;;
 ;; Primitive datatypes 
 ;;
@@ -30,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Foo 0)
+    (Main@Pixel 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Foo-mk (Main@Foo-x Int) (Main@Foo-y Int)))
+        ((Main@Pixel-mk (Main@Pixel-r Int) (Main@Pixel-g Int) (Main@Pixel-b Int) (Main@Pixel-a Int)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -59,30 +70,33 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((f Main@Foo)) (@Result Int)
-    (let ((k (+ (Main@Foo-x f) (Main@Foo-y f))))
-        (ite (not (> k (Main@Foo-x f))) (as @Result-err-other (@Result Int))
-            (@Result-ok k)
+(define-fun Main@main ((p Main@Pixel)) (@Result Bool)
+    (let ((base (+ (Main@Pixel-r p) (Main@Pixel-b p))))
+        (ite (not (> base 255)) (as @Result-err-other (@Result Bool))
+            (ite (not (= (Main@Pixel-r p) (Main@Pixel-b p))) (as @Result-err-other (@Result Bool))
+                (ite (not (= (Main@Pixel-g p) 0)) (as @Result-err-other (@Result Bool))
+                    (ite (not (= (Main@Pixel-a p) 0)) (as @Result-err-other (@Result Bool))
+                        (@Result-ok true)
+                    )
+                )
+            )
         )
     )
 )
 
 (assert (= Int@zero-cc-temp (@Result-ok 0)))
-(assert ((_ is @Result-ok) Int@zero-cc-temp))
+(assert (is-@Result-ok Int@zero-cc-temp))
 (assert (= Int@zero (@Result-value Int@zero-cc-temp)))
 (assert (= Int@one-cc-temp (@Result-ok 1)))
-(assert ((_ is @Result-ok) Int@one-cc-temp))
+(assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;Above is SMTLIB code generated from the Bosque Code
-;;Below is the setup for checking for an error -- if we can trigger 
-;;then error then the entire formula is satisfiable and we want get the value 
-;;for the argument "f"
+(declare-const pix Main@Pixel)
+(declare-const res (@Result Bool))
+(assert (= res (Main@main pix)))
 
-(declare-const f Main@Foo)
-(declare-const res (@Result Int))
-(assert (= res (Main@main f)))
+;;(assert (= res @Result-err-other))
+(assert (= res (as @Result-err-other (@Result Bool))))
 
-(assert (= res @Result-err-other))

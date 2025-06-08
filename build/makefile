@@ -155,7 +155,7 @@ $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	flex --warn -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
 
-smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)smt_test_driver.h $(SMT_TEST_SOURCES)
+smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)smt_test_driver.h $(SMT_TEST_SOURCES) $(SMT_SOURCES)
 	@rm -rf $(BIN_DIR)
 	@mkdir -p $(BIN_DIR)
 	cp -r $(SMT_TEST_DIR)asm_meta $(BIN_DIR)asm_meta

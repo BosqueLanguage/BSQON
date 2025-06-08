@@ -53,6 +53,8 @@ bsqon::Value* ValueSolver::solvePrimitive(bsqon::PrimitiveType* bsq_t, z3::func_
 
 bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::func_decl fn)
 {
+    // HACK
+    std::cout << this->s.get_model() << "\n";
 
     z3::func_decl_vector constructs = fn.range().constructors();
     if(constructs.size() > 1) {

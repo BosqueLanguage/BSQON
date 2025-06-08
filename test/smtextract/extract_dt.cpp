@@ -16,9 +16,9 @@ BOOST_AUTO_TEST_CASE(int_entity)
 {
     TEST_IT("--Main::Foo", "dt_int", "dt_int", u8"Main::Foo{0i, 0i}");
 }
-// BOOST_AUTO_TEST_CASE(Cstr_entity)
-// {
-//     TEST_IT("--Main::Bar", "smt_dt_Cstr", "smt_dt_Cstr", u8"Main::Bar{Manchester}");
-// }
+BOOST_AUTO_TEST_CASE(pixel_entity)
+{
+    TEST_IT("--Main::Pixel", "dt_pixel", "dt_pixel", u8"Main::Pixel{255i,255i,0i,255i}");
+}
 
 BOOST_AUTO_TEST_SUITE_END() // DataType

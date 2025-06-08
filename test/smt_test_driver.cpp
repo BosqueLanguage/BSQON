@@ -1,4 +1,4 @@
-#include "test_driver.h"
+#include "smt_test_driver.h"
 
 #include <fstream>
 

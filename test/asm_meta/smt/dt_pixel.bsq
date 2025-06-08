@@ -1,0 +1,22 @@
+declare namespace Main;
+
+entity Pixel {
+    field r: Int;
+    field g: Int;
+    field b: Int;
+    field a: Int;
+}
+
+
+public function main(p: Pixel): Bool { 
+	let base = p.r + p.b;
+	assert base > 255i;
+	
+	assert p.r == p.b;
+	assert p.g == 0i;
+	assert p.a == 0i;
+
+	return true;
+}
+
+
