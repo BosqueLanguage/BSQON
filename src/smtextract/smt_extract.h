@@ -5,6 +5,9 @@
 #include "../info/bsqon.h"
 #include <cstdio>
 
+#define BSQ_INT_MIN -500
+#define BSQ_INT_MAX 500
+
 class ValueSolver
 {
   public:
@@ -20,8 +23,8 @@ class ValueSolver
     bool isPrimitive(bsqon::Type* bsq_t, z3::func_decl fn);
 
     // bsqon::CStringValue* solveCString(const bsqon::PrimitiveType* bsq_t, z3::func_decl fn);
-    bsqon::IntNumberValue* solveInt(const bsqon::PrimitiveType* bsq_t, z3::func_decl fn);
-    bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::func_decl fn);
-    bsqon::Value* solveEntity(bsqon::StdEntityType* t, z3::func_decl fn);
-    bsqon::Value* solveValue(bsqon::Type* t, z3::func_decl fn);
+    bsqon::Value* solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
+    bsqon::Value* solveEntity(bsqon::StdEntityType* t, z3::expr ex);
+    bsqon::Value* solveValue(bsqon::Type* t, z3::expr ex);
 };

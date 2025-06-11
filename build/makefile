@@ -21,7 +21,7 @@ Z3_PATH=$(BUILD_DIR)include/z3/
 LIB_PATH=$(OUT_EXE)
 
 SMT_TEST_DIR=$(MAKE_PATH)/../test/
-SMT_TEST_SRC_DIR=$(SMT_TEST_DIR)smtextract/
+SMT_TEST_SRC_DIR=$(SMT_TEST_DIR)smt_utests/
 
 BSQON_TEST_DIR=$(MAKE_PATH)/../test/
 BSQON_TEST_SRC_DIR=$(BSQON_TEST_DIR)utests/
@@ -160,7 +160,7 @@ smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TE
 	@mkdir -p $(BIN_DIR)
 	cp -r $(SMT_TEST_DIR)asm_meta $(BIN_DIR)asm_meta
 	cp -r $(SMT_TEST_DIR)asm_meta/smt/ $(BIN_DIR)asm_meta/smt/
-	cp -r $(SMT_TEST_DIR)smtextract/ $(BIN_DIR)smtextract/
+	cp -r $(SMT_TEST_DIR)smt_utests/ $(BIN_DIR)smt_utests/
 	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)smtextract_test $(SMT_TEST_SOURCES) $(SMT_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -lgmp -lz3 -lboost_unit_test_framework #-lfl
 
 test_smt: smt_test_files

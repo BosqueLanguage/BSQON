@@ -61,27 +61,21 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-;;NLA options
-(declare-fun @NLA_I_mult (Int Int) Int)
-(declare-fun @NLA_I_div (Int Int) Int)
-
 (declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
 (declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((p Main@Pixel)) (@Result Bool)
-    (let ((base (+ (Main@Pixel-r p) (Main@Pixel-b p))))
-        (ite (not (> base 255)) (as @Result-err-other (@Result Bool))
-            (ite (not (= (Main@Pixel-r p) (Main@Pixel-b p))) (as @Result-err-other (@Result Bool))
-                (ite (not (= (Main@Pixel-g p) 0)) (as @Result-err-other (@Result Bool))
-                    (ite (not (= (Main@Pixel-a p) 0)) (as @Result-err-other (@Result Bool))
-                        (@Result-ok true)
-                    )
-                )
-            )
+(define-fun Main@main ((pix Main@Pixel)) (@Result Int)
+    (let ((red 255))
+    (let ((green 0))
+    (let ((blue red))
+    (let ((alpha 255))
+    (let ((px (Main@Pixel-mk red green blue alpha)))
+        (ite (not (not (= (Main@Pixel-r px) (Main@Pixel-b pix)))) (as @Result-err-other (@Result Int))
+            (@Result-ok (Main@Pixel-r px))
         )
-    )
+    )))))
 )
 
 (assert (= Int@zero-cc-temp (@Result-ok 0)))
@@ -93,10 +87,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(declare-const pix Main@Pixel)
-(declare-const res (@Result Bool))
-(assert (= res (Main@main pix)))
+(declare-const pixel Main@Pixel)
+(declare-const res (@Result Int))
+(assert (= res (Main@main pixel)))
 
-;;(assert (= res @Result-err-other))
-(assert (= res (as @Result-err-other (@Result Bool))))
+(assert (= res @Result-err-other))
+
+(check-sat)
+(get-model)
 

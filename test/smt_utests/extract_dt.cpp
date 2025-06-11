@@ -12,13 +12,19 @@
 
 BOOST_AUTO_TEST_SUITE(DataType)
 
+// BOOST_AUTO_TEST_CASE(CString_primitive)
+// {
+//     TEST_IT("--CString", "prim_CString", "prim_CString", u8"Manchester");
+// }
+
 BOOST_AUTO_TEST_CASE(int_entity)
 {
     TEST_IT("--Main::Foo", "dt_int", "dt_int", u8"Main::Foo{0i, 0i}");
 }
+
 BOOST_AUTO_TEST_CASE(pixel_entity)
 {
-    TEST_IT("--Main::Pixel", "dt_pixel", "dt_pixel", u8"Main::Pixel{255i,255i,0i,255i}");
+    TEST_IT("--Main::Pixel", "dt_pixel", "dt_pixel", u8"Main::Pixel{0i, 0i, 255i, 0i}");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // DataType

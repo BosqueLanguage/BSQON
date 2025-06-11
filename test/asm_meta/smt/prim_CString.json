@@ -5,12 +5,7 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": [
-                [
-                    "Pixel",
-                    "Main::Pixel"
-                ]
-            ]
+            "types": []
         },
         {
             "istoplevel": true,
@@ -84,41 +79,13 @@
                     "Bool"
                 ],
                 [
-                    "Int",
-                    "Int"
+                    "CString",
+                    "CString"
                 ]
             ]
         }
     ],
     "typerefs": [
-        {
-            "tag": "StdEntity",
-            "fields": [
-                {
-                    "fname": "r",
-                    "ftype": "Int",
-                    "isoptional": false
-                },
-                {
-                    "fname": "g",
-                    "ftype": "Int",
-                    "isoptional": false
-                },
-                {
-                    "fname": "b",
-                    "ftype": "Int",
-                    "isoptional": false
-                },
-                {
-                    "fname": "a",
-                    "ftype": "Int",
-                    "isoptional": false
-                }
-            ],
-            "hasvalidations": false,
-            "tkey": "Main::Pixel",
-            "name": "Pixel"
-        },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
@@ -138,10 +105,10 @@
         {
             "tag": "PrimitiveEntity",
             "attributes": {
-                "docstring": "%** Primitive integer value. **%"
+                "docstring": "%** Primitive string value. **%"
             },
-            "tkey": "Int",
-            "name": "Int"
+            "tkey": "CString",
+            "name": "CString"
         }
     ],
     "recursiveSets": [],

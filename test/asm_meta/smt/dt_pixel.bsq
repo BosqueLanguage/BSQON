@@ -8,15 +8,17 @@ entity Pixel {
 }
 
 
-public function main(p: Pixel): Bool { 
-	let base = p.r + p.b;
-	assert base > 255i;
-	
-	assert p.r == p.b;
-	assert p.g == 0i;
-	assert p.a == 0i;
+public function main(pix: Pixel): Int { 
+	let red = 255i;
+	let green = 0i;
+	let blue = red;
+	let alpha = 255i;
 
-	return true;
+	let px = Pixel{red,green,blue,alpha};
+
+	assert px.r !== pix.b;
+
+	return px.r;
 }
 
 

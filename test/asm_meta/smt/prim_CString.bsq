@@ -1,0 +1,11 @@
+declare namespace Main;
+
+const s:CString = 'Manchester';
+
+public function main(s: CString): CString { 
+	let t:CString = 'Manchester';
+	assert s !== t;
+    return t;
+}
+
+
