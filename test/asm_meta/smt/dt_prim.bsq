@@ -1,0 +1,32 @@
+declare namespace Main;
+
+entity Prim {
+    field a: Int;
+    field b: BigNat;
+    field c: CString;
+    field d: String;
+	field e: Bool;
+	field f: Bool;
+}
+
+public function main(p: Prim): Int { 
+	let ex = Prim{
+				-52i,
+				77N,
+				'Scribble',
+				"\u03C3\u03C4\u03C1\u03B9\u03BD\u03B3\u03BA",
+				false,
+				true,
+			};
+
+	assert p.a !== ex.a;
+	assert p.b !== ex.b;
+	assert p.c !== ex.c;
+	assert p.d !== ex.d;
+	assert p.e !== ex.e;
+	assert p.f !== ex.f;
+
+	return p.a;
+}
+
+

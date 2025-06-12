@@ -1,14 +1,38 @@
 #include "smt_utils.h"
 #include <cstdio>
 #include <vector>
+#include <z3_api.h>
 #include "smt_extract.h"
 
 bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     auto tk = bsq_t->tkey;
-    if(ex.is_int() && (tk == "Int")) {
-        int64_t eval_int = ex.get_numeral_int64();
-        return new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, eval_int);
+    if(ex.get_sort().sort_kind() == 1000) {
+        return NULL;
+    }
+    else if(tk == "Int") {
+        int64_t val = ex.get_numeral_int64();
+        return new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, val);
+    }
+    else if(tk == "Nat") {
+        uint64_t val = ex.get_numeral_uint64();
+        return new bsqon::NatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, val);
+    }
+    else if(tk == "BigInt") {
+        int64_t val = ex.get_numeral_int64();
+        return new bsqon::BigIntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, val);
+    }
+    else if(tk == "BigNat") {
+        uint64_t val = ex.get_numeral_uint64();
+        return new bsqon::BigIntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, val);
+    }
+    else if(tk == "CString") {
+        std::string val = ex.get_string();
+        return bsqon::CStringValue::createFromGenerator(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, val);
+    }
+    else if(tk == "String") {
+        std::u32string val = ex.get_u32string();
+        return bsqon::StringValue::createFromGenerator(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, val);
     }
     return NULL;
 }

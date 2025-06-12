@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Pixel 0)
+    ;;no content -- ;;--ENTITY_DECLS--;;
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Pixel-mk (Main@Pixel-r Int) (Main@Pixel-g Int) (Main@Pixel-b Int) (Main@Pixel-a Int)))
+        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -61,44 +61,11 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-(declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
-(declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
+;;no content -- ;;--GLOBAL_DECLS--;;
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((pix Main@Pixel)) (@Result Int)
-    (let ((red 250))
-    (let ((green 0))
-    (let ((blue 250))
-    (let ((alpha 250))
-    (let ((px (Main@Pixel-mk red green blue alpha)))
-        (ite (not (= (Main@Pixel-r px) (Main@Pixel-r pix))) (as @Result-err-other (@Result Int))
-            (ite (not (= (Main@Pixel-g px) (Main@Pixel-g pix))) (as @Result-err-other (@Result Int))
-                (ite (not (= (Main@Pixel-b px) (Main@Pixel-b pix))) (as @Result-err-other (@Result Int))
-                    (ite (not (= (Main@Pixel-a px) (Main@Pixel-a pix))) (as @Result-err-other (@Result Int))
-                        (@Result-ok (Main@Pixel-r pix))
-                    )
-                )
-            )
-        )
-    )))))
-)
+;;no content -- ;;--FUNCTION_DECLS--;;
 
-(assert (= Int@zero-cc-temp (@Result-ok 0)))
-(assert (is-@Result-ok Int@zero-cc-temp))
-(assert (= Int@zero (@Result-value Int@zero-cc-temp)))
-(assert (= Int@one-cc-temp (@Result-ok 1)))
-(assert (is-@Result-ok Int@one-cc-temp))
-(assert (= Int@one (@Result-value Int@one-cc-temp)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(declare-const pixel Main@Pixel)
-(declare-const res (@Result Int))
-(assert (= res (Main@main pixel)))
-
-(assert (= res @Result-err-other))
-
-(check-sat)
-(get-model)
+;;no content -- ;;--GLOBAL_IMPLS--;;
 

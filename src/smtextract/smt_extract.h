@@ -7,6 +7,14 @@
 
 #define BSQ_INT_MIN -500
 #define BSQ_INT_MAX 500
+#define BSQ_BIGINT_MIN -1000
+#define BSQ_BIGINT_MAX 1000
+
+#define BSQ_NAT_MIN 0
+#define BSQ_NAT_MAX 500
+
+#define BSQ_BIGNAT_MIN 0
+#define BSQ_BIGNAT_MAX 1000
 
 class ValueSolver
 {

@@ -1,0 +1,195 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Prim",
+                    "Main::Prim"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "AlgorithmOps",
+                    "AlgorithmOps"
+                ],
+                [
+                    "Algorithm",
+                    "Algorithm"
+                ],
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CCharBufferOps",
+                    "CCharBufferOps"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "UnicodeCharBufferOps",
+                    "UnicodeCharBufferOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "BigNat",
+                    "BigNat"
+                ],
+                [
+                    "String",
+                    "String"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "a",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "b",
+                    "ftype": "BigNat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "c",
+                    "ftype": "CString",
+                    "isoptional": false
+                },
+                {
+                    "fname": "d",
+                    "ftype": "String",
+                    "isoptional": false
+                },
+                {
+                    "fname": "e",
+                    "ftype": "Bool",
+                    "isoptional": false
+                },
+                {
+                    "fname": "f",
+                    "ftype": "Bool",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Prim",
+            "name": "Prim"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive big-integer value. **%"
+            },
+            "tkey": "BigNat",
+            "name": "BigNat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "String",
+            "name": "String"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
