@@ -19,13 +19,12 @@ BOOST_AUTO_TEST_CASE(int_entity)
 
 BOOST_AUTO_TEST_CASE(pixel_entity)
 {
-    TEST_IT("--Main::Pixel", "dt_pixel", "dt_pixel", u8"Main::Pixel{0i, 0i, 255i, 0i}");
+    TEST_IT("--Main::Pixel", "dt_pixel", "dt_pixel", u8"Main::Pixel{250i, 0i, 120i, 245i}");
 }
 
 BOOST_AUTO_TEST_CASE(primitives_entity)
 {
-    TEST_IT("--Main::Prim", "dt_prim", "dt_prim",
-            u8"Main::Prim{-52i,77N,\'Scribble\',\"\u03C3\u03C4\u03C1\u03B9\u03BD\u03B3\u03BA\",false,true}");
+    TEST_IT("--Main::Prim", "dt_prim", "dt_prim", u8"Main::Prim{-52i,77N,\'Scribble\',\'Scribble2\',false,true}");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // DataType

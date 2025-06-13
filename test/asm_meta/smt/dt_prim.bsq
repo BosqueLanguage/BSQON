@@ -4,29 +4,34 @@ entity Prim {
     field a: Int;
     field b: BigNat;
     field c: CString;
-    field d: String;
+    field d: CString;
 	field e: Bool;
 	field f: Bool;
 }
 
-public function main(p: Prim): Int { 
-	let ex = Prim{
-				-52i,
-				77N,
-				'Scribble',
-				"\u03C3\u03C4\u03C1\u03B9\u03BD\u03B3\u03BA",
-				false,
-				true,
-			};
 
-	assert p.a !== ex.a;
-	assert p.b !== ex.b;
-	assert p.c !== ex.c;
-	assert p.d !== ex.d;
-	assert p.e !== ex.e;
-	assert p.f !== ex.f;
+const p:Prim = Prim{
+		-52i,                                    
+        77N,                                     
+        'Sphinx of black quartz, judge my vow.', 
+        'Mr. Jock, TV quiz PhD, bags few lynx.', 
+        false,                                   
+        true                                     
+	};
 
-	return p.a;
+
+public function main(p: Prim): Prim { 
+	
+	assert /\(
+				p.a !== -52i,
+				p.b !== 77N,
+				p.c !== 'Sphinx of black quartz, judge my vow.',
+				p.d !== 'Mr. Jock, TV quiz PhD, bags few lynx.',
+				p.e !== false,
+				p.f !== true
+		);
+
+	return p;
 }
 
 

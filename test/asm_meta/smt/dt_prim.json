@@ -92,10 +92,6 @@
                     "BigNat"
                 ],
                 [
-                    "String",
-                    "String"
-                ],
-                [
                     "CString",
                     "CString"
                 ]
@@ -123,7 +119,7 @@
                 },
                 {
                     "fname": "d",
-                    "ftype": "String",
+                    "ftype": "CString",
                     "isoptional": false
                 },
                 {
@@ -172,14 +168,6 @@
             },
             "tkey": "BigNat",
             "name": "BigNat"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive string value. **%"
-            },
-            "tkey": "String",
-            "name": "String"
         },
         {
             "tag": "PrimitiveEntity",

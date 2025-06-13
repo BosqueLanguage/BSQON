@@ -67,21 +67,9 @@
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((pix Main@Pixel)) (@Result Int)
-    (let ((red 250))
-    (let ((green 0))
-    (let ((blue 250))
-    (let ((alpha 250))
-    (let ((px (Main@Pixel-mk red green blue alpha)))
-        (ite (not (= (Main@Pixel-r px) (Main@Pixel-r pix))) (as @Result-err-other (@Result Int))
-            (ite (not (= (Main@Pixel-g px) (Main@Pixel-g pix))) (as @Result-err-other (@Result Int))
-                (ite (not (= (Main@Pixel-b px) (Main@Pixel-b pix))) (as @Result-err-other (@Result Int))
-                    (ite (not (= (Main@Pixel-a px) (Main@Pixel-a pix))) (as @Result-err-other (@Result Int))
-                        (@Result-ok (Main@Pixel-r pix))
-                    )
-                )
-            )
-        )
-    )))))
+    (ite (not (or (not (= (Main@Pixel-r pix) 250)) (not (= (Main@Pixel-g pix) 0)) (not (= (Main@Pixel-b pix) 120)) (not (= (Main@Pixel-a pix) 245)))) (as @Result-err-other (@Result Int))
+        (@Result-ok 0)
+    )
 )
 
 (assert (= Int@zero-cc-temp (@Result-ok 0)))
@@ -91,14 +79,12 @@
 (assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(declare-const pixel Main@Pixel)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare-const px Main@Pixel)
 (declare-const res (@Result Int))
-(assert (= res (Main@main pixel)))
+(assert (= res (Main@main px)))
 
-(assert (= res @Result-err-other))
-
+(assert (= res (as @Result-err-other (@Result Int))))
 (check-sat)
 (get-model)
 

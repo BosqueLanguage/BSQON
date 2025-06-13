@@ -85,8 +85,7 @@ void smt_tround(std::string smt_in, std::string meta_file, const char* t_in, std
         printf("GOT NULL: From first call of solveValue.\n");
         exit(1);
     }
-    std::u8string rstr = res->toString();
-    // printf("%s\n", (const char*)rstr.c_str());
-    result = rstr;
+
+    result = res->toString();
     return;
 }

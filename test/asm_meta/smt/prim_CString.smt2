@@ -83,3 +83,6 @@
 (assert (= res (Main@main s)))
 
 (assert (= res @Result-err-other))
+
+(check-sat)
+(get-model)

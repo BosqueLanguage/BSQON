@@ -163,7 +163,7 @@ smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TE
 	cp -r $(SMT_TEST_DIR)smt_utests/ $(BIN_DIR)smt_utests/
 	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)smtextract_test $(SMT_TEST_SOURCES) $(SMT_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -lgmp -lz3 -lboost_unit_test_framework #-lfl
 
-test_smt: smt_test_files
+smt_test: smt_test_files
 	$(BIN_DIR)smtextract_test --report_level=short --color_output
 
 testfiles: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)test_driver.h $(BSQON_TEST_SOURCES)

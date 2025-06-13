@@ -7,21 +7,11 @@ entity Pixel {
     field a: Int;
 }
 
-
 public function main(pix: Pixel): Int { 
-	let red = 250i;
-	let green = 0i;
-	let blue = 250i;
-	let alpha = 250i;
 
-	let px = Pixel{red,green,blue,alpha};
+	assert \/( pix.r !== 250i, pix.g !== 0i, pix.b !== 120i, pix.a !== 245i);
 
-	assert px.r !== pix.r;
-	assert px.g !== pix.g;
-	assert px.b !== pix.b;
-	assert px.a !== pix.a;
-
-	return pix.r;
+	return 0i;
 }
 
 

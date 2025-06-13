@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    ;;no content -- ;;--ENTITY_DECLS--;;
+    (Main@Prim 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
+        ((Main@Prim-mk (Main@Prim-a Int) (Main@Prim-b BigNat) (Main@Prim-c CString) (Main@Prim-d CString) (Main@Prim-e Bool) (Main@Prim-f Bool)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -61,11 +61,27 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-;;no content -- ;;--GLOBAL_DECLS--;;
+(declare-const Main@p Main@Prim) (declare-const Main@p-cc-temp (@Result Main@Prim))
+(declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
+(declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-;;no content -- ;;--FUNCTION_DECLS--;;
+(define-fun Main@main ((p Main@Prim)) (@Result Main@Prim)
+    (ite (not (and (not (= (Main@Prim-a p) -52)) (not (= (Main@Prim-b p) 77)) (not (= (Main@Prim-c p) "Sphinx of black quartz, judge my vow.")) (not (= (Main@Prim-d p) "Mr. Jock, TV quiz PhD, bags few lynx.")) (not (= (Main@Prim-e p) false)) (not (= (Main@Prim-f p) true)))) (as @Result-err-other (@Result Main@Prim))
+        (@Result-ok p)
+    )
+)
 
-;;no content -- ;;--GLOBAL_IMPLS--;;
+(assert (= Main@p-cc-temp (@Result-ok (Main@Prim-mk -52 77 "Sphinx of black quartz, judge my vow." "Mr. Jock, TV quiz PhD, bags few lynx." false true))))
+(assert (is-@Result-ok Main@p-cc-temp))
+(assert (= Main@p (@Result-value Main@p-cc-temp)))
+(assert (= Int@zero-cc-temp (@Result-ok 0)))
+(assert (is-@Result-ok Int@zero-cc-temp))
+(assert (= Int@zero (@Result-value Int@zero-cc-temp)))
+(assert (= Int@one-cc-temp (@Result-ok 1)))
+(assert (is-@Result-ok Int@one-cc-temp))
+(assert (= Int@one (@Result-value Int@one-cc-temp)))
 
+(check-sat)
+(get-model)
