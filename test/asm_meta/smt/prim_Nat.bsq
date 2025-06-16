@@ -1,0 +1,13 @@
+declare namespace Main;
+
+entity Nats {
+    field a: Nat;
+    field b: Nat;
+    field c: BigNat;
+    field d: BigNat;
+}
+
+public function main(n: Nats): Nats { 
+	assert \/( n.a !== 55n, n.b !== 0n, n.c !== 375N, n.d !== 222N);
+    return n;
+}

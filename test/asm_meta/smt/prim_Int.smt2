@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Man 0)
+    (Main@Nums 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Man-mk (Main@Man-a CString)))
+        ((Main@Nums-mk (Main@Nums-a Int) (Main@Nums-b Int) (Main@Nums-c BigInt) (Main@Nums-d BigInt)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -61,27 +61,30 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-;;no content -- ;;--GLOBAL_DECLS--;;
+(declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
+(declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((s Main@Man)) (@Result CString)
-    (let ((t "Manchester"))
-        (ite (not (not (= (Main@Man-a s) t))) (as @Result-err-other (@Result CString))
-            (@Result-ok (Main@Man-a s))
-        )
+(define-fun Main@main ((n Main@Nums)) (@Result Main@Nums)
+    (ite (not (or (not (= (Main@Nums-a n) 55)) (not (= (Main@Nums-b n) -22)) (not (= (Main@Nums-c n) 375)) (not (= (Main@Nums-d n) -288)))) (as @Result-err-other (@Result Main@Nums))
+        (@Result-ok n)
     )
 )
 
-;;no content -- ;;--GLOBAL_IMPLS--;;
+(assert (= Int@zero-cc-temp (@Result-ok 0)))
+(assert (is-@Result-ok Int@zero-cc-temp))
+(assert (= Int@zero (@Result-value Int@zero-cc-temp)))
+(assert (= Int@one-cc-temp (@Result-ok 1)))
+(assert (is-@Result-ok Int@one-cc-temp))
+(assert (= Int@one (@Result-value Int@one-cc-temp)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const cs Main@Man)
-(declare-const res (@Result String)) 
-(assert (= res (Main@main cs)))
+(declare-const nm Main@Nums)
+(declare-const res (@Result Main@Nums))
+(assert (= res (Main@main nm)))
 
-(assert (= res (as @Result-err-other (@Result String))))
+(assert (= res (as @Result-err-other (@Result Main@Nums))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-

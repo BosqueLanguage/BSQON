@@ -7,8 +7,8 @@
             "subns": [],
             "types": [
                 [
-                    "Man",
-                    "Main::Man"
+                    "Nums",
+                    "Main::Nums"
                 ]
             ]
         },
@@ -84,8 +84,12 @@
                     "Bool"
                 ],
                 [
-                    "CString",
-                    "CString"
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "BigInt",
+                    "BigInt"
                 ]
             ]
         }
@@ -96,13 +100,28 @@
             "fields": [
                 {
                     "fname": "a",
-                    "ftype": "CString",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "b",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "c",
+                    "ftype": "BigInt",
+                    "isoptional": false
+                },
+                {
+                    "fname": "d",
+                    "ftype": "BigInt",
                     "isoptional": false
                 }
             ],
             "hasvalidations": false,
-            "tkey": "Main::Man",
-            "name": "Man"
+            "tkey": "Main::Nums",
+            "name": "Nums"
         },
         {
             "tag": "PrimitiveEntity",
@@ -123,10 +142,18 @@
         {
             "tag": "PrimitiveEntity",
             "attributes": {
-                "docstring": "%** Primitive string value. **%"
+                "docstring": "%** Primitive integer value. **%"
             },
-            "tkey": "CString",
-            "name": "CString"
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive big-integer value. **%"
+            },
+            "tkey": "BigInt",
+            "name": "BigInt"
         }
     ],
     "recursiveSets": [],

@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Man 0)
+    (Main@Nats 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Man-mk (Main@Man-a CString)))
+        ((Main@Nats-mk (Main@Nats-a Nat) (Main@Nats-b Nat) (Main@Nats-c BigNat) (Main@Nats-d BigNat)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -61,27 +61,30 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-;;no content -- ;;--GLOBAL_DECLS--;;
+(declare-const Nat@zero Nat) (declare-const Nat@zero-cc-temp (@Result Nat))
+(declare-const Nat@one Nat) (declare-const Nat@one-cc-temp (@Result Nat))
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((s Main@Man)) (@Result CString)
-    (let ((t "Manchester"))
-        (ite (not (not (= (Main@Man-a s) t))) (as @Result-err-other (@Result CString))
-            (@Result-ok (Main@Man-a s))
-        )
+(define-fun Main@main ((n Main@Nats)) (@Result Main@Nats)
+    (ite (not (or (not (= (Main@Nats-a n) 55)) (not (= (Main@Nats-b n) 0)) (not (= (Main@Nats-c n) 375)) (not (= (Main@Nats-d n) 222)))) (as @Result-err-other (@Result Main@Nats))
+        (@Result-ok n)
     )
 )
 
-;;no content -- ;;--GLOBAL_IMPLS--;;
+(assert (= Nat@zero-cc-temp (@Result-ok 0)))
+(assert (is-@Result-ok Nat@zero-cc-temp))
+(assert (= Nat@zero (@Result-value Nat@zero-cc-temp)))
+(assert (= Nat@one-cc-temp (@Result-ok 1)))
+(assert (is-@Result-ok Nat@one-cc-temp))
+(assert (= Nat@one (@Result-value Nat@one-cc-temp)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const cs Main@Man)
-(declare-const res (@Result String)) 
-(assert (= res (Main@main cs)))
+(declare-const nm Main@Nats)
+(declare-const res (@Result Main@Nats))
+(assert (= res (Main@main nm)))
 
-(assert (= res (as @Result-err-other (@Result String))))
+(assert (= res (as @Result-err-other (@Result Main@Nats))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-

@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Man 0)
+    (Main@Boo 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Man-mk (Main@Man-a CString)))
+        ((Main@Boo-mk (Main@Boo-a Bool) (Main@Boo-b Bool) (Main@Boo-c Bool) (Main@Boo-d Bool) (Main@Boo-e Bool)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -65,22 +65,21 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((s Main@Man)) (@Result CString)
-    (let ((t "Manchester"))
-        (ite (not (not (= (Main@Man-a s) t))) (as @Result-err-other (@Result CString))
-            (@Result-ok (Main@Man-a s))
-        )
+(define-fun Main@main ((b Main@Boo)) (@Result Main@Boo)
+    (ite (not (or (not (= (Main@Boo-a b) true)) (not (= (Main@Boo-b b) false)) (not (= (Main@Boo-c b) true)) (not (= (Main@Boo-d b) true)) (not (= (Main@Boo-e b) false)))) (as @Result-err-other (@Result Main@Boo))
+        (@Result-ok b)
     )
 )
 
 ;;no content -- ;;--GLOBAL_IMPLS--;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const cs Main@Man)
-(declare-const res (@Result String)) 
-(assert (= res (Main@main cs)))
 
-(assert (= res (as @Result-err-other (@Result String))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare-const boo Main@Boo)
+(declare-const res (@Result Main@Boo))
+(assert (= res (Main@main boo)))
+
+(assert (= res (as @Result-err-other (@Result Main@Boo))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
