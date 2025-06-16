@@ -1,0 +1,12 @@
+declare namespace Main;
+
+entity Man {
+    field a: CString;
+}
+
+
+public function main(s: Man): CString { 
+	let t:CString = 'Manchester';
+	assert s.a !== t;
+    return s.a;
+}

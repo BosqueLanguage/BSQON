@@ -1,0 +1,17 @@
+declare namespace Main;
+
+entity Pixel {
+    field r: Int;
+    field g: Int;
+    field b: Int;
+    field a: Int;
+}
+
+public function main(pix: Pixel): Int { 
+
+	assert \/( pix.r !== 250i, pix.g !== 0i, pix.b !== 120i, pix.a !== 245i);
+
+	return 0i;
+}
+
+

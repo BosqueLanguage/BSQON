@@ -1,0 +1,161 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "Nats",
+                    "Main::Nats"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "AlgorithmOps",
+                    "AlgorithmOps"
+                ],
+                [
+                    "Algorithm",
+                    "Algorithm"
+                ],
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CCharBufferOps",
+                    "CCharBufferOps"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "UnicodeCharBufferOps",
+                    "UnicodeCharBufferOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "BigNat",
+                    "BigNat"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "a",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "b",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "c",
+                    "ftype": "BigNat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "d",
+                    "ftype": "BigNat",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Nats",
+            "name": "Nats"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive big-integer value. **%"
+            },
+            "tkey": "BigNat",
+            "name": "BigNat"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}
