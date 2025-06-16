@@ -55,26 +55,33 @@ int main(int argc, char** argv)
     }
     bsqon::AssemblyInfo::parse(jv, asm_info);
 
-    // TODO: Check type is passed in correct format of --<TYPE>
-    const char* tar_t = argv[3] + 2; /*Just move ptr to get past '--'.*/
-    if(!(tar_t[0] >= 'A' || tar_t[0] <= 'Z')) {
-        badArgs("Incorrect Type format.");
-    }
-
     ////////////////////////////////////////////////////////////////////////////
+    z3::model m = s.get_model();
+    for(uint i = 0; i < m.num_funcs(); ++i) {
+        z3::func_decl fn = m.get_func_decl(i);
+        std::cout << "FUNC" << fn << "\n";
+        std::cout << "ARITY" << fn.arity() << "\n";
+        for(uint j = 0; j < fn.arity(); ++j) {
+            z3::sort arg = fn.domain(j);
+            std::cout << "ARG SORT " << arg.name() << "\n";
+        }
+    }
+    return 0;
+
     // Find Type in asm_info
-    bsqon::Type* bsq_t = asm_info.lookupTypeKey(tar_t);
-    if(bsq_t == nullptr) {
-        badArgs("Unable to find TypeKey");
-    }
-
-    ValueSolver sol(&asm_info, bsq_t, s);
-    bsqon::Value* result = sol.solveValue(sol.bsq_t, sol.ex);
-    if(result == NULL) {
-        printf("solveValue returned NULL \n");
-        exit(1);
-    }
-
-    std::u8string rstr = result->toString();
-    printf("%s\n", (const char*)rstr.c_str());
-};
+    // bsqon::Type* bsq_t = asm_info.lookupTypeKey(tar_t);
+    // if(bsq_t == nullptr) {
+    //     badArgs("Unable to find TypeKey");
+    // }
+    //
+    // ValueSolver sol(&asm_info, bsq_t, s);
+    //
+    // bsqon::Value* result = sol.solveValue(sol.bsq_t, sol.ex);
+    // if(result == NULL) {
+    //     printf("solveValue returned NULL \n");
+    //     exit(1);
+    // }
+    //
+    // std::u8string rstr = result->toString();
+    // printf("%s\n", (const char*)rstr.c_str());
+}

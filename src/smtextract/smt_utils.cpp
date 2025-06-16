@@ -1,6 +1,7 @@
 #include "smt_utils.h"
 #include "smt_extract.h"
 #include <cstdio>
+#include <optional>
 #include <regex>
 
 void badArgs(const char* msg)
@@ -28,41 +29,6 @@ bool validPath(const char* filepath, const char* extension)
     }
 
     return valid;
-}
-
-bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
-{
-    if(tk == "Nat") {
-        return bsqon::TypeKey("Int");
-    }
-    if(tk == "CString") {
-        return bsqon::TypeKey("String");
-    }
-
-    std::string og = tk;
-    std::regex bsq_name("::");
-    std::string smt_tk = std::regex_replace(og, bsq_name, "@");
-
-    return bsqon::TypeKey(smt_tk);
-}
-
-// Use Type* to find the func_decl in the z3::model.
-std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s)
-{
-    bsqon::TypeKey smt_tk = bsqonToSmt(bsq_t->tkey);
-    z3::model m = s.get_model();
-
-    for(size_t i = 0; i < m.num_consts(); i++) {
-
-        std::string const_name = m.get_const_decl(i).range().name().str();
-
-        if(strcmp(const_name.c_str(), smt_tk.c_str()) == 0) {
-            std::cout << m.get_const_decl(i) << "\n";
-            return m.get_const_decl(i)();
-        }
-    }
-
-    return std::nullopt;
 }
 
 std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
@@ -94,5 +60,22 @@ std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
         return this->s.ctx().string_val(Cv->sv);
     }
 
+    return std::nullopt;
+}
+
+////////This uses the z3 generated model to find the constant value.
+
+bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
+{
+    std::string og = tk;
+    std::regex bsq_name("::");
+    std::string smt_tk = std::regex_replace(og, bsq_name, "@");
+
+    return bsqon::TypeKey(smt_tk);
+}
+
+// Use Type* to find the func_decl in the z3::model.
+std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s)
+{
     return std::nullopt;
 }
