@@ -22,11 +22,11 @@ bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
         ex.is_numeral_i64(Ival);
         return new bsqon::BigIntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, Ival);
     }
-    // else if(tk == "BigNat" && ex.is_int()) {
-    //     uint64_t Nval;
-    //     ex.is_numeral_u64(Nval);
-    //     return new bsqon::BigNatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, Nval);
-    // }
+    else if(tk == "BigNat" && ex.is_int()) {
+        uint64_t Nval;
+        ex.is_numeral_u64(Nval);
+        return new bsqon::BigNatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, Nval);
+    }
     else if(tk == "CString" && ex.is_string_value()) {
         std::string csval = ex.get_string();
         return bsqon::CStringValue::createFromGenerator(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, csval);
@@ -42,8 +42,8 @@ bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 // TODO: Make this us the Z3 Interp and Binary Search
 z3::expr ValueSolver::FindStringLen(z3::expr ex)
 {
-    std::vector<int> choices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 37, 36, 32};
-    z3::expr result = this->s.ctx().real_const("Int String: N/A");
+    std::vector<int> choices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    z3::expr result = this->s.ctx().int_val(0);
 
     for(int i : choices) {
         this->s.push();
@@ -58,6 +58,36 @@ z3::expr ValueSolver::FindStringLen(z3::expr ex)
             break;
         }
     }
+
+    // SAT Bin Search for all possible values.
+    int min = BSQ_INT_MIN;
+    int max = BSQ_INT_MAX;
+
+    while(min < max) {
+        int mid = (max / 2) + (min / 2) + (((max % 2) + (min % 2)) / 2);
+        this->s.push();
+
+        z3::expr int_tmp = this->s.ctx().int_val(mid);
+        this->s.add(ex.length() <= int_tmp);
+
+        z3::check_result rr = this->s.check();
+        this->s.pop();
+
+        if(rr == z3::check_result::sat) {
+            max = mid;
+        }
+        else if(rr == z3::check_result::unsat) {
+            min = mid + 1;
+        }
+        else {
+            return result;
+        }
+    }
+
+    int64_t search_int = min;
+    result = this->s.ctx().int_val(search_int);
+
+    this->s.add(ex.length() == result);
 
     return result;
 }
