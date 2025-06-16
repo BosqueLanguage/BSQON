@@ -71,6 +71,7 @@ int main(int argc, char** argv)
     ValueSolver sol(&asm_info, bsq_t, s);
     bsqon::Value* result = sol.solveValue(sol.bsq_t, sol.fn());
     if(result == NULL) {
+        printf("solveValue returned NULL \n");
         exit(1);
     }
 

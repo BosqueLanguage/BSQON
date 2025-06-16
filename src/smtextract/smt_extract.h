@@ -37,7 +37,9 @@ class ValueSolver
 
     bsqon::Value* solveCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* solveBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* solveEntity(bsqon::StdEntityType* t, z3::expr ex);

@@ -61,21 +61,17 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-(declare-const Main@p Main@Prim) (declare-const Main@p-cc-temp (@Result Main@Prim))
 (declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
 (declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((p Main@Prim)) (@Result Main@Prim)
-    (ite (not (and (not (= (Main@Prim-a p) -52)) (not (= (Main@Prim-b p) 77)) (not (= (Main@Prim-c p) "Sphinx of black quartz, judge my vow.")) (not (= (Main@Prim-d p) "Mr. Jock, TV quiz PhD, bags few lynx.")) (not (= (Main@Prim-e p) false)) (not (= (Main@Prim-f p) true)))) (as @Result-err-other (@Result Main@Prim))
+    (ite (not (or (not (= (Main@Prim-a p) -52)) (not (= (Main@Prim-b p) 77)) (not (= (Main@Prim-c p) "Sphinx of black quartz, judge my vow.")) (not (= (Main@Prim-d p) "Mr. Jock, TV quiz PhD, bags few lynx.")) (not (= (Main@Prim-e p) false)) (not (= (Main@Prim-f p) true)))) (as @Result-err-other (@Result Main@Prim))
         (@Result-ok p)
     )
 )
 
-(assert (= Main@p-cc-temp (@Result-ok (Main@Prim-mk -52 77 "Sphinx of black quartz, judge my vow." "Mr. Jock, TV quiz PhD, bags few lynx." false true))))
-(assert (is-@Result-ok Main@p-cc-temp))
-(assert (= Main@p (@Result-value Main@p-cc-temp)))
 (assert (= Int@zero-cc-temp (@Result-ok 0)))
 (assert (is-@Result-ok Int@zero-cc-temp))
 (assert (= Int@zero (@Result-value Int@zero-cc-temp)))
@@ -83,5 +79,13 @@
 (assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare-const prim Main@Prim)
+(declare-const res (@Result Main@Prim))
+(assert (= res (Main@main prim)))
+
+(assert (= res (as @Result-err-other (@Result Main@Prim))))
 (check-sat)
 (get-model)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

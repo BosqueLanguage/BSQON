@@ -24,7 +24,9 @@ BOOST_AUTO_TEST_CASE(pixel_entity)
 
 BOOST_AUTO_TEST_CASE(primitives_entity)
 {
-    TEST_IT("--Main::Prim", "dt_prim", "dt_prim", u8"Main::Prim{-52i,77N,\'Scribble\',\'Scribble2\',false,true}");
+    TEST_IT("--Main::Prim", "dt_prim", "dt_prim",
+            u8"Main::Prim{-52i, 77N, 'Sphinx of black quartz, judge my vow.', 'Mr. Jock, TV quiz PhD, bags few lynx.', "
+            u8"false, true}");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // DataType
