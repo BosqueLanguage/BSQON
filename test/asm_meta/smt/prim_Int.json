@@ -5,12 +5,7 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": [
-                [
-                    "Nums",
-                    "Main::Nums"
-                ]
-            ]
+            "types": []
         },
         {
             "istoplevel": true,
@@ -86,43 +81,11 @@
                 [
                     "Int",
                     "Int"
-                ],
-                [
-                    "BigInt",
-                    "BigInt"
                 ]
             ]
         }
     ],
     "typerefs": [
-        {
-            "tag": "StdEntity",
-            "fields": [
-                {
-                    "fname": "a",
-                    "ftype": "Int",
-                    "isoptional": false
-                },
-                {
-                    "fname": "b",
-                    "ftype": "Int",
-                    "isoptional": false
-                },
-                {
-                    "fname": "c",
-                    "ftype": "BigInt",
-                    "isoptional": false
-                },
-                {
-                    "fname": "d",
-                    "ftype": "BigInt",
-                    "isoptional": false
-                }
-            ],
-            "hasvalidations": false,
-            "tkey": "Main::Nums",
-            "name": "Nums"
-        },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
@@ -146,14 +109,6 @@
             },
             "tkey": "Int",
             "name": "Int"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive big-integer value. **%"
-            },
-            "tkey": "BigInt",
-            "name": "BigInt"
         }
     ],
     "recursiveSets": [],

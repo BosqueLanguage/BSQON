@@ -5,12 +5,7 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": [
-                [
-                    "Man",
-                    "Main::Man"
-                ]
-            ]
+            "types": []
         },
         {
             "istoplevel": true,
@@ -91,19 +86,6 @@
         }
     ],
     "typerefs": [
-        {
-            "tag": "StdEntity",
-            "fields": [
-                {
-                    "fname": "a",
-                    "ftype": "CString",
-                    "isoptional": false
-                }
-            ],
-            "hasvalidations": false,
-            "tkey": "Main::Man",
-            "name": "Man"
-        },
         {
             "tag": "PrimitiveEntity",
             "attributes": {

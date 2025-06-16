@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Nats 0)
+    ;;no content -- ;;--ENTITY_DECLS--;;
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Nats-mk (Main@Nats-a Nat) (Main@Nats-b Nat) (Main@Nats-c BigNat) (Main@Nats-d BigNat)))
+        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -66,8 +66,8 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((n Main@Nats)) (@Result Main@Nats)
-    (ite (not (or (not (= (Main@Nats-a n) 55)) (not (= (Main@Nats-b n) 0)) (not (= (Main@Nats-c n) 375)) (not (= (Main@Nats-d n) 222)))) (as @Result-err-other (@Result Main@Nats))
+(define-fun Main@main ((n Nat)) (@Result Nat)
+    (ite (not (not (= n 92))) (as @Result-err-other (@Result Nat))
         (@Result-ok n)
     )
 )
@@ -80,11 +80,12 @@
 (assert (= Nat@one (@Result-value Nat@one-cc-temp)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const nm Main@Nats)
-(declare-const res (@Result Main@Nats))
+(declare-const nm Nat)
+(declare-const res (@Result Nat))
 (assert (= res (Main@main nm)))
 
-(assert (= res (as @Result-err-other (@Result Main@Nats))))
+(assert (= res (as @Result-err-other (@Result Nat))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

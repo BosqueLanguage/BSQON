@@ -1,14 +1,7 @@
 declare namespace Main;
 
-entity Nums {
-    field a: Int;
-    field b: Int;
-    field c: BigInt;
-    field d: BigInt;
-}
-
-public function main(n: Nums): Nums { 
-	assert \/( n.a !== 55i, n.b !== -22i, n.c !== 375I, n.d !== -288I);
+public function main(n: Int): Int { 
+	assert n !== 33i;
     return n;
 }
 

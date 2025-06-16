@@ -1,15 +1,7 @@
 declare namespace Main;
 
-entity Boo {
-    field a: Bool;
-    field b: Bool;
-    field c: Bool;
-    field d: Bool;
-    field e: Bool;
-}
-
-public function main(b: Boo): Boo { 
-	assert \/( b.a !== true, b.b !== false, b.c !== true, b.d !== true, b.e !== false);
+public function main(b: Bool): Bool { 
+	assert b !== false;
     return b;
 }
 

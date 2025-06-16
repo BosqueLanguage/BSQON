@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Nums 0)
+    ;;no content -- ;;--ENTITY_DECLS--;;
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Nums-mk (Main@Nums-a Int) (Main@Nums-b Int) (Main@Nums-c BigInt) (Main@Nums-d BigInt)))
+        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -66,8 +66,8 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((n Main@Nums)) (@Result Main@Nums)
-    (ite (not (or (not (= (Main@Nums-a n) 55)) (not (= (Main@Nums-b n) -22)) (not (= (Main@Nums-c n) 375)) (not (= (Main@Nums-d n) -288)))) (as @Result-err-other (@Result Main@Nums))
+(define-fun Main@main ((n Int)) (@Result Int)
+    (ite (not (not (= n 33))) (as @Result-err-other (@Result Int))
         (@Result-ok n)
     )
 )
@@ -80,11 +80,13 @@
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const nm Main@Nums)
-(declare-const res (@Result Main@Nums))
-(assert (= res (Main@main nm)))
+(declare-const num Int)
+(declare-const res (@Result Int))
+(assert (= res (Main@main num)))
 
-(assert (= res (as @Result-err-other (@Result Main@Nums))))
+(assert (= res (as @Result-err-other (@Result Int))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+

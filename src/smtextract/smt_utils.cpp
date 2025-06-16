@@ -32,6 +32,13 @@ bool validPath(const char* filepath, const char* extension)
 
 bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
 {
+    if(tk == "Nat") {
+        return bsqon::TypeKey("Int");
+    }
+    if(tk == "CString") {
+        return bsqon::TypeKey("String");
+    }
+
     std::string og = tk;
     std::regex bsq_name("::");
     std::string smt_tk = std::regex_replace(og, bsq_name, "@");
@@ -40,7 +47,7 @@ bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
 }
 
 // Use Type* to find the func_decl in the z3::model.
-std::optional<z3::func_decl> getFuncDecl(bsqon::Type* bsq_t, z3::solver& s)
+std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s)
 {
     bsqon::TypeKey smt_tk = bsqonToSmt(bsq_t->tkey);
     z3::model m = s.get_model();
@@ -48,10 +55,13 @@ std::optional<z3::func_decl> getFuncDecl(bsqon::Type* bsq_t, z3::solver& s)
     for(size_t i = 0; i < m.num_consts(); i++) {
 
         std::string const_name = m.get_const_decl(i).range().name().str();
+
         if(strcmp(const_name.c_str(), smt_tk.c_str()) == 0) {
-            return m.get_const_decl(i);
+            std::cout << m.get_const_decl(i) << "\n";
+            return m.get_const_decl(i)();
         }
     }
+
     return std::nullopt;
 }
 

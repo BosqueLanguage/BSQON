@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Man 0)
+    ;;no content -- ;;--ENTITY_DECLS--;;
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Man-mk (Main@Man-a CString)))
+        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -65,10 +65,10 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((s Main@Man)) (@Result CString)
+(define-fun Main@main ((s CString)) (@Result CString)
     (let ((t "Manchester"))
-        (ite (not (not (= (Main@Man-a s) t))) (as @Result-err-other (@Result CString))
-            (@Result-ok (Main@Man-a s))
+        (ite (not (not (= s t))) (as @Result-err-other (@Result CString))
+            (@Result-ok s)
         )
     )
 )
@@ -76,11 +76,11 @@
 ;;no content -- ;;--GLOBAL_IMPLS--;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const cs Main@Man)
-(declare-const res (@Result String)) 
-(assert (= res (Main@main cs)))
+(declare-const nm CString)
+(declare-const res (@Result CString))
+(assert (= res (Main@main nm)))
 
-(assert (= res (as @Result-err-other (@Result String))))
+(assert (= res (as @Result-err-other (@Result CString))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

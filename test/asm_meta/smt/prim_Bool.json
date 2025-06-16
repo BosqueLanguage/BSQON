@@ -5,12 +5,7 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": [
-                [
-                    "Boo",
-                    "Main::Boo"
-                ]
-            ]
+            "types": []
         },
         {
             "istoplevel": true,
@@ -87,39 +82,6 @@
         }
     ],
     "typerefs": [
-        {
-            "tag": "StdEntity",
-            "fields": [
-                {
-                    "fname": "a",
-                    "ftype": "Bool",
-                    "isoptional": false
-                },
-                {
-                    "fname": "b",
-                    "ftype": "Bool",
-                    "isoptional": false
-                },
-                {
-                    "fname": "c",
-                    "ftype": "Bool",
-                    "isoptional": false
-                },
-                {
-                    "fname": "d",
-                    "ftype": "Bool",
-                    "isoptional": false
-                },
-                {
-                    "fname": "e",
-                    "ftype": "Bool",
-                    "isoptional": false
-                }
-            ],
-            "hasvalidations": false,
-            "tkey": "Main::Boo",
-            "name": "Boo"
-        },
         {
             "tag": "PrimitiveEntity",
             "attributes": {

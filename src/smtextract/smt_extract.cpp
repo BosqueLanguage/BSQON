@@ -554,7 +554,6 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 
 bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::expr ex)
 {
-
     if(bsq_t->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
         return solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
     }
@@ -566,8 +565,8 @@ bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::expr ex)
 }
 
 ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& solver)
-    : asm_info(asm_info), bsq_t(bsq_t), s(solver), fn([&]() {
-          auto tmp = getFuncDecl(bsq_t, solver);
+    : asm_info(asm_info), bsq_t(bsq_t), s(solver), ex([&]() {
+          auto tmp = getBsqTypeExpr(bsq_t, solver);
           if(!tmp.has_value()) {
               std::cout << "Provided type " << bsq_t->tkey << " not found in .smt2 file" << "\n";
               exit(1);

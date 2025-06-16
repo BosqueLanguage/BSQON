@@ -25,7 +25,7 @@ class ValueSolver
     bsqon::AssemblyInfo* asm_info;
     bsqon::Type* bsq_t;
     z3::solver& s;
-    z3::func_decl fn;
+    z3::expr ex;
 
     ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& s);
 

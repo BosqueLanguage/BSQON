@@ -5,12 +5,7 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": [
-                [
-                    "Nats",
-                    "Main::Nats"
-                ]
-            ]
+            "types": []
         },
         {
             "istoplevel": true,
@@ -86,43 +81,11 @@
                 [
                     "Nat",
                     "Nat"
-                ],
-                [
-                    "BigNat",
-                    "BigNat"
                 ]
             ]
         }
     ],
     "typerefs": [
-        {
-            "tag": "StdEntity",
-            "fields": [
-                {
-                    "fname": "a",
-                    "ftype": "Nat",
-                    "isoptional": false
-                },
-                {
-                    "fname": "b",
-                    "ftype": "Nat",
-                    "isoptional": false
-                },
-                {
-                    "fname": "c",
-                    "ftype": "BigNat",
-                    "isoptional": false
-                },
-                {
-                    "fname": "d",
-                    "ftype": "BigNat",
-                    "isoptional": false
-                }
-            ],
-            "hasvalidations": false,
-            "tkey": "Main::Nats",
-            "name": "Nats"
-        },
         {
             "tag": "PrimitiveEntity",
             "attributes": {
@@ -146,14 +109,6 @@
             },
             "tkey": "Nat",
             "name": "Nat"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive big-integer value. **%"
-            },
-            "tkey": "BigNat",
-            "name": "BigNat"
         }
     ],
     "recursiveSets": [],

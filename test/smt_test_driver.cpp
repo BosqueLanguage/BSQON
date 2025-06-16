@@ -80,7 +80,7 @@ void smt_tround(std::string smt_in, std::string meta_file, const char* t_in, std
     }
 
     ValueSolver sol(&asm_info, bsq_t, s);
-    bsqon::Value* res = sol.solveValue(sol.bsq_t, sol.fn());
+    bsqon::Value* res = sol.solveValue(sol.bsq_t, sol.ex);
     if(res == NULL) {
         printf("GOT NULL: From first call of solveValue.\n");
         exit(1);

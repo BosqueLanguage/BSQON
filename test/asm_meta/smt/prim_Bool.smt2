@@ -41,13 +41,13 @@
 (declare-datatypes (
     ;;no content -- ;;--SPECIAL_DECLS--;;
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    (Main@Boo 0)
+    ;;no content -- ;;--ENTITY_DECLS--;;
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
         ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@Boo-mk (Main@Boo-a Bool) (Main@Boo-b Bool) (Main@Boo-c Bool) (Main@Boo-d Bool) (Main@Boo-e Bool)))
+        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-mk-None)
@@ -65,22 +65,22 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((b Main@Boo)) (@Result Main@Boo)
-    (ite (not (or (not (= (Main@Boo-a b) true)) (not (= (Main@Boo-b b) false)) (not (= (Main@Boo-c b) true)) (not (= (Main@Boo-d b) true)) (not (= (Main@Boo-e b) false)))) (as @Result-err-other (@Result Main@Boo))
+(define-fun Main@main ((b Bool)) (@Result Bool)
+    (ite (not (not (= b false))) (as @Result-err-other (@Result Bool))
         (@Result-ok b)
     )
 )
 
 ;;no content -- ;;--GLOBAL_IMPLS--;;
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const boo Main@Boo)
-(declare-const res (@Result Main@Boo))
+(declare-const boo Bool)
+(declare-const res (@Result Bool))
 (assert (= res (Main@main boo)))
 
-(assert (= res (as @Result-err-other (@Result Main@Boo))))
+(assert (= res (as @Result-err-other (@Result Bool))))
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 

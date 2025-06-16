@@ -14,22 +14,32 @@ BOOST_AUTO_TEST_SUITE(Primitives)
 
 BOOST_AUTO_TEST_CASE(CString)
 {
-    TEST_IT("--Main::Man", "prim_CString", "prim_CString", u8"Main::Man{'Manchester'}");
+    TEST_IT("--CString", "prim_CString", "prim_CString", u8"'Manchester'");
 }
 
 BOOST_AUTO_TEST_CASE(Bool)
 {
-    TEST_IT("--Main::Boo", "prim_Bool", "prim_Bool", u8"Main::Boo{true, false, true, true, false}");
+    TEST_IT("--Bool", "prim_Bool", "prim_Bool", u8"false");
 }
 
-BOOST_AUTO_TEST_CASE(IntNums)
+BOOST_AUTO_TEST_CASE(Int)
 {
-    TEST_IT("--Main::Nums", "prim_Int", "prim_Int", u8"Main::Nums{55i, -22i, 375I, -288I}");
+    TEST_IT("--Int", "prim_Int", "prim_Int", u8"33i");
 }
 
-BOOST_AUTO_TEST_CASE(NatNums)
+// BOOST_AUTO_TEST_CASE(BigInt)
+// {
+//     TEST_IT("--BigInt", "prim_Int", "prim_Int", u8"33I");
+// }
+
+BOOST_AUTO_TEST_CASE(Nat)
 {
-    TEST_IT("--Main::Nats", "prim_Nat", "prim_Nat", u8"Main::Nats{55n, 0n, 375N, 222N}");
+    TEST_IT("--Nat", "prim_Nat", "prim_Nat", u8"92n");
 }
+
+// BOOST_AUTO_TEST_CASE(BigNat)
+// {
+//     TEST_IT("--BigNat", "prim_Nat", "prim_Nat", u8"0N");
+// }
 
 BOOST_AUTO_TEST_SUITE_END() // Primitives
