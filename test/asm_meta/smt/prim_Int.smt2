@@ -66,9 +66,9 @@
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((n Int)) (@Result Int)
-    (ite (not (not (= n 33))) (as @Result-err-other (@Result Int))
-        (@Result-ok n)
+(define-fun Main@main ((digit Int) (big_digit BigInt)) (@Result Int)
+    (ite (not (or (not (= digit 33)) (not (= big_digit 457)))) (as @Result-err-other (@Result Int))
+        (@Result-ok digit)
     )
 )
 
@@ -78,15 +78,4 @@
 (assert (= Int@one-cc-temp (@Result-ok 1)))
 (assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const num Int)
-(declare-const res (@Result Int))
-(assert (= res (Main@main num)))
-
-(assert (= res (as @Result-err-other (@Result Int))))
-(check-sat)
-(get-model)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 

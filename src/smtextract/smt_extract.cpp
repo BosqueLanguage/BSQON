@@ -1,8 +1,7 @@
-#include "smt_utils.h"
 #include <cstdio>
 #include <vector>
-#include <z3_api.h>
 #include "smt_extract.h"
+#include "smt_utils.h"
 
 bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
@@ -564,11 +563,23 @@ bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::expr ex)
     return NULL;
 }
 
-ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& solver)
+// Use Type* to find the func_decl in the z3::model.
+std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s, uint ith)
+{
+    if(s.check() == z3::sat) {
+        z3::func_decl arg = s.get_model().get_const_decl(ith);
+        std::cout << "ARG NAME: " << arg.name() << "\n";
+        std::cout << arg() << "\n";
+        return arg();
+    }
+    return std::nullopt;
+}
+
+ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& solver, uint ith)
     : asm_info(asm_info), bsq_t(bsq_t), s(solver), ex([&]() {
-          auto tmp = getBsqTypeExpr(bsq_t, solver);
+          auto tmp = getBsqTypeExpr(bsq_t, solver, ith);
           if(!tmp.has_value()) {
-              std::cout << "Provided type " << bsq_t->tkey << " not found in .smt2 file" << "\n";
+              std::cout << "Const not found in not found in .smt2 file" << "\n";
               exit(1);
           }
           return tmp.value();

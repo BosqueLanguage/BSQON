@@ -33,7 +33,6 @@ bool validPath(const char* filepath, const char* extension)
 
 std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
 {
-
     auto vk = v->kind;
     if(vk == bsqon::ValueKind::IntNumberValueKind) {
         bsqon::IntNumberValue* nv = static_cast<bsqon::IntNumberValue*>(v);
@@ -64,7 +63,6 @@ std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
 }
 
 ////////This uses the z3 generated model to find the constant value.
-
 bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
 {
     std::string og = tk;
@@ -72,10 +70,4 @@ bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
     std::string smt_tk = std::regex_replace(og, bsq_name, "@");
 
     return bsqon::TypeKey(smt_tk);
-}
-
-// Use Type* to find the func_decl in the z3::model.
-std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s)
-{
-    return std::nullopt;
 }

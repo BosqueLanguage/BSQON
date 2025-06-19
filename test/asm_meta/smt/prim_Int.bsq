@@ -1,9 +1,6 @@
 declare namespace Main;
 
-public function main(n: Int): Int { 
-	assert n !== 33i;
-    return n;
+public function main(digit: Int, big_digit: BigInt ): Int { 
+	assert \/(digit !== 33i, big_digit !== 457I);
+    return digit;
 }
-
-
-

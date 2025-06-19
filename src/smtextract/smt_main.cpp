@@ -1,15 +1,6 @@
 #include "smt_utils.h"
 #include "smt_extract.h"
-#include <cstddef>
-#include <cstdio>
-#include <string.h>
-#include <cstdlib>
-#include <string.h>
-#include <cstring>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <z3_api.h>
 
 int main(int argc, char** argv)
 {
@@ -17,71 +8,63 @@ int main(int argc, char** argv)
         badArgs("");
     }
 
-    // BSQ SMT INIT
-    const char* smt_path = argv[1];
-    if(validPath(smt_path, "smt2") == false) {
+    // Load SMT FILE
+    const char* smt_file = argv[1];
+    if(validPath(smt_file, "smt2") == false) {
         badArgs("Incorrect .smt2 file");
     }
 
-    const char* smt_file = smt_path;
     z3::context c;
     z3::solver s(c);
-    s.add(s.ctx().parse_file(smt_file));
+    s.from_file(smt_file);
 
-    if(s.check() == z3::unsat) {
-        badArgs("UNSAT smt file.");
+    z3::check_result chk_smt = s.check();
+    if(chk_smt == z3::unsat) {
+        badArgs("Unsat smt file\n");
     }
-    else if(s.check() == z3::unknown) {
-        badArgs("UNKNOWN smt file.");
+    else if(chk_smt == z3::unknown) {
+        badArgs("Unknown smt file\n");
     }
 
-    // BSQ ASSEMBLY INIT
-    const char* asm_path = argv[2];
-    if(validPath(asm_path, "json") == false) {
+    // Load TYPEINFO FILE
+    const char* asm_file = argv[3];
+    if(validPath(asm_file, "json") == false) {
         badArgs("Incorrect .json file");
     }
 
-    json jv;
+    json j_type;
     bsqon::AssemblyInfo asm_info;
-
-    const char* asm_json = asm_path;
     try {
-        std::ifstream infile(asm_json);
-        infile >> jv;
+        std::ifstream infile(asm_file);
+        infile >> j_type;
     }
     catch(const std::exception& e) {
         printf("Error parsing JSON: %s\n", e.what());
         exit(1);
     }
-    bsqon::AssemblyInfo::parse(jv, asm_info);
+    bsqon::AssemblyInfo::parse(j_type, asm_info);
 
-    ////////////////////////////////////////////////////////////////////////////
-    z3::model m = s.get_model();
-    for(uint i = 0; i < m.num_funcs(); ++i) {
-        z3::func_decl fn = m.get_func_decl(i);
-        std::cout << "FUNC" << fn << "\n";
-        std::cout << "ARITY" << fn.arity() << "\n";
-        for(uint j = 0; j < fn.arity(); ++j) {
-            z3::sort arg = fn.domain(j);
-            std::cout << "ARG SORT " << arg.name() << "\n";
-        }
+    // Load FN INFO FILE
+    const char* fn_info_file = argv[2];
+    if(validPath(fn_info_file, "json") == false) {
+        badArgs("Incorrect .json file");
     }
-    return 0;
 
-    // Find Type in asm_info
-    // bsqon::Type* bsq_t = asm_info.lookupTypeKey(tar_t);
-    // if(bsq_t == nullptr) {
-    //     badArgs("Unable to find TypeKey");
-    // }
-    //
-    // ValueSolver sol(&asm_info, bsq_t, s);
-    //
-    // bsqon::Value* result = sol.solveValue(sol.bsq_t, sol.ex);
-    // if(result == NULL) {
-    //     printf("solveValue returned NULL \n");
-    //     exit(1);
-    // }
-    //
-    // std::u8string rstr = result->toString();
-    // printf("%s\n", (const char*)rstr.c_str());
+    std::map<std::string, bsqon::Type*> arg_refs;
+    json j_fn;
+    try {
+        std::ifstream infile(fn_info_file);
+        infile >> j_fn;
+    }
+    catch(const std::exception& e) {
+        printf("Error parsing JSON: %s\n", e.what());
+        exit(1);
+    }
+
+    // Find all arg_refs for the function.
+    auto name = j_fn.count("name");
+    std::cout << "Name Val: " << name << "\n";
+
+    // FIND VALUES FOR ALL FN ARGUMENTS
+    return 0;
 }

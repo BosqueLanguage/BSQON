@@ -81,6 +81,10 @@
                 [
                     "Int",
                     "Int"
+                ],
+                [
+                    "BigInt",
+                    "BigInt"
                 ]
             ]
         }
@@ -109,6 +113,14 @@
             },
             "tkey": "Int",
             "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive big-integer value. **%"
+            },
+            "tkey": "BigInt",
+            "name": "BigInt"
         }
     ],
     "recursiveSets": [],
