@@ -1,0 +1,16 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "digit",
+            "type": "Int"
+        },
+        {
+            "name": "big_digit",
+            "type": "BigInt"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Int"
+}

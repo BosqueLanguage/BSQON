@@ -1,0 +1,6 @@
+declare namespace Main;
+
+public function main(n: Nat): Nat { 
+	assert n !== 92n;
+    return n;
+}

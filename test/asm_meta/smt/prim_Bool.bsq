@@ -1,0 +1,7 @@
+declare namespace Main;
+
+public function main(b: Bool): Bool { 
+	assert b !== false;
+    return b;
+}
+

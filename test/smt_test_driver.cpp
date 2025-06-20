@@ -1,15 +1,35 @@
-#include "smt_utils.h"
-#include "smt_extract.h"
+#include "smt_test_driver.h"
+
 #include <fstream>
 
-int main(int argc, char** argv)
+#ifndef TEST_PATH
+#define TEST_PATH "./"
+#endif
+
+void checkAndReport(const std::u8string& result, const std::u8string& expected)
 {
-    if(argc != 4) {
-        badArgs("");
+    if(result != expected) {
+        std::cout << "\033[33;1mExpected:\033[0m " << std::string(expected.cbegin(), expected.cend()) << std::endl;
+        std::cout << "\033[33;1mGot:\033[0m      " << std::string(result.cbegin(), result.cend()) << std::endl;
     }
 
+    BOOST_ASSERT(result == expected);
+}
+
+std::string createSmtPathName(std::string tcc)
+{
+    return std::string(TEST_PATH) + "asm_meta/smt/" + tcc + ".smt2";
+}
+
+std::string createSmtJSONPathName(std::string tcc)
+{
+    return std::string(TEST_PATH) + "asm_meta/smt/" + tcc + ".json";
+}
+
+void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std::u8string& result)
+{
     // Load SMT FILE
-    const char* smt_file = argv[1];
+    const char* smt_file = smt_in.c_str();
     if(validPath(smt_file, "smt2") == false) {
         badArgs("Incorrect .smt2 file");
     }
@@ -27,7 +47,7 @@ int main(int argc, char** argv)
     }
 
     // Load TYPEINFO FILE
-    const char* asm_file = argv[3];
+    const char* asm_file = tref_in.c_str();
     if(validPath(asm_file, "json") == false) {
         badArgs("Incorrect .json file");
     }
@@ -45,7 +65,7 @@ int main(int argc, char** argv)
     bsqon::AssemblyInfo::parse(j_type, asm_info);
 
     // Load FN INFO FILE
-    const char* fn_info_file = argv[2];
+    const char* fn_info_file = fn_in.c_str();
     if(validPath(fn_info_file, "json") == false) {
         badArgs("Incorrect .json file");
     }
@@ -68,14 +88,12 @@ int main(int argc, char** argv)
     // FIND VALUES FOR ALL FN ARGUMENTS
     for(const auto& [key, value] : arg_refs) {
         ValueSolver sol(&asm_info, key, s);
-        bsqon::Value* result = sol.solveValue(value, sol.ex);
-        if(result == NULL) {
+        bsqon::Value* res = sol.solveValue(value, sol.ex);
+        if(res == NULL) {
             printf("solveValue returned NULL \n");
             exit(1);
         }
 
-        std::u8string rstr = result->toString();
-        printf("%s\n", (const char*)rstr.c_str());
+        result += res->toString() + u8"\n";
     }
-    return 0;
 }

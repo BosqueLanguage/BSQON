@@ -20,13 +20,16 @@ Z3_INCLUDES=-I $(BUILD_DIR)include/z3/
 Z3_PATH=$(BUILD_DIR)include/z3/
 LIB_PATH=$(OUT_EXE)
 
+SMT_TEST_DIR=$(MAKE_PATH)/../test/
+SMT_TEST_SRC_DIR=$(SMT_TEST_DIR)smt_utests/
+
 BSQON_TEST_DIR=$(MAKE_PATH)/../test/
 BSQON_TEST_SRC_DIR=$(BSQON_TEST_DIR)utests/
 
 #dev is default, for another flavor : make BUILD=release or debug
 BUILD := dev
 
-CPP=g++
+CPP=g++ 
 CPP_STDFLAGS=-Wall -Wextra -Wno-unused-parameter -Wuninitialized -Werror -std=gnu++20
 
 CPPFLAGS_OPT.debug=-O0 -g -ggdb -fno-omit-frame-pointer -fsanitize=address
@@ -35,7 +38,7 @@ CPPFLAGS_OPT.release=-O3 -march=x86-64-v3
 CPPFLAGS=${CPPFLAGS_OPT.${BUILD}} ${CPP_STDFLAGS}
 CPPFLAGS_TEST=${CPPFLAGS_OPT.dev} ${CPP_STDFLAGS}
 
-CC=gcc
+CC=gcc 
 CSTDFLAGS=-DEXPORT -std=gnu17
 
 CFLAGS_OPT.debug=-O0 -g -ggdb -fno-omit-frame-pointer
@@ -62,10 +65,11 @@ GEN_HEADERS=$(GEN_DIR)component.h $(GEN_DIR)generator_rnd.h $(GEN_DIR)/generator
 GEN_SOURCES=$(GEN_DIR)component.cpp $(GEN_DIR)generator_rnd.cpp $(GEN_DIR)/generator_ai.cpp
 GEN_OBJS=$(OUT_OBJ)component.o $(OUT_OBJ)generator_rnd.o $(OUT_OBJ)generator_ai.o
 
-SMT_HEADERS=$(SMT_DIR)smt_utils.h
-# SMT_SOURCES=$(SMT_DIR)smt_main.cpp
-# SMT_OBJS=$(OUT_OBJ)
+SMT_HEADERS=$(SMT_DIR)smt_utils.h $(SMT_DIR)smt_extract.h
+SMT_SOURCES=$(SMT_DIR)smt_utils.cpp $(SMT_DIR)smt_extract.cpp
+# SMT_OBJS=$(OUT_OBJ)smt_utils.o	$(OUT_OBJ)smt_extract.o
 
+SMT_TEST_SOURCES= $(BSQON_TEST_DIR)smt_test_driver.cpp $(SMT_TEST_SRC_DIR)extract_prim.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)main.cpp 
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
 MAKEFLAGS += -j4
@@ -87,9 +91,9 @@ $(OUT_EXE)tgen: $(GEN_HEADERS) $(GEN_OBJS) $(OUT_EXE)libbsqon.a $(GEN_DIR)tgen.c
 	@mkdir -p $(OUT_EXE)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)tgen $(GEN_OBJS) $(GEN_DIR)tgen.cpp -lbsqon -lbrex -lgmp -lcurl #-lfl, caused build err.
 
-$(OUT_EXE)smtextract: $(SMT_HEADERS) $(OUT_EXE)libbsqon.a $(SMT_DIR)smt_main.cpp #$(SMT_OBJS) $(SMT_SOURCES)
+$(OUT_EXE)smtextract: $(SMT_HEADERS) $(OUT_EXE)libbsqon.a $(SMT_DIR)smt_main.cpp $(SMT_SOURCES)
 	@mkdir -p $(OUT_EXE)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -L$(Z3_PATH) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)smtextract $(SMT_DIR)smt_main.cpp -lbsqon -lbrex -lgmp -lcurl -lz3 #-lfl, caused build err.
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -L$(Z3_PATH) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)smtextract  $(SMT_SOURCES) $(SMT_DIR)smt_main.cpp -lbsqon -lbrex -lgmp -lcurl -lz3 #-lfl, caused build err.
 
 $(OUT_OBJ)component.o: $(GEN_HEADERS) $(GEN_SOURCES)
 	@mkdir -p $(OUT_OBJ)
@@ -150,6 +154,17 @@ $(OUT_OBJ)bsqon.tab.h $(OUT_OBJ)bsqon.tab.c &: $(CFG_HEADERS) $(CFG_SOURCES)
 $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	flex --warn -o $(OUT_OBJ)lex.yy.c $(PARSER_GEN_DIR)bsqon.l
+
+smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)smt_test_driver.h $(SMT_TEST_SOURCES) $(SMT_SOURCES)
+	@rm -rf $(BIN_DIR)
+	@mkdir -p $(BIN_DIR)
+	cp -r $(SMT_TEST_DIR)asm_meta $(BIN_DIR)asm_meta
+	cp -r $(SMT_TEST_DIR)asm_meta/smt/ $(BIN_DIR)asm_meta/smt/
+	cp -r $(SMT_TEST_DIR)smt_utests/ $(BIN_DIR)smt_utests/
+	$(CPP) $(CPPFLAGS_TEST) -DTEST_PATH='"$(BIN_DIR)"' $(JSON_INCLUDES) $(BREX_INCLUDES) -L$(BREX_PATH) -L$(LIB_PATH) -o $(BIN_DIR)smtextract_test $(SMT_TEST_SOURCES) $(SMT_SOURCES) $(OUT_EXE)libbsqon.a -lbsqon -lbrex -lgmp -lz3 -lboost_unit_test_framework #-lfl
+
+smt_test: smt_test_files
+	$(BIN_DIR)smtextract_test --report_level=short --color_output
 
 testfiles: $(BSQON_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)test_driver.h $(BSQON_TEST_SOURCES)
 	@rm -rf $(BIN_DIR)

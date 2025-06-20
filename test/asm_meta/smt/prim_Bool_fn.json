@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "b",
+            "type": "Bool"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Bool"
+}

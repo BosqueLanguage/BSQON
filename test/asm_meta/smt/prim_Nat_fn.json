@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "n",
+            "type": "Nat"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Nat"
+}
