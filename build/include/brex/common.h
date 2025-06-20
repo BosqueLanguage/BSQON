@@ -6,7 +6,7 @@
 #include <map>
 #include <set>
 
-#include "../json/json.hpp"
+#include "json.hpp"
 typedef nlohmann::json json;
 
 #ifdef BREX_DEBUG
