@@ -13,9 +13,9 @@
     (@EList-3 3)
     (@EList-4 4)
     ) (
-        (par (T1 T2) ((@EList-2-mk (_1 T1) (_2 T2))) )
-        (par (T1 T2 T3) ((@EList-3-mk (_1 T1) (_2 T2) (_3 T3))) )
-        (par (T1 T2 T3 T4) ((@EList-4-mk (_1 T1) (_2 T2) (_3 T3) (_4 T4))) )
+        (par (T1 T2) ((@EList-2-mk (@EList-2-0 T1) (@EList-2-1 T2))) )
+        (par (T1 T2 T3) ((@EList-3-mk (@EList-3-0 T1) (@EList-3-1 T2) (@EList-3-2 T3))) )
+        (par (T1 T2 T3 T4) ((@EList-4-mk (@EList-4-0 T1) (@EList-4-1 T2) (@EList-4-2 T3) (@EList-4-3 T4))) )
     )
 )
 
@@ -80,9 +80,9 @@
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const prim Main@Prim)
+(declare-const p Main@Prim)
 (declare-const res (@Result Main@Prim))
-(assert (= res (Main@main prim)))
+(assert (= res (Main@main p)))
 
 (assert (= res (as @Result-err-other (@Result Main@Prim))))
 (check-sat)

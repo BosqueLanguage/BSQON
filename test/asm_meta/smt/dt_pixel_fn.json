@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "pix",
+            "type": "Main::Pixel"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Int"
+}

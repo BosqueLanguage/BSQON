@@ -24,11 +24,10 @@ class ValueSolver
 {
   public:
     bsqon::AssemblyInfo* asm_info;
-    bsqon::Type* bsq_t;
     z3::solver& s;
     z3::expr ex;
 
-    ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& s, uint ith);
+    ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
 
     bsqon::Value* solveCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
@@ -45,15 +44,4 @@ class ValueSolver
     z3::expr FindStringLen(z3::expr ex);
     bool isDatatype(bsqon::Type* bsq_t, z3::func_decl fn);
     bool isPrimitive(bsqon::Type* bsq_t, z3::func_decl fn);
-
-    // bsqon::Type* lookupFnArg(std::string id)
-    // {
-    //     auto a = this->arg_refs.find(id);
-    //     if(a != this->arg_refs.end()) {
-    //         return a->second;
-    //     }
-    //     else {
-    //         return bsqon::UnresolvedType::singleton;
-    //     }
-    // }
 };

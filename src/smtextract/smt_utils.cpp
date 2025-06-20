@@ -6,7 +6,8 @@
 
 void badArgs(const char* msg)
 {
-    const char* usage = "USAGE: smtextract <formula.smt2> <assembly.json> <types>\n\nTYPES:\n  --Int\n  --Entity\n";
+    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json>";
+
     printf("%s\n", usage);
     printf("%s\n", msg);
     exit(1);
@@ -60,14 +61,4 @@ std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
     }
 
     return std::nullopt;
-}
-
-////////This uses the z3 generated model to find the constant value.
-bsqon::TypeKey bsqonToSmt(bsqon::TypeKey tk)
-{
-    std::string og = tk;
-    std::regex bsq_name("::");
-    std::string smt_tk = std::regex_replace(og, bsq_name, "@");
-
-    return bsqon::TypeKey(smt_tk);
 }

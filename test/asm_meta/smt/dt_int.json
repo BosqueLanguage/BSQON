@@ -18,6 +18,14 @@
             "ns": "Core",
             "subns": [
                 [
+                    "AlgorithmOps",
+                    "AlgorithmOps"
+                ],
+                [
+                    "Algorithm",
+                    "Algorithm"
+                ],
+                [
                     "KeyComparator",
                     "KeyComparator"
                 ],
@@ -68,6 +76,10 @@
             ],
             "types": [
                 [
+                    "None",
+                    "None"
+                ],
+                [
                     "Bool",
                     "Bool"
                 ],
@@ -96,6 +108,14 @@
             "hasvalidations": false,
             "tkey": "Main::Foo",
             "name": "Foo"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
         },
         {
             "tag": "PrimitiveEntity",

@@ -8,6 +8,17 @@
     (@Result-ok (@Result-value T))
 )))
 
+(declare-datatypes (
+    (@EList-2 2)
+    (@EList-3 3)
+    (@EList-4 4)
+    ) (
+        (par (T1 T2) ((@EList-2-mk (@EList-2-0 T1) (@EList-2-1 T2))) )
+        (par (T1 T2 T3) ((@EList-3-mk (@EList-3-0 T1) (@EList-3-1 T2) (@EList-3-2 T3))) )
+        (par (T1 T2 T3 T4) ((@EList-4-mk (@EList-4-0 T1) (@EList-4-1 T2) (@EList-4-2 T3) (@EList-4-3 T4))) )
+    )
+)
+
 ;;
 ;; Primitive datatypes 
 ;;
@@ -50,10 +61,6 @@
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
-;;NLA options
-(declare-fun @NLA_I_mult (Int Int) Int)
-(declare-fun @NLA_I_div (Int Int) Int)
-
 (declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
 (declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
@@ -68,12 +75,11 @@
 )
 
 (assert (= Int@zero-cc-temp (@Result-ok 0)))
-(assert ((_ is @Result-ok) Int@zero-cc-temp))
+(assert (is-@Result-ok Int@zero-cc-temp))
 (assert (= Int@zero (@Result-value Int@zero-cc-temp)))
 (assert (= Int@one-cc-temp (@Result-ok 1)))
-(assert ((_ is @Result-ok) Int@one-cc-temp))
+(assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;Above is SMTLIB code generated from the Bosque Code
@@ -87,5 +93,6 @@
 
 (assert (= res @Result-err-other))
 
-	(check-sat)
+(check-sat)
 (get-model)
+

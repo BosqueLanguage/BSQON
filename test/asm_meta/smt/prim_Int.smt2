@@ -64,6 +64,11 @@
 (declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
 (declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
+;;no content -- ;;--FN_ARGUMENTS--;;
+
+(declare-const digit Int)
+(declare-const big_digit BigInt)
+
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((digit Int) (big_digit BigInt)) (@Result Int)
@@ -79,3 +84,11 @@
 (assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
+;;;;;;;;;;;;;
+(declare-const res (@Result (Int)))
+(assert (= res (Main@main digit big_digit)))
+(assert (= res (as @Result-err-other (@Result Int))))
+
+
+(check-sat)
+(get-model)

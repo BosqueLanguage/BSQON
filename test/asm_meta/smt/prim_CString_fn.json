@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "s",
+            "type": "CString"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "CString"
+}

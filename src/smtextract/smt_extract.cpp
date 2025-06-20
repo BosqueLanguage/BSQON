@@ -564,20 +564,24 @@ bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::expr ex)
 }
 
 // Use Type* to find the func_decl in the z3::model.
-std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s, uint ith)
+std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s)
 {
     if(s.check() == z3::sat) {
-        z3::func_decl arg = s.get_model().get_const_decl(ith);
-        std::cout << "ARG NAME: " << arg.name() << "\n";
-        std::cout << arg() << "\n";
-        return arg();
+        z3::model m = s.get_model();
+        for(uint i = 0; i < m.num_consts(); ++i) {
+            z3::func_decl fn = m.get_const_decl(i);
+            if(fn.name().str() == target) {
+                return fn();
+            }
+        }
     }
+
     return std::nullopt;
 }
 
-ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, bsqon::Type* bsq_t, z3::solver& solver, uint ith)
-    : asm_info(asm_info), bsq_t(bsq_t), s(solver), ex([&]() {
-          auto tmp = getBsqTypeExpr(bsq_t, solver, ith);
+ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& solver)
+    : asm_info(asm_info), s(solver), ex([&]() {
+          auto tmp = getBsqTypeExpr(target, solver);
           if(!tmp.has_value()) {
               std::cout << "Const not found in not found in .smt2 file" << "\n";
               exit(1);

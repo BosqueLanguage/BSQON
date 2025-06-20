@@ -61,10 +61,21 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // Find all arg_refs for the function.
-    auto name = j_fn.count("name");
-    std::cout << "Name Val: " << name << "\n";
+    for(const auto& arg : j_fn["args"]) {
+        arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
+    }
 
     // FIND VALUES FOR ALL FN ARGUMENTS
+    for(const auto& [key, value] : arg_refs) {
+        ValueSolver sol(&asm_info, key, s);
+        bsqon::Value* result = sol.solveValue(value, sol.ex);
+        if(result == NULL) {
+            printf("solveValue returned NULL \n");
+            exit(1);
+        }
+
+        std::u8string rstr = result->toString();
+        printf("%s\n", (const char*)rstr.c_str());
+    }
     return 0;
 }

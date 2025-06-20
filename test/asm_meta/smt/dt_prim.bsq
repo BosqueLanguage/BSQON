@@ -17,7 +17,7 @@ public function main(p: Prim): Prim {
 				p.c !== 'Sphinx of black quartz, judge my vow.',
 				p.d !== 'Mr. Jock, TV quiz PhD, bags few lynx.',
 				p.e !== false,
-				p.f !== true)
+				p.f !== true);
 
 	return p;
 }
