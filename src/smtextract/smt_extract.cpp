@@ -540,7 +540,6 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
         fieldvalues.push_back(field_val);
     }
 
-    this->s.add(ex == c(fields));
     z3::check_result rr = this->s.check();
 
     if(rr == z3::sat) {
