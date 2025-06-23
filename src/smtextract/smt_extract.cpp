@@ -449,7 +449,7 @@ bsqon::Value* ValueSolver::solvePrimitive(bsqon::PrimitiveType* bsq_t, z3::expr 
         return solveCString(bsq_t, ex);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
@@ -461,7 +461,6 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
     z3::func_decl c = constructs[0];
     z3::func_decl_vector c_accs = c.accessors();
 
-    z3::expr_vector fields(this->s.ctx());
     std::vector<bsqon::Value*> fieldvalues;
 
     for(size_t j = 0; j < c_accs.size(); j++) {
@@ -481,13 +480,72 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
     return new bsqon::EntityValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, std::move(fieldvalues));
 }
 
+// If its none just return none value by testing for equality.
+// If its not that then just extract the value of it.
+bsqon::Value* ValueSolver::solveOption(bsqon::ConceptType* bsq_t, z3::expr ex)
+{
+    // Check if Optional is None
+    z3::func_decl_vector opts = ex.get_sort().constructors();
+    // z3::expr tmp_none = opts[0]();
+    // this->s.push();
+    //
+    // this->s.add(ex == tmp_none);
+    // z3::check_result res_none = this->s.check();
+    //
+    // this->s.pop();
+    //
+    // if(res_none == z3::sat) {
+    //     this->s.add(ex == tmp_none);
+    //     return new bsqon::NoneValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0});
+    // }
+
+    z3::func_decl_vector some = opts[1].accessors();
+    std::cout << "opts" << ex.get_sort().constructors() << "\n";
+    std::cout << "some = opts[i].accessors();" << "\n";
+    std::cout << "some[0] -> " << some[0] << "\n";
+    std::cout << "some[0].range() -> " << some[0].range() << "\n";
+    std::cout << "some[0].range().constructors()[0] -> " << some[0].range().constructors()[0] << "\n";
+    std::cout << "some[0].range().constructors()[0].accessors() -> " << some[0].range().constructors()[0].accessors()
+              << "\n";
+
+    ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
+
+    // If Opt is not none, then solve for some.
+    for(size_t i = 1; i < opts.size(); ++i) {
+        // this->s.push();
+
+        // this->s.add(ex == some);
+        // z3::check_result rr = this->s.check();
+        //
+        // this->s.pop();
+        // std::cout << rr << "\n";
+    }
+
+    return nullptr;
+};
+
+bsqon::Value* ValueSolver::solveConcept(bsqon::ConceptType* bsq_t, z3::expr ex)
+{
+    auto tg = bsq_t->tag;
+    if(tg == bsqon::TypeTag::TYPE_OPTION) {
+        return solveOption(bsq_t, ex);
+    }
+
+    return nullptr;
+}
+
 bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::expr ex)
 {
-    if(bsq_t->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
+
+    auto tg = bsq_t->tag;
+    if(tg == bsqon::TypeTag::TYPE_STD_ENTITY) {
         return solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
     }
-    else if(bsq_t->tag == bsqon::TypeTag::TYPE_PRIMITIVE) {
+    else if(tg == bsqon::TypeTag::TYPE_PRIMITIVE) {
         return solvePrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT || tg == bsqon::TypeTag::TYPE_OPTION) {
+        return solveConcept(static_cast<bsqon::ConceptType*>(bsq_t), ex);
     }
 
     return nullptr;

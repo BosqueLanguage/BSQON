@@ -1,0 +1,12 @@
+declare namespace Main;
+
+
+public function main(f: Option<Int>): Option<Int> {
+	if (f@some == 3i){
+		return some(0i);
+	}
+	return f;
+}
+
+
+

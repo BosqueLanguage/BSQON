@@ -35,7 +35,9 @@ class ValueSolver
     bsqon::Value* solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* solveOption(bsqon::ConceptType* bsq_t, z3::expr ex);
     bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
+    bsqon::Value* solveConcept(bsqon::ConceptType* t, z3::expr ex);
     bsqon::Value* solveEntity(bsqon::StdEntityType* t, z3::expr ex);
     bsqon::Value* solveValue(bsqon::Type* t, z3::expr ex);
 

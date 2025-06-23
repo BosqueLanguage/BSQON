@@ -42,3 +42,5 @@ build/bsqon/parser/*
 !build/include/brex/libbrex.a
 !build/include/z3/libz3.a
 
+#formatting
+.clang-format

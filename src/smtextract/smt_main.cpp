@@ -1,5 +1,5 @@
-#include "smt_utils.h"
 #include "smt_extract.h"
+#include "smt_utils.h"
 #include <fstream>
 
 int main(int argc, char** argv)
@@ -65,7 +65,6 @@ int main(int argc, char** argv)
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
-    // FIND VALUES FOR ALL FN ARGUMENTS
     for(const auto& [key, value] : arg_refs) {
         ValueSolver sol(&asm_info, key, s);
         bsqon::Value* result = sol.solveValue(value, sol.ex);
