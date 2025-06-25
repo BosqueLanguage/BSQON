@@ -1,0 +1,23 @@
+declare namespace Main;
+
+entity Prim {
+    field a: Int;
+    field b: BigNat;
+    field c: CString;
+    field d: CString;
+	field e: Bool;
+	field f: Option<Int>;
+}
+
+
+public function main(p: Prim): Prim { 
+	
+	assert \/( p.a !== -52i,
+				p.b !== 77N,
+				p.c !== 'Sphinx of black quartz, judge my vow.',
+				p.d !== 'Mr. Jock, TV quiz PhD, bags few lynx.',
+				p.e !== false,
+				p.f@some !== 3i);
+
+	return p;
+}
