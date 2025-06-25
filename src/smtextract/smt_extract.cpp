@@ -480,12 +480,15 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
     return new bsqon::EntityValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, std::move(fieldvalues));
 }
 
+// ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
+
 // If its none just return none value by testing for equality.
 // If its not that then just extract the value of it.
-bsqon::Value* ValueSolver::solveOption(bsqon::ConceptType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::solveOption(bsqon::OptionType* bsq_t, z3::expr ex)
 {
-    // Check if Optional is None
+    // Optional None? Return none;
     z3::func_decl_vector opts = ex.get_sort().constructors();
+
     // z3::expr tmp_none = opts[0]();
     // this->s.push();
     //
@@ -499,27 +502,18 @@ bsqon::Value* ValueSolver::solveOption(bsqon::ConceptType* bsq_t, z3::expr ex)
     //     return new bsqon::NoneValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0});
     // }
 
-    z3::func_decl_vector some = opts[1].accessors();
-    std::cout << "opts" << ex.get_sort().constructors() << "\n";
-    std::cout << "some = opts[i].accessors();" << "\n";
-    std::cout << "some[0] -> " << some[0] << "\n";
-    std::cout << "some[0].range() -> " << some[0].range() << "\n";
-    std::cout << "some[0].range().constructors()[0] -> " << some[0].range().constructors()[0] << "\n";
-    std::cout << "some[0].range().constructors()[0].accessors() -> " << some[0].range().constructors()[0].accessors()
-              << "\n";
-
-    ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
-
-    // If Opt is not none, then solve for some.
-    for(size_t i = 1; i < opts.size(); ++i) {
-        // this->s.push();
-
-        // this->s.add(ex == some);
-        // z3::check_result rr = this->s.check();
-        //
-        // this->s.pop();
-        // std::cout << rr << "\n";
-    }
+    std::cout << bsq_t->tkey << "\n";
+    // Since sat then we can return @Term for the main ex.
+    auto it = this->asm_info->concreteSubtypesMap.find(bsq_t->);
+    // if(it != this->asm_info->concreteSubtypesMap.end()) {
+    //     const auto& types = it->second;
+    //     for(const auto& t : types) {
+    //         std::cout << t << "\n";
+    //     }
+    // }
+    // else {
+    //     std::cout << "No concrete subtypes found for: " << bsq_t->oftype << "\n";
+    // }
 
     return nullptr;
 };
@@ -528,7 +522,7 @@ bsqon::Value* ValueSolver::solveConcept(bsqon::ConceptType* bsq_t, z3::expr ex)
 {
     auto tg = bsq_t->tag;
     if(tg == bsqon::TypeTag::TYPE_OPTION) {
-        return solveOption(bsq_t, ex);
+        return solveOption(static_cast<bsqon::OptionType*>(bsq_t), ex);
     }
 
     return nullptr;
