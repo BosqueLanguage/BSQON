@@ -487,7 +487,16 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 bsqon::Value* ValueSolver::solveOption(bsqon::OptionType* bsq_t, z3::expr ex)
 {
     // Optional None? Return none;
-    z3::func_decl_vector opts = ex.get_sort().constructors();
+    // EX can only have two possibilities noneValue or someValue.
+
+    z3::func_decl_vector terms = ex.get_sort().constructors();
+    for(size_t i = 0; i < terms.size(); ++i) {
+        std::cout << terms[i].name() << "\n";
+    }
+
+    std::cout << "TYPE: " << bsq_t->tkey << "\n";
+    const std::vector<bsqon::TypeKey>& supertypes = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
+    std::cout << "SUPERTYPES: " << supertypes.size() << "\n";
 
     // z3::expr tmp_none = opts[0]();
     // this->s.push();
@@ -502,9 +511,7 @@ bsqon::Value* ValueSolver::solveOption(bsqon::OptionType* bsq_t, z3::expr ex)
     //     return new bsqon::NoneValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0});
     // }
 
-    std::cout << bsq_t->tkey << "\n";
     // Since sat then we can return @Term for the main ex.
-    auto it = this->asm_info->concreteSubtypesMap.find(bsq_t->);
     // if(it != this->asm_info->concreteSubtypesMap.end()) {
     //     const auto& types = it->second;
     //     for(const auto& t : types) {
