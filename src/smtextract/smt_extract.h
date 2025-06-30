@@ -35,6 +35,7 @@ class ValueSolver
     bsqon::Value* solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* solveSome(bsqon::SomeType* bsq_t, z3::expr ex);
     bsqon::Value* solveOption(bsqon::OptionType* bsq_t, z3::expr ex);
     bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* solveConcept(bsqon::ConceptType* t, z3::expr ex);
@@ -43,7 +44,6 @@ class ValueSolver
 
     std::optional<z3::expr> getExprFromVal(bsqon::Value* v);
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
+
     z3::expr FindStringLen(z3::expr ex);
-    bool isDatatype(bsqon::Type* bsq_t, z3::func_decl fn);
-    bool isPrimitive(bsqon::Type* bsq_t, z3::func_decl fn);
 };

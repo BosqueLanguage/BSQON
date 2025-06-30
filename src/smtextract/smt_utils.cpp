@@ -62,3 +62,56 @@ std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
 
     return std::nullopt;
 }
+
+// Look for a "-mk" contruct from @Term.
+std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::string target)
+{
+    for(size_t i = 0; i < terms.size(); ++i) {
+        z3::func_decl ith_term = terms[i];
+
+        if(ith_term.name().str() == target) {
+            return ith_term;
+        }
+    }
+
+    return std::nullopt;
+};
+
+// SmtNameType Options:
+// NONE,
+// STRUCT_CONSTRUCT,
+// STRUCT_FIELD,
+// STRUCT_TERM_CONSTRUCT,
+// STRUCT_TERM_FIELD,
+// NAMESPACE_NAME,
+// TYPE_CONST_NAME,
+// TERM_SUBTYPE_FN_NAME,
+std::optional<std::string> tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
+{
+    if(n == STRUCT_CONSTRUCT) {
+        return tk + "-mk";
+    }
+    else if(n == STRUCT_FIELD) {
+        // TODO
+    }
+    else if(n == STRUCT_TERM_CONSTRUCT) {
+        return "@Term-" + tk + "-mk";
+    }
+    else if(n == STRUCT_TERM_FIELD) {
+        return "@Term-" + tk + "-value";
+    }
+    else if(n == NONE) {
+        return "@Term-mk-" + tk;
+    }
+    else if(n == NAMESPACE_NAME) {
+        // TODO
+    }
+    else if(n == TYPE_CONST_NAME) {
+        // TODO
+    }
+    else if(n == TERM_SUBTYPE_FN_NAME) {
+        return "@SubtypeOf-" + tk;
+    }
+
+    return std::nullopt;
+}

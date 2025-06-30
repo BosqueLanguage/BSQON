@@ -1,6 +1,7 @@
 #include "smt_test_driver.h"
 
 #include <fstream>
+#include <z3_api.h>
 
 #ifndef TEST_PATH
 #define TEST_PATH "./"
@@ -96,4 +97,6 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
 
         result += res->toString() + u8"\n";
     }
+
+    Z3_finalize_memory();
 }

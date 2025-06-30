@@ -43,6 +43,7 @@ int main(int argc, char** argv)
         exit(1);
     }
     bsqon::AssemblyInfo::parse(j_type, asm_info);
+    bsqon::loadAssembly(j_type, asm_info);
 
     // Load FN INFO FILE
     const char* fn_info_file = argv[2];
@@ -76,5 +77,7 @@ int main(int argc, char** argv)
         std::u8string rstr = result->toString();
         printf("%s\n", (const char*)rstr.c_str());
     }
+
+    Z3_finalize_memory();
     return 0;
 }

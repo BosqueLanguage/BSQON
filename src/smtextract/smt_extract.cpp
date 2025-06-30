@@ -1,4 +1,6 @@
 #include <cstdio>
+#include <cstring>
+#include <optional>
 #include <vector>
 #include "smt_extract.h"
 #include "smt_utils.h"
@@ -481,48 +483,65 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 }
 
 // ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
-
-// If its none just return none value by testing for equality.
-// If its not that then just extract the value of it.
-bsqon::Value* ValueSolver::solveOption(bsqon::OptionType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::solveSome(bsqon::SomeType* bsq_t, z3::expr ex)
 {
-    // Optional None? Return none;
-    // EX can only have two possibilities noneValue or someValue.
+    //"ex" should be at this point a primitive sort.
+    z3::sort some_sort = ex.get_sort();
+    z3::func_decl some_construct = some_sort.constructors()[0];
+    std::cout << some_construct << "\n";
 
-    z3::func_decl_vector terms = ex.get_sort().constructors();
-    for(size_t i = 0; i < terms.size(); ++i) {
-        std::cout << terms[i].name() << "\n";
+    z3::func_ecl some_accessor = some_construct.accessors()[0];
+    std::cout << some_accessor << "\n";
+
+    bsqon::Type* some_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
+    bsqon::Value* some_val = nullptr;
+    try {
+        some_val = this->solveValue(some_t, ex);
+    }
+    catch(const std::exception& e) {
+        std::cerr << "ERR: " << e.what() << "\n";
     }
 
-    std::cout << "TYPE: " << bsq_t->tkey << "\n";
-    const std::vector<bsqon::TypeKey>& supertypes = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
-    std::cout << "SUPERTYPES: " << supertypes.size() << "\n";
+    return new bsqon::SomeValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, some_val);
+}
 
-    // z3::expr tmp_none = opts[0]();
+bsqon::Value* ValueSolver::solveOption(bsqon::OptionType* bsq_t, z3::expr ex)
+{
+    z3::func_decl_vector terms = ex.get_sort().constructors();
+    const std::vector<bsqon::TypeKey>& subtypes = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
+
+    // Solving if Option is None.
     // this->s.push();
+    // z3::func_decl fn_none = findConstruct(terms, tKeyToSmtName("None", NONE).value());
+    // z3::expr none_expr = fn_none;
     //
-    // this->s.add(ex == tmp_none);
+    // this->s.add(ex == none_expr);
     // z3::check_result res_none = this->s.check();
     //
     // this->s.pop();
     //
     // if(res_none == z3::sat) {
-    //     this->s.add(ex == tmp_none);
+    //     this->s.add(ex == none_expr);
     //     return new bsqon::NoneValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0});
     // }
 
-    // Since sat then we can return @Term for the main ex.
-    // if(it != this->asm_info->concreteSubtypesMap.end()) {
-    //     const auto& types = it->second;
-    //     for(const auto& t : types) {
-    //         std::cout << t << "\n";
-    //     }
-    // }
-    // else {
-    //     std::cout << "No concrete subtypes found for: " << bsq_t->oftype << "\n";
-    // }
+    // Solving if Option is Some.
 
-    return nullptr;
+    // this->s.add();
+    //(declare-fun @Term-Some<Int>-mk (Some<Int>) @Term)
+    std::optional<z3::func_decl> some_mk =
+        findConstruct(terms, tKeyToSmtName(subtypes.at(0), STRUCT_TERM_CONSTRUCT).value());
+
+    // Some<Int>
+    z3::sort some_sort = some_mk.value().accessors()[0].range();
+    z3::symbol some_sym = this->s.ctx().str_symbol("tmp_some");
+    z3::expr some_unin = this->s.ctx().constant(some_sym, some_sort);
+
+    z3::expr some_mk_expr = some_mk.value()(some_unin);
+
+    // Should make some_mk == to whatever the SAT for some_mk_expr be.
+    // this->s.add();
+    Value* some_val = this->solveSome(dynamic_cast<bsqon::SomeType*>(bsq_t), some_val_expr);
 };
 
 bsqon::Value* ValueSolver::solveConcept(bsqon::ConceptType* bsq_t, z3::expr ex)
