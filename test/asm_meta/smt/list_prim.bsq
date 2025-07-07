@@ -1,0 +1,7 @@
+declare namespace Main;
+
+function main(l: List<Int>): List<Int> {
+	let ll = List<Int>{1i, 6i, 33i , 0i};
+
+	return ll;
+}

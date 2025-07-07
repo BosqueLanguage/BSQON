@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "l",
+            "type": "List<Int>"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "List<Int>"
+}

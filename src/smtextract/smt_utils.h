@@ -7,7 +7,7 @@
 
 enum SmtNameType
 {
-    NONE,
+    NONE_NAME,
     STRUCT_CONSTRUCT,
     STRUCT_FIELD,
     STRUCT_TERM_CONSTRUCT,

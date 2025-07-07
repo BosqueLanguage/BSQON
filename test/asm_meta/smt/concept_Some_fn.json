@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "t",
+            "type": "Option<Int>"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Option<Int>"
+}

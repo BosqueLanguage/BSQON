@@ -78,7 +78,7 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 };
 
 // SmtNameType Options:
-// NONE,
+// NONE_NAME,
 // STRUCT_CONSTRUCT,
 // STRUCT_FIELD,
 // STRUCT_TERM_CONSTRUCT,
@@ -86,6 +86,7 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 // NAMESPACE_NAME,
 // TYPE_CONST_NAME,
 // TERM_SUBTYPE_FN_NAME,
+
 std::optional<std::string> tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
 {
     if(n == STRUCT_CONSTRUCT) {
@@ -100,7 +101,7 @@ std::optional<std::string> tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
     else if(n == STRUCT_TERM_FIELD) {
         return "@Term-" + tk + "-value";
     }
-    else if(n == NONE) {
+    else if(n == NONE_NAME) {
         return "@Term-mk-" + tk;
     }
     else if(n == NAMESPACE_NAME) {

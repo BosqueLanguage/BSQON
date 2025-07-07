@@ -29,21 +29,23 @@ class ValueSolver
 
     ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
 
-    bsqon::Value* solveCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* solveBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* solveBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* solveSome(bsqon::SomeType* bsq_t, z3::expr ex);
-    bsqon::Value* solveOption(bsqon::OptionType* bsq_t, z3::expr ex);
-    bsqon::Value* solvePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* solveConcept(bsqon::ConceptType* t, z3::expr ex);
-    bsqon::Value* solveEntity(bsqon::StdEntityType* t, z3::expr ex);
-    bsqon::Value* solveValue(bsqon::Type* t, z3::expr ex);
+    bsqon::Value* extractCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractList(const bsqon::ListType* bsq_t, z3::expr ex);
+    bsqon::Value* extractBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractSome(bsqon::SomeType* bsq_t, z3::expr ex);
+    bsqon::Value* extractOption(bsqon::OptionType* bsq_t, z3::expr ex);
+    bsqon::Value* extractList(bsqon::ListType* bsq_t, z3::expr ex);
+    bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
+    bsqon::Value* extractConcept(bsqon::ConceptType* t, z3::expr ex);
+    bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
+    bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);
 
     std::optional<z3::expr> getExprFromVal(bsqon::Value* v);
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
 
-    z3::expr FindStringLen(z3::expr ex);
+    z3::expr extractSequenceLen(z3::expr ex);
 };
