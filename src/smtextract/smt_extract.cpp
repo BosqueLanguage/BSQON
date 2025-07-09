@@ -525,8 +525,6 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     this->s.pop();
 
     if(r_none == z3::sat) {
-        // TODO: TMP
-        printf("Got Sat for None\n");
         this->s.add(ex == none_ex);
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
@@ -547,8 +545,6 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
-        // TODO: TMP
-        printf("Got Sat for Some\n");
         this->s.add(some_recog(ex));
 
         z3::expr unin_some = this->s.ctx().constant(some_sort.name(), some_sort);
@@ -559,11 +555,6 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 
     return some_val;
 };
-
-bsqon::Type* getTypeFromExpr(z3::expr ex)
-{
-    return nullptr;
-}
 
 bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
@@ -578,9 +569,6 @@ bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     this->s.add(ex == c(list_expr));
 
     z3::expr list_len = this->extractSequenceLen(list_expr);
-
-    // TODO: TMP
-    std::cout << list_len.get_numeral_int() << "\n";
 
     bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
 
