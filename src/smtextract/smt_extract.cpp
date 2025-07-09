@@ -524,9 +524,6 @@ bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     else if(tg == bsqon::TypeTag::TYPE_PRIMITIVE) {
         return extractPrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
     }
-    else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT || tg == bsqon::TypeTag::TYPE_OPTION) {
-        return extractConcept(static_cast<bsqon::ConceptType*>(bsq_t), ex);
-    }
     else if(tg == bsqon::TypeTag::TYPE_LIST) {
         return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
     }
