@@ -514,16 +514,6 @@ bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
 }
 
-bsqon::Value* ValueSolver::extractConcept(bsqon::ConceptType* bsq_t, z3::expr ex)
-{
-    auto tg = bsq_t->tag;
-    if(tg == bsqon::TypeTag::TYPE_OPTION) {
-        return extractOption(static_cast<bsqon::OptionType*>(bsq_t), ex);
-    }
-
-    return nullptr;
-}
-
 bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
 
