@@ -5,12 +5,7 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": [
-                [
-                    "Prim",
-                    "Main::Prim"
-                ]
-            ]
+            "types": []
         },
         {
             "istoplevel": true,
@@ -94,57 +89,11 @@
                 [
                     "Int",
                     "Int"
-                ],
-                [
-                    "BigNat",
-                    "BigNat"
-                ],
-                [
-                    "CString",
-                    "CString"
                 ]
             ]
         }
     ],
     "typerefs": [
-        {
-            "tag": "StdEntity",
-            "fields": [
-                {
-                    "fname": "a",
-                    "ftype": "Int",
-                    "isoptional": false
-                },
-                {
-                    "fname": "b",
-                    "ftype": "BigNat",
-                    "isoptional": false
-                },
-                {
-                    "fname": "c",
-                    "ftype": "CString",
-                    "isoptional": false
-                },
-                {
-                    "fname": "d",
-                    "ftype": "CString",
-                    "isoptional": false
-                },
-                {
-                    "fname": "e",
-                    "ftype": "Bool",
-                    "isoptional": false
-                },
-                {
-                    "fname": "f",
-                    "ftype": "Option<Int>",
-                    "isoptional": false
-                }
-            ],
-            "hasvalidations": false,
-            "tkey": "Main::Prim",
-            "name": "Prim"
-        },
         {
             "tag": "Option",
             "attributes": {
@@ -189,22 +138,6 @@
             },
             "tkey": "Int",
             "name": "Int"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive big-integer value. **%"
-            },
-            "tkey": "BigNat",
-            "name": "BigNat"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive string value. **%"
-            },
-            "tkey": "CString",
-            "name": "CString"
         }
     ],
     "recursiveSets": [],

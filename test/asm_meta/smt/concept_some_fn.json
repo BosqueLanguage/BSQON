@@ -2,8 +2,8 @@
     "fname": "Main::main",
     "args": [
         {
-            "name": "t",
-            "type": "Option<Int>"
+            "name": "f",
+            "type": "Some<Int>"
         }
     ],
     "precondition": [],

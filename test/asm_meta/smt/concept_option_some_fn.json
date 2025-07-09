@@ -2,11 +2,11 @@
     "fname": "Main::main",
     "args": [
         {
-            "name": "p",
-            "type": "Main::Prim"
+            "name": "f",
+            "type": "Option<Int>"
         }
     ],
     "precondition": [],
     "postcondition": [],
-    "return": "Main::Prim"
+    "return": "Option<Int>"
 }

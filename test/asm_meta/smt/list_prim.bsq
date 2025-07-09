@@ -1,7 +1,9 @@
 declare namespace Main;
 
-function main(l: List<Int>): List<Int> {
-	let ll = List<Int>{1i, 6i, 33i , 0i};
+public function main(f: List<Int>): List<Int>{
+	let l = List<Int>{3i,5i,7i};
 
-	return ll;
+	assert /\(f.get(0n) !== l.get(0n), f.get(1n) !== l.get(1n), f.get(2n) !== l.get(2n));
+
+	return f;
 }

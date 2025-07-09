@@ -2,7 +2,7 @@
     "fname": "Main::main",
     "args": [
         {
-            "name": "l",
+            "name": "f",
             "type": "List<Int>"
         }
     ],

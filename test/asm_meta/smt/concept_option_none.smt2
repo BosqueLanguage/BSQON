@@ -51,7 +51,7 @@
         ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
-            (@Term-mk-None)
+            (@Term-None-mk)
             ;;no content -- ;;--TYPEDECL_TERM_CONSTRUCTORS--;;
             (@Term-Some<Int>-mk (@Term-Some<Int>-value Some<Int>))
             ;;no content -- ;;--ENTITY_TERM_CONSTRUCTORS--;;
@@ -62,17 +62,17 @@
 
 ;;no content -- ;;--VFIELD_ACCESS--;;
 
-(define-fun @SubtypeOf-Option<Int>((tt @Term)) Bool (or (is-@Term-Some<Int>-mk tt) (= tt @Term-mk-None)))
+(define-fun @SubtypeOf-Option<Int>((tt @Term)) Bool (or (is-@Term-Some<Int>-mk tt) (= tt @Term-None-mk)))
 
 (declare-const Int@zero Int) (declare-const Int@zero-cc-temp (@Result Int))
 (declare-const Int@one Int) (declare-const Int@one-cc-temp (@Result Int))
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-(define-fun Main@main ((t @Term)) (@Result @Term)
-    (let ((x (@Term-Some<Int>-mk (Some<Int>-mk 3))))
-        (ite (not (= (let ((@tmp-1-0 (ite (not (not (= t @Term-mk-None))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value t)))))) (ite (not (is-@Result-ok @tmp-1-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-0)) (let ((@tmp-1-1 (ite (not (not (= x @Term-mk-None))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value x)))))) (ite (not (is-@Result-ok @tmp-1-1)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-1)) (@Result-ok (not (= (@Result-value @tmp-1-0) (@Result-value @tmp-1-1)))))))) (@Result-ok true))) (let ((@failure (let ((@tmp-1-0 (ite (not (not (= t @Term-mk-None))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value t)))))) (ite (not (is-@Result-ok @tmp-1-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-0)) (let ((@tmp-1-1 (ite (not (not (= x @Term-mk-None))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value x)))))) (ite (not (is-@Result-ok @tmp-1-1)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-1)) (@Result-ok (not (= (@Result-value @tmp-1-0) (@Result-value @tmp-1-1)))))))))) (ite (= @failure (@Result-ok false)) ((as @Result-err (@Result @Term)) @err-other) ((as @Result-err (@Result @Term)) (@Result-etag @failure))))
-            (@Result-ok t)
+(define-fun Main@main ((f @Term)) (@Result @Term)
+    (let ((x @Term-None-mk))
+        (ite (not (= (let ((@tmp-1-1 (ite (not (not (= f @Term-None-mk))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value f)))))) (ite (not (is-@Result-ok @tmp-1-1)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-1)) (@Result-ok (or (= x @Term-None-mk) (not (= (Some<Int>-value (@Term-Some<Int>-value x)) (@Result-value @tmp-1-1))))))) (@Result-ok true))) (let ((@failure (let ((@tmp-1-1 (ite (not (not (= f @Term-None-mk))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value f)))))) (ite (not (is-@Result-ok @tmp-1-1)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-1)) (@Result-ok (or (= x @Term-None-mk) (not (= (Some<Int>-value (@Term-Some<Int>-value x)) (@Result-value @tmp-1-1))))))))) (ite (= @failure (@Result-ok false)) ((as @Result-err (@Result @Term)) @err-other) ((as @Result-err (@Result @Term)) (@Result-etag @failure))))
+            (@Result-ok f)
         )
     )
 )
@@ -86,6 +86,7 @@
 
 (declare-const SMV_I_RANGE Int) (assert (= SMV_I_RANGE 32))
 (declare-const SMV_STR_LENGTH Int) (assert (= SMV_STR_LENGTH 16))
+(declare-const SMV_LIST_SIZE_MAX Int) (assert (<= SMV_LIST_SIZE_MAX 3))
 
 (define-fun @Validate-None ((v None)) Bool true)
 (define-fun @Validate-Bool ((v Bool)) Bool true)
@@ -101,14 +102,22 @@
     (@Validate-Int (Some<Int>-value v))
 )
 (define-fun @Validate-Option<Int> ((v @Term)) Bool
-    (ite (not (= v @Term-mk-None)) (@Validate-Some<Int> (@Term-Some<Int>-value v)) true)
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Int> (@Term-Some<Int>-value v)) true)
 )
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const f @Term)
+(define-fun @ValidateRoot-Some<Int> ((v Some<Int>)) Bool
+    (@Validate-Some<Int> v)
+)
+(define-fun @ValidateRoot-Option<Int> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Int> (@Term-Some<Int>-value v)) true)
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare-const foo @Term)
 (declare-const res (@Result @Term))
-(assert (= res (Main@main f)))
 
+(assert (= res (Main@main foo)))
+(assert (= res ((as @Result-err (@Result @Term)) @err-other)))
 
 (check-sat)
 (get-model)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
