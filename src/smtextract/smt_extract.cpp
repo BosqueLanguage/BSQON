@@ -42,20 +42,9 @@ bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
     return nullptr;
 }
 
-// TODO: Make this us the Z3 Interp and Binary Search
 z3::expr ValueSolver::extractSequenceLen(z3::expr ex)
 {
-    if(this->s.check() == z3::sat) {
-        z3::expr z3_eval = this->s.get_model().eval(ex, true);
-        int ival;
-
-        if(ex.is_int()) {
-            ex.is_numeral_i(ival);
-            return this->s.ctx().int_val(ival);
-        }
-    }
-
-    std::vector<int> choices = {0, 1, 2, 10, 255};
+    std::vector<int> choices = {3, 1, 2, 10, 255};
     z3::expr result = this->s.ctx().int_val(0);
 
     for(int i : choices) {
@@ -72,7 +61,6 @@ z3::expr ValueSolver::extractSequenceLen(z3::expr ex)
         }
     }
 
-    // SAT Bin Search for all possible values.
     int min = BSQ_INT_MIN;
     int max = BSQ_INT_MAX;
 
@@ -537,6 +525,7 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     this->s.pop();
 
     if(r_none == z3::sat) {
+        // TODO: TMP
         printf("Got Sat for None\n");
         this->s.add(ex == none_ex);
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
@@ -558,6 +547,7 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
+        // TODO: TMP
         printf("Got Sat for Some\n");
         this->s.add(some_recog(ex));
 
@@ -577,19 +567,31 @@ bsqon::Type* getTypeFromExpr(z3::expr ex)
 
 bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
-    // Find the length.
-    z3::expr list_len = this->extractSequenceLen(ex);
+    z3::func_decl_vector constructs = ex.get_sort().constructors();
+    assert(constructs.size() <= 1);
 
-    // Find the Type of the list.
-    const std::vector<bsqon::TypeKey>& list_sub = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
-    bsqon::Type* list_t = this->asm_info->lookupTypeKey(list_sub[0]);
+    z3::func_decl c = constructs[0];
+    z3::func_decl_vector c_accs = c.accessors();
+
+    z3::expr list_expr = c_accs[0](ex);
+
+    this->s.add(ex == c(list_expr));
+
+    z3::expr list_len = this->extractSequenceLen(list_expr);
+
+    // TODO: TMP
+    std::cout << list_len.get_numeral_int() << "\n";
+
+    bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
 
     std::vector<bsqon::Value*> vals;
 
     for(int i = 0; i < list_len.get_numeral_int(); ++i) {
         z3::expr idx = this->s.ctx().int_val(i);
-        z3::expr ith_val = ex.nth(idx);
 
+        z3::expr ith_val = list_expr.nth(idx);
+
+        // str_exp.nth(index).char_to_int()
         bsqon::Type* t = this->asm_info->lookupTypeKey(list_t->tkey);
         bsqon::Value* val = this->extractValue(t, ith_val);
         vals.push_back(val);
@@ -620,6 +622,9 @@ bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     }
     else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT || tg == bsqon::TypeTag::TYPE_OPTION) {
         return extractConcept(static_cast<bsqon::ConceptType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_LIST) {
+        return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
     }
 
     return nullptr;
