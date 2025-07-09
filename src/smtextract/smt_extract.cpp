@@ -521,6 +521,7 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 
     this->s.push();
     this->s.add(opt_some_mk(ex));
+    this->s.add(opt_none_mk(ex));
     z3::check_result r_none = this->s.check();
     this->s.pop();
 
