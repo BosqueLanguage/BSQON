@@ -521,19 +521,23 @@ bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector opt_cs = ex.get_sort().constructors();
-    z3::func_decl_vector opt_recogs = ex.get_sort().recognizers();
     const std::vector<bsqon::TypeKey>& opt_sub = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
 
-    auto none_name = tKeyToSmtName("None", NONE_NAME);
+    z3::func_decl_vector opt_recogs = ex.get_sort().recognizers();
+    z3::func_decl opt_none_mk = opt_recogs[0];
+    z3::func_decl opt_some_mk = opt_recogs[1];
+
+    auto none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
     std::optional<z3::func_decl> none_mk = findConstruct(opt_cs, none_name.value());
     z3::expr none_ex = none_mk.value()();
 
     this->s.push();
-    this->s.add(opt_recogs[0](ex));
+    this->s.add(opt_some_mk(ex));
     z3::check_result r_none = this->s.check();
     this->s.pop();
 
     if(r_none == z3::sat) {
+        printf("Got Sat for None\n");
         this->s.add(ex == none_ex);
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
@@ -554,12 +558,13 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
+        printf("Got Sat for Some\n");
         this->s.add(some_recog(ex));
 
         z3::expr unin_some = this->s.ctx().constant(some_sort.name(), some_sort);
         z3::expr some_expr = some_mk.value()(unin_some);
 
-        some_val = this->extractSome(dynamic_cast<bsqon::SomeType*>(bsq_t), some_expr);
+        // some_val = this->extractSome(dynamic_cast<bsqon::SomeType*>(bsq_t), some_expr);
     }
 
     return some_val;
