@@ -513,19 +513,19 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     std::optional<z3::func_decl> none_mk_fn = findConstruct(opt_cs, none_name.value());
 
     z3::expr none_mk = none_mk_fn.value()();
-    this->s.push();
-
+    // this->s.push();
+    //
     // this->s.add(ex == none_mk);
-
-    z3::check_result r_none = this->s.check();
-    std::cout << r_none << "\n";
-
-    this->s.pop();
-
-    if(r_none == z3::sat) {
-        this->s.add(ex == none_mk);
-        return new bsqon::NoneValue(bsq_t, FILLER_POS);
-    }
+    //
+    // z3::check_result r_none = this->s.check();
+    // std::cout << r_none << "\n";
+    //
+    // this->s.pop();
+    //
+    // if(r_none == z3::sat) {
+    //     this->s.add(ex == none_mk);
+    //     return new bsqon::NoneValue(bsq_t, FILLER_POS);
+    // }
 
     //--------------------------------------------------------------------------
 
