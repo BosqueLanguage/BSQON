@@ -111,10 +111,10 @@
     (ite (not (= v @Term-None-mk)) (@Validate-Some<Int> (@Term-Some<Int>-value v)) true)
 )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare-const foo @Term)
+(declare-const f @Term)
 (declare-const res (@Result @Term))
 
-(assert (= res (Main@main foo)))
+(assert (= res (Main@main f)))
 (assert (= res ((as @Result-err (@Result @Term)) @err-other)))
 
 (check-sat)

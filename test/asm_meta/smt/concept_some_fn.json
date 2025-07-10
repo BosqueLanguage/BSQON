@@ -8,5 +8,5 @@
     ],
     "precondition": [],
     "postcondition": [],
-    "return": "Option<Int>"
+    "return": "Some<Int>"
 }

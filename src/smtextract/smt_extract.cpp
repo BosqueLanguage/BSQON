@@ -456,7 +456,6 @@ bsqon::Value* ValueSolver::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::exp
 
 bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
-
     z3::func_decl_vector constructs = ex.get_sort().constructors();
     assert(constructs.size() <= 1);
 
@@ -485,21 +484,16 @@ bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr e
 // ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
 bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 {
-    // NOTE: ex == (@Term-Some<Int>-mk Some<Int>)
-    //(declare-fun @Term-Some<T>-value (@Term) Some<T>)
-    z3::func_decl term_val_fn = ex.decl().accessors()[0];
+    z3::sort some_sort = ex.get_sort();
 
-    z3::sort srt_some = term_val_fn.range(); // Some<T>
+    //(declare-fun Some<Int>-mk (Int) Some<Int>)
+    z3::func_decl some_construct = some_sort.constructors()[0];
+    //(declare-fun Some<Int>-value (Some<Int>) Int)
+    z3::func_decl some_accesor = some_construct.accessors()[0];
 
-    z3::func_decl some_mk = srt_some.constructors()[0];
-    z3::func_decl some_expr = some_mk.accessors()[0];
+    z3::expr target_some = some_accesor(ex);
 
-    z3::expr unin_some = this->s.ctx().constant(srt_some.name(), srt_some);
-
-    z3::expr target_some = some_expr(unin_some);
-    std::cout << ex.decl() << "==" << target_some.decl() << "\n";
-    // this->s.add(ex = target_some);
-
+    std::cout << bsq_t->oftype << "\n";
     bsqon::Type* some_type = this->asm_info->lookupTypeKey(bsq_t->oftype);
     bsqon::Value* some_val = this->extractValue(some_type, target_some);
 
@@ -509,53 +503,54 @@ bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector opt_cs = ex.get_sort().constructors();
-    const std::vector<bsqon::TypeKey>& opt_sub = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
+    const std::vector<bsqon::TypeKey>& opt_subtype = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
 
     z3::func_decl_vector opt_recogs = ex.get_sort().recognizers();
-    z3::func_decl opt_none_mk = opt_recogs[0];
-    z3::func_decl opt_some_mk = opt_recogs[1];
+    z3::func_decl opt_none_is = opt_recogs[0];
+    z3::func_decl opt_some_is = opt_recogs[1];
 
     auto none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
-    std::optional<z3::func_decl> none_mk = findConstruct(opt_cs, none_name.value());
-    z3::expr none_ex = none_mk.value()();
+    std::optional<z3::func_decl> none_mk_fn = findConstruct(opt_cs, none_name.value());
 
+    z3::expr none_mk = none_mk_fn.value()();
     this->s.push();
-    this->s.add(opt_some_mk(ex));
-    this->s.add(opt_none_mk(ex));
+
+    this->s.add(!opt_some_is(ex));
+
     z3::check_result r_none = this->s.check();
+
     this->s.pop();
 
     if(r_none == z3::sat) {
-        this->s.add(ex == none_ex);
+        this->s.add(ex == none_mk);
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
 
     //--------------------------------------------------------------------------
 
-    bsqon::TypeKey some_tk = opt_sub[0];
+    bsqon::TypeKey some_tk = opt_subtype.at(0);
     auto some_name = tKeyToSmtName(some_tk, STRUCT_TERM_CONSTRUCT);
-    std::optional<z3::func_decl> some_mk = findConstruct(opt_cs, some_name.value());
-    std::cout << some_mk.value().range().recognizers() << "\n";
-    z3::sort some_sort = some_mk.value().accessors()[0].range();
-    z3::func_decl some_recog = some_sort.recognizers()[0];
 
-    this->s.push();
-    this->s.add(opt_recogs[1](ex));
+    //(declare-fun @Term-Some<Int>-mk (Some<Int>) @Term)
+    std::optional<z3::func_decl> term_some_mk = findConstruct(opt_cs, some_name.value());
+    //(declare-fun @Term-Some<Int>-value (@Term) Some<Int>)
+    z3::func_decl term_some_acc = term_some_mk.value().accessors()[0];
+
+    this->s.add(opt_some_is(ex));
     z3::check_result r_some = this->s.check();
-    this->s.pop();
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
-        this->s.add(some_recog(ex));
+        // some_expr: must be passed in the shape of (T) Some<Int>.
+        // T must be discovered in the block above and applied to the expr.
+        z3::expr some_expr = term_some_acc(ex);
+        bsqon::Type* some_type = this->asm_info->lookupTypeKey(some_tk);
 
-        z3::expr unin_some = this->s.ctx().constant(some_sort.name(), some_sort);
-        z3::expr some_expr = some_mk.value()(unin_some);
-
-        // some_val = this->extractSome(dynamic_cast<bsqon::SomeType*>(bsq_t), some_expr);
+        some_val = this->extractSome(dynamic_cast<bsqon::SomeType*>(some_type), some_expr);
     }
 
     return some_val;
-};
+}
 
 bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
