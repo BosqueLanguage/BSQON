@@ -115,7 +115,6 @@
 (declare-const f @Term)
 (declare-const res (@Result @Term))
 
-
 (assert (= res (Main@main f)))
 (assert (= res ((as @Result-err (@Result @Term)) @err-other)))
 
