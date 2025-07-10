@@ -494,8 +494,7 @@ bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr e
 bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
-    z3::func_decl_vector testers = ex.get_sort().recognizers();
-    assert(constructs.size() <= 1);
+    assert(constructs.size() == 1);
     z3::func_decl c = constructs[0];
     z3::func_decl c_accs = c.accessors()[0];
 
