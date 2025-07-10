@@ -2,8 +2,7 @@ declare namespace Main;
 
 public function main(f: Option<Int>): Option<Int> { 
 	let x: Option<Int> = some(3i);
-
-	assert(x !== f@some);
+	assert(x@some !== f@some);
 
 	return f;
 }

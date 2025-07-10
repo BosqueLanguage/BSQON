@@ -493,7 +493,6 @@ bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 
     z3::expr target_some = some_accesor(ex);
 
-    std::cout << bsq_t->oftype << "\n";
     bsqon::Type* some_type = this->asm_info->lookupTypeKey(bsq_t->oftype);
     bsqon::Value* some_val = this->extractValue(some_type, target_some);
 
@@ -509,24 +508,23 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     z3::func_decl opt_none_is = opt_recogs[0];
     z3::func_decl opt_some_is = opt_recogs[1];
 
+    //--------------------------------------------------------------------------
     auto none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
     std::optional<z3::func_decl> none_mk_fn = findConstruct(opt_cs, none_name.value());
 
     z3::expr none_mk = none_mk_fn.value()();
-    // this->s.push();
-    //
-    // this->s.add(ex == none_mk);
-    //
-    // z3::check_result r_none = this->s.check();
-    // std::cout << r_none << "\n";
-    //
-    // this->s.pop();
-    //
-    // if(r_none == z3::sat) {
-    //     this->s.add(ex == none_mk);
-    //     return new bsqon::NoneValue(bsq_t, FILLER_POS);
-    // }
+    this->s.push();
 
+    this->s.add(opt_some_is(ex));
+    z3::check_result r_none = this->s.check();
+
+    this->s.pop();
+
+    // Negation was the only way to get this working.
+    if(r_none == z3::unsat) {
+        this->s.add(opt_none_is(ex));
+        return new bsqon::NoneValue(bsq_t, FILLER_POS);
+    }
     //--------------------------------------------------------------------------
 
     bsqon::TypeKey some_tk = opt_subtype.at(0);
@@ -538,12 +536,11 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     z3::func_decl term_some_acc = term_some_mk.value().accessors()[0];
 
     this->s.add(opt_some_is(ex));
+
     z3::check_result r_some = this->s.check();
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
-        // some_expr: must be passed in the shape of (T) Some<Int>.
-        // T must be discovered in the block above and applied to the expr.
         z3::expr some_expr = term_some_acc(ex);
         bsqon::Type* some_type = this->asm_info->lookupTypeKey(some_tk);
 
