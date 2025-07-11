@@ -68,9 +68,6 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 {
     for(size_t i = 0; i < terms.size(); ++i) {
         z3::func_decl ith_term = terms[i];
-        // NOTE: TMP
-        std::cout << "TERM\n" << ith_term << "\nTarget\n" << target << "\n";
-
         if(ith_term.name().str() == target) {
             return ith_term;
         }

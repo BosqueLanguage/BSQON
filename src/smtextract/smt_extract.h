@@ -38,9 +38,9 @@ class ValueSolver
     bsqon::Value* extractInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractSome(bsqon::SomeType* bsq_t, z3::expr ex);
     bsqon::Value* extractOption(bsqon::OptionType* bsq_t, z3::expr ex);
+    bsqon::Value* extractConcept(bsqon::ConceptType* t, z3::expr ex);
     bsqon::Value* extractList(bsqon::ListType* bsq_t, z3::expr ex);
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* extractConcept(bsqon::ConceptType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
     bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);
 
