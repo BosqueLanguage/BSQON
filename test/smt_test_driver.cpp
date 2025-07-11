@@ -1,6 +1,7 @@
 #include "smt_test_driver.h"
 
 #include <fstream>
+#include <z3_api.h>
 
 #ifndef TEST_PATH
 #define TEST_PATH "./"
@@ -88,7 +89,7 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
     // FIND VALUES FOR ALL FN ARGUMENTS
     for(const auto& [key, value] : arg_refs) {
         ValueSolver sol(&asm_info, key, s);
-        bsqon::Value* res = sol.solveValue(value, sol.ex);
+        bsqon::Value* res = sol.extractValue(value, sol.ex);
         if(res == NULL) {
             printf("solveValue returned NULL \n");
             exit(1);
@@ -96,4 +97,6 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
 
         result += res->toString() + u8"\n";
     }
+
+    Z3_finalize_memory();
 }

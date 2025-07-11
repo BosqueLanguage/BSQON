@@ -1,5 +1,5 @@
-#include "smt_utils.h"
 #include "smt_extract.h"
+#include "smt_utils.h"
 #include <fstream>
 
 int main(int argc, char** argv)
@@ -43,6 +43,7 @@ int main(int argc, char** argv)
         exit(1);
     }
     bsqon::AssemblyInfo::parse(j_type, asm_info);
+    bsqon::loadAssembly(j_type, asm_info);
 
     // Load FN INFO FILE
     const char* fn_info_file = argv[2];
@@ -65,10 +66,9 @@ int main(int argc, char** argv)
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
-    // FIND VALUES FOR ALL FN ARGUMENTS
     for(const auto& [key, value] : arg_refs) {
         ValueSolver sol(&asm_info, key, s);
-        bsqon::Value* result = sol.solveValue(value, sol.ex);
+        bsqon::Value* result = sol.extractValue(value, sol.ex);
         if(result == NULL) {
             printf("solveValue returned NULL \n");
             exit(1);
@@ -77,5 +77,7 @@ int main(int argc, char** argv)
         std::u8string rstr = result->toString();
         printf("%s\n", (const char*)rstr.c_str());
     }
+
+    Z3_finalize_memory();
     return 0;
 }

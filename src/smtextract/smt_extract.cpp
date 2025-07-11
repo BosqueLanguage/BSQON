@@ -1,7 +1,11 @@
 #include <cstdio>
+#include <cstring>
+#include <optional>
 #include <vector>
 #include "smt_extract.h"
 #include "smt_utils.h"
+
+#define FILLER_POS bsqon::SourcePos{0, 0, 0, 0}
 
 bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
@@ -9,38 +13,45 @@ bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
     if(tk == "Int" && ex.is_int()) {
         int ival;
         ex.is_numeral_i(ival);
-        return new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, ival);
+        return new bsqon::IntNumberValue(bsq_t, FILLER_POS, ival);
     }
     else if(tk == "Nat" && ex.is_int()) {
         uint nval;
         ex.is_numeral_u(nval);
-        return new bsqon::NatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, nval);
+        return new bsqon::NatNumberValue(bsq_t, FILLER_POS, nval);
     }
     else if(tk == "BigInt" && ex.is_int()) {
         int64_t Ival;
         ex.is_numeral_i64(Ival);
-        return new bsqon::BigIntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, Ival);
+        return new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, Ival);
     }
     else if(tk == "BigNat" && ex.is_int()) {
         uint64_t Nval;
         ex.is_numeral_u64(Nval);
-        return new bsqon::BigNatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, Nval);
+        return new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, Nval);
     }
     else if(tk == "CString" && ex.is_string_value()) {
         std::string csval = ex.get_string();
-        return bsqon::CStringValue::createFromGenerator(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, csval);
+        return bsqon::CStringValue::createFromGenerator(bsq_t, FILLER_POS, csval);
     }
     else if(tk == "String" && ex.is_string_value()) {
         std::string sval = ex.get_string();
-        return bsqon::StringValue::createFromGenerator(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, sval);
+        return bsqon::StringValue::createFromGenerator(bsq_t, FILLER_POS, sval);
     }
 
     return nullptr;
 }
 
-// TODO: Make this us the Z3 Interp and Binary Search
-z3::expr ValueSolver::FindStringLen(z3::expr ex)
+z3::expr ValueSolver::extractSequenceLen(z3::expr ex)
 {
+    // Check Z3 interpretation z3 expr
+    if(this->s.check() == z3::sat) {
+        z3::expr z3_eval = this->s.get_model().eval(ex.length(), true);
+        if(z3_eval.is_int()) {
+            return z3_eval;
+        }
+    }
+
     std::vector<int> choices = {0, 1, 2, 10, 255};
     z3::expr result = this->s.ctx().int_val(0);
 
@@ -53,12 +64,12 @@ z3::expr ValueSolver::FindStringLen(z3::expr ex)
         z3::check_result rr = this->s.check();
         this->s.pop();
         if(rr == z3::sat) {
+            this->s.add(ex.length() == len_tmp);
             result = len_tmp;
             return result;
         }
     }
 
-    // SAT Bin Search for all possible values.
     int min = BSQ_INT_MIN;
     int max = BSQ_INT_MAX;
 
@@ -126,9 +137,9 @@ std::optional<char> ValueSolver::BinSearchChar(z3::expr str_exp, z3::expr index,
     return const_char;
 }
 
-bsqon::Value* ValueSolver::solveCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
-    // Check Z3 interpretation z3 expr
+    // // Check Z3 interpretation z3 expr
     if(this->s.check() == z3::sat) {
         z3::expr z3_eval = this->s.get_model().eval(ex, true);
         bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
@@ -139,7 +150,7 @@ bsqon::Value* ValueSolver::solveCString(const bsqon::PrimitiveType* bsq_t, z3::e
 
     std::string str_tmp("");
 
-    z3::expr str_len = FindStringLen(ex);
+    z3::expr str_len = extractSequenceLen(ex);
     int found_str_len = str_len.get_numeral_int();
 
     for(int i = 0; i < found_str_len; i++) {
@@ -154,10 +165,10 @@ bsqon::Value* ValueSolver::solveCString(const bsqon::PrimitiveType* bsq_t, z3::e
         }
     }
 
-    return bsqon::CStringValue::createFromGenerator(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, str_tmp);
+    return bsqon::CStringValue::createFromGenerator(bsq_t, FILLER_POS, str_tmp);
 }
 
-bsqon::Value* ValueSolver::solveBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     this->s.push();
 
@@ -168,16 +179,16 @@ bsqon::Value* ValueSolver::solveBool(const bsqon::PrimitiveType* bsq_t, z3::expr
 
     if(rr == z3::sat) {
         this->s.add(ex);
-        return new bsqon::BoolValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, true);
+        return new bsqon::BoolValue(bsq_t, FILLER_POS, true);
     }
     else {
         z3::expr alt = this->s.ctx().bool_val(false);
         this->s.add(ex == alt);
-        return new bsqon::BoolValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, false);
+        return new bsqon::BoolValue(bsq_t, FILLER_POS, false);
     }
 }
 
-bsqon::Value* ValueSolver::solveBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     // Check Z3 interpretation z3 expr
     if(this->s.check() == z3::sat) {
@@ -203,7 +214,7 @@ bsqon::Value* ValueSolver::solveBigNat(const bsqon::PrimitiveType* bsq_t, z3::ex
 
         if(rr == z3::sat) {
             this->s.add(ex == int_tmp);
-            res = new bsqon::BigNatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, uint64_t(choices.at(i)));
+            res = new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, uint64_t(choices.at(i)));
             return res;
         }
     }
@@ -235,10 +246,10 @@ bsqon::Value* ValueSolver::solveBigNat(const bsqon::PrimitiveType* bsq_t, z3::ex
 
     this->s.add(ex == int_expr);
 
-    return new bsqon::BigNatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, search_int);
+    return new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, search_int);
 }
 
-bsqon::Value* ValueSolver::solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     // Check Z3 interpretation z3 expr
     if(this->s.check() == z3::sat) {
@@ -264,7 +275,7 @@ bsqon::Value* ValueSolver::solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr 
 
         if(rr == z3::sat) {
             this->s.add(ex == int_tmp);
-            res = new bsqon::NatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, uint64_t(choices.at(i)));
+            res = new bsqon::NatNumberValue(bsq_t, FILLER_POS, uint64_t(choices.at(i)));
             return res;
         }
     }
@@ -298,10 +309,10 @@ bsqon::Value* ValueSolver::solveNat(const bsqon::PrimitiveType* bsq_t, z3::expr 
     z3::expr int_expr = this->s.ctx().int_val(search_int);
 
     this->s.add(ex == int_expr);
-    return new bsqon::NatNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, search_int);
+    return new bsqon::NatNumberValue(bsq_t, FILLER_POS, search_int);
 }
 
-bsqon::Value* ValueSolver::solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     // Check Z3 interpretation z3 expr
     if(this->s.check() == z3::sat) {
@@ -327,7 +338,7 @@ bsqon::Value* ValueSolver::solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::ex
 
         if(rr == z3::sat) {
             this->s.add(ex == int_tmp);
-            res = new bsqon::BigIntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, int64_t(choices.at(i)));
+            res = new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, int64_t(choices.at(i)));
             return res;
         }
     }
@@ -361,10 +372,10 @@ bsqon::Value* ValueSolver::solveBigInt(const bsqon::PrimitiveType* bsq_t, z3::ex
     z3::expr int_expr = this->s.ctx().int_val(search_int);
 
     this->s.add(ex == int_expr);
-    return new bsqon::BigIntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, search_int);
+    return new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, search_int);
 }
 
-bsqon::Value* ValueSolver::solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     // Check Z3 interpretation z3 expr
     if(this->s.check() == z3::sat) {
@@ -390,7 +401,7 @@ bsqon::Value* ValueSolver::solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr 
 
         if(rr == z3::sat) {
             this->s.add(ex == int_tmp);
-            res = new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, int64_t(choices.at(i)));
+            res = new bsqon::IntNumberValue(bsq_t, FILLER_POS, int64_t(choices.at(i)));
             return res;
         }
     }
@@ -424,44 +435,43 @@ bsqon::Value* ValueSolver::solveInt(const bsqon::PrimitiveType* bsq_t, z3::expr 
     z3::expr int_expr = this->s.ctx().int_val(search_int);
 
     this->s.add(ex == int_expr);
-    return new bsqon::IntNumberValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, search_int);
+    return new bsqon::IntNumberValue(bsq_t, FILLER_POS, search_int);
 }
 
-bsqon::Value* ValueSolver::solvePrimitive(bsqon::PrimitiveType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
     auto tk = bsq_t->tkey;
     if(tk == "Int") {
-        return solveInt(bsq_t, ex);
+        return extractInt(bsq_t, ex);
     }
     else if(tk == "BigInt") {
-        return solveBigInt(bsq_t, ex);
+        return extractBigInt(bsq_t, ex);
     }
     else if(tk == "Nat") {
-        return solveNat(bsq_t, ex);
+        return extractNat(bsq_t, ex);
     }
     else if(tk == "BigNat") {
-        return solveBigNat(bsq_t, ex);
+        return extractBigNat(bsq_t, ex);
     }
     else if(tk == "Bool") {
-        return solveBool(bsq_t, ex);
+        return extractBool(bsq_t, ex);
     }
     else if(tk == "CString") {
-        return solveCString(bsq_t, ex);
+        return extractCString(bsq_t, ex);
     }
 
-    return NULL;
+    return nullptr;
 }
 
-bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
 
     z3::func_decl_vector constructs = ex.get_sort().constructors();
-    assert(constructs.size() <= 1);
+    assert(constructs.size() == 1);
 
     z3::func_decl c = constructs[0];
     z3::func_decl_vector c_accs = c.accessors();
 
-    z3::expr_vector fields(this->s.ctx());
     std::vector<bsqon::Value*> fieldvalues;
 
     for(size_t j = 0; j < c_accs.size(); j++) {
@@ -470,7 +480,7 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 
         z3::expr field_acc = c_accs[j](ex);
         try {
-            bsqon::Value* field_val = this->solveValue(field_t, field_acc);
+            bsqon::Value* field_val = this->extractValue(field_t, field_acc);
             fieldvalues.push_back(field_val);
         }
         catch(const std::exception& e) {
@@ -478,16 +488,48 @@ bsqon::Value* ValueSolver::solveEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
         }
     }
 
-    return new bsqon::EntityValue(bsq_t, bsqon::SourcePos{0, 0, 0, 0}, std::move(fieldvalues));
+    return new bsqon::EntityValue(bsq_t, FILLER_POS, std::move(fieldvalues));
 }
 
-bsqon::Value* ValueSolver::solveValue(bsqon::Type* bsq_t, z3::expr ex)
+bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
-    if(bsq_t->tag == bsqon::TypeTag::TYPE_STD_ENTITY) {
-        return solveEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
+    z3::func_decl_vector constructs = ex.get_sort().constructors();
+    assert(constructs.size() == 1);
+    z3::func_decl c = constructs[0];
+    z3::func_decl c_accs = c.accessors()[0];
+
+    z3::expr list_expr = c_accs(ex);
+    z3::expr list_len = this->extractSequenceLen(list_expr);
+
+    bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
+    std::vector<bsqon::Value*> vals;
+
+    for(int i = 0; i < list_len.get_numeral_int(); ++i) {
+        z3::expr idx = this->s.ctx().int_val(i);
+
+        z3::expr ith_val = list_expr.nth(idx);
+
+        bsqon::Type* t = this->asm_info->lookupTypeKey(list_t->tkey);
+        bsqon::Value* val = this->extractValue(t, ith_val);
+        vals.push_back(val);
     }
-    else if(bsq_t->tag == bsqon::TypeTag::TYPE_PRIMITIVE) {
-        return solvePrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
+
+    this->s.add(ex == c(list_expr));
+    return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
+}
+
+bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
+{
+
+    auto tg = bsq_t->tag;
+    if(tg == bsqon::TypeTag::TYPE_STD_ENTITY) {
+        return extractEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_PRIMITIVE) {
+        return extractPrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_LIST) {
+        return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
     }
 
     return nullptr;
