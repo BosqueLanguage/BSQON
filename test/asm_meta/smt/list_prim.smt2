@@ -132,7 +132,6 @@
 (define-fun @ValidateRoot-List<Int> ((v List<Int>)) Bool
     (@Validate-List<Int> v)
 )
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (declare-const f List<Int>)
 (declare-const res (@Result List<Int>))
@@ -144,3 +143,4 @@
 (get-model)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

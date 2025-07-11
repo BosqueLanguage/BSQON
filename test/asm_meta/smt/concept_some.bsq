@@ -3,7 +3,7 @@ declare namespace Main;
 public function main(f: Some<Int>): Some<Int> { 
 	let x = some(33i);
 
-	assert(x@some !== f@some);
+	assert(x@ !== f@);
 
 	return f;
 }
