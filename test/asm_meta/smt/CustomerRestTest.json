@@ -5,7 +5,16 @@
             "imports": [],
             "ns": "Main",
             "subns": [],
-            "types": []
+            "types": [
+                [
+                    "EMAIL",
+                    "Main::EMAIL"
+                ],
+                [
+                    "UserDTO",
+                    "Main::UserDTO"
+                ]
+            ]
         },
         {
             "istoplevel": true,
@@ -72,7 +81,7 @@
             "types": [
                 [
                     "Option",
-                    "Option<Int>"
+                    "Option<Main::EMAIL>"
                 ],
                 [
                     "None",
@@ -80,28 +89,67 @@
                 ],
                 [
                     "Some",
-                    "Some<Int>"
+                    "Some<Main::EMAIL>"
                 ],
                 [
                     "Bool",
                     "Bool"
                 ],
                 [
-                    "Int",
-                    "Int"
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ],
+                [
+                    "CRegex",
+                    "CRegex"
                 ]
             ]
+        },
+        {
+            "istoplevel": false,
+            "imports": [],
+            "ns": "CStringOps",
+            "subns": [],
+            "types": []
         }
     ],
     "typerefs": [
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/${re_SAFEIDENTIFIERCHAR}+('.'${re_SAFEIDENTIFIERCHAR})* '@' (${re_SAFEIDENTIFIERCHAR}+ '.')+ [a-zA-Z]+ /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::EMAIL",
+            "name": "EMAIL"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "email",
+                    "ftype": "Option<Main::EMAIL>",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": true,
+            "tkey": "Main::UserDTO",
+            "name": "UserDTO"
+        },
         {
             "tag": "Option",
             "attributes": {
                 "docstring": "%** Type for representing the option value. **%"
             },
-            "tkey": "Option<Int>",
+            "tkey": "Option<Main::EMAIL>",
             "name": "Option",
-            "oftype": "Int"
+            "oftype": "Main::EMAIL"
         },
         {
             "tag": "PrimitiveEntity",
@@ -117,11 +165,11 @@
                 "docstring": "%** Type for representing the some option value. **%"
             },
             "supertypes": [
-                "Option<Int>"
+                "Option<Main::EMAIL>"
             ],
-            "tkey": "Some<Int>",
+            "tkey": "Some<Main::EMAIL>",
             "name": "Some",
-            "oftype": "Int"
+            "oftype": "Main::EMAIL"
         },
         {
             "tag": "PrimitiveEntity",
@@ -134,12 +182,41 @@
         {
             "tag": "PrimitiveEntity",
             "attributes": {
-                "docstring": "%** Primitive integer value. **%"
+                "docstring": "%** Primitive natural number value. **%"
             },
-            "tkey": "Int",
-            "name": "Int"
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive unicode regex value. **%"
+            },
+            "tkey": "CRegex",
+            "name": "CRegex"
         }
     ],
     "recursiveSets": [],
-    "resystem": []
+    "resystem": [
+        {
+            "nsinfo": {
+                "inns": "Main",
+                "nsmappings": []
+            },
+            "reinfos": [
+                {
+                    "name": "re_SAFEIDENTIFIERCHAR",
+                    "restr": "/[a-zA-Z0-9-_]/c"
+                }
+            ]
+        }
+    ]
 }

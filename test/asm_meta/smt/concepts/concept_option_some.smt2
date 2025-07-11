@@ -70,10 +70,8 @@
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((f @Term)) (@Result @Term)
-    (let ((x (@Term-Some<Int>-mk (Some<Int>-mk 3))))
-        (ite (not (= (let ((@tmp-1-0 (ite (not (not (= x @Term-None-mk))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value x)))))) (ite (not (is-@Result-ok @tmp-1-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-0)) (let ((@tmp-1-1 (ite (not (not (= f @Term-None-mk))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value f)))))) (ite (not (is-@Result-ok @tmp-1-1)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-1)) (@Result-ok (not (= (@Result-value @tmp-1-0) (@Result-value @tmp-1-1)))))))) (@Result-ok true))) (let ((@failure (let ((@tmp-1-0 (ite (not (not (= x @Term-None-mk))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value x)))))) (ite (not (is-@Result-ok @tmp-1-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-0)) (let ((@tmp-1-1 (ite (not (not (= f @Term-None-mk))) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (Some<Int>-value (@Term-Some<Int>-value f)))))) (ite (not (is-@Result-ok @tmp-1-1)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-1)) (@Result-ok (not (= (@Result-value @tmp-1-0) (@Result-value @tmp-1-1)))))))))) (ite (= @failure (@Result-ok false)) ((as @Result-err (@Result @Term)) @err-other) ((as @Result-err (@Result @Term)) (@Result-etag @failure))))
-            (@Result-ok f)
-        )
+    (ite (not (or (= f @Term-None-mk) (not (= (Some<Int>-value (@Term-Some<Int>-value f)) 3)))) ((as @Result-err (@Result @Term)) @err-other)
+        (@Result-ok f)
     )
 )
 
@@ -121,3 +119,4 @@
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

@@ -484,6 +484,7 @@ bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr e
 // ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
 bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 {
+    std::cout << "Triggered err?" << ex << "\n";
     z3::sort some_sort = ex.get_sort();
 
     //(declare-fun Some<Int>-mk (Int) Some<Int>)
@@ -515,13 +516,13 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     z3::expr none_mk = none_mk_fn.value()();
     this->s.push();
 
-    this->s.add(opt_some_is(ex));
+    this->s.add(opt_none_is(ex));
     z3::check_result r_none = this->s.check();
 
     this->s.pop();
 
     // Negation was the only way to get this working.
-    if(r_none == z3::unsat) {
+    if(r_none == z3::sat) {
         this->s.add(opt_none_is(ex));
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
@@ -530,9 +531,10 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     bsqon::TypeKey some_tk = opt_subtype.at(0);
     auto some_name = tKeyToSmtName(some_tk, STRUCT_TERM_CONSTRUCT);
 
-    //(declare-fun @Term-Some<Int>-mk (Some<Int>) @Term)
+    //(declare-fun @Term-Some<Int>-mk (Some<T>) @Term)
     std::optional<z3::func_decl> term_some_mk = findConstruct(opt_cs, some_name.value());
-    //(declare-fun @Term-Some<Int>-value (@Term) Some<Int>)
+    //(declare-fun @Term-Some<Int>-value (@Term) Some<T>)
+    std::cout << "GOT:\n" << term_some_mk.value() << "\n";
     z3::func_decl term_some_acc = term_some_mk.value().accessors()[0];
 
     this->s.add(opt_some_is(ex));

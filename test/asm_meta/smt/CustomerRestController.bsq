@@ -1,4 +1,4 @@
-declare namespace Customer;
+declare namespace Main;
 const re_SAFEIDENTIFIERCHAR: CRegex = /[a-zA-Z0-9-_]/c;
 
 type ALPHANUMERIC = CString of / [a-zA-Z0-9]+/c;
@@ -16,7 +16,7 @@ type EXCLUDE_SPECIALS = CString of / !['#$%;^*()'']* /c;
 
 entity UserDTO {
     field email: Option<EMAIL>;
-    invariant emailNotEmpty($email);
+    invariant userEmailNotEmpty($email);
     field password: ALPHANUMERIC;
     invariant $password.value.size() >= 6n && $password.value.size() <= 50n;
     field name: Option<USER_NAME>;
@@ -27,7 +27,7 @@ entity UserDTO {
     invariant userAddressNotEmpty($address);
 }
 
-function emailNotEmpty(x: Option<EMAIL>) : Bool {
+function userEmailNotEmpty(x: Option<EMAIL>) : Bool {
     if(x)@@none {
         return false;
     }
@@ -55,6 +55,7 @@ function userAddressNotEmpty(x: Option<USER_ADDRESS>): Bool {
     return !x.value.empty() && x.value.size() <= 100n;
 }
 
+
 public function getCustomer(): UserDTO {
     return UserDTO {
         some('jch270@uky.edu'<EMAIL>),
@@ -73,4 +74,12 @@ public function createCustomer(user: UserDTO): UserDTO {
         some('+12 111 111 11 11'<USER_PHONE>),
         some('123 Fake Street'<USER_ADDRESS>),
     };
+}
+
+public function main(user: UserDTO): UserDTO{
+	let james = getCustomer();
+
+	assert (james.name@some == user.name@some);
+
+    return user;
 }
