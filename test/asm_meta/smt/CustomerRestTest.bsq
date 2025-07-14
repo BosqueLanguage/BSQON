@@ -5,7 +5,6 @@ type EMAIL = CString of /${re_SAFEIDENTIFIERCHAR}+('.'${re_SAFEIDENTIFIERCHAR})*
 
 entity UserDTO {
     field email: Option<EMAIL>;
-    invariant userEmailNotEmpty($email);
 }
 
 function userEmailNotEmpty(x: Option<EMAIL>) : Bool {
@@ -16,9 +15,8 @@ function userEmailNotEmpty(x: Option<EMAIL>) : Bool {
 }
 
 public function main(user: UserDTO): UserDTO{
-	let x: Option<EMAIL> = some('jch270@uky.edu'<EMAIL>);
 
-	assert \/(x@some !== user.email@some);
+	assert \/(user.email !== 'jch270@uky.edu'<EMAIL> );
 
     return user;
 }

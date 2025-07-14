@@ -14,7 +14,18 @@ BOOST_AUTO_TEST_SUITE(Concept)
 
 BOOST_AUTO_TEST_CASE(concept_list)
 {
-    TEST_IT("list_prim", "list_prim_fn", "list_prim", u8"List<Int>{10i, 2i, 5i}\n");
+    TEST_IT("concepts/list_prim", "concepts/list_prim_fn", "concepts/list_prim", u8"List<Int>{10i}\n");
+}
+
+BOOST_AUTO_TEST_CASE(option_some)
+{
+    TEST_IT("concepts/concept_option_some", "concepts/concept_option_some", "concepts/concept_option_some",
+            u8"Some<Int>{3i}\n");
+}
+
+BOOST_AUTO_TEST_CASE(option_none)
+{
+    TEST_IT("concepts/concept_option_none", "concepts/concept_option_some", "concepts/concept_option_some", u8"none\n");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // DataType

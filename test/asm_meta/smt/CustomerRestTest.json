@@ -96,10 +96,6 @@
                     "Bool"
                 ],
                 [
-                    "Nat",
-                    "Nat"
-                ],
-                [
                     "CString",
                     "CString"
                 ],
@@ -108,13 +104,6 @@
                     "CRegex"
                 ]
             ]
-        },
-        {
-            "istoplevel": false,
-            "imports": [],
-            "ns": "CStringOps",
-            "subns": [],
-            "types": []
         }
     ],
     "typerefs": [
@@ -138,7 +127,7 @@
                     "isoptional": false
                 }
             ],
-            "hasvalidations": true,
+            "hasvalidations": false,
             "tkey": "Main::UserDTO",
             "name": "UserDTO"
         },
@@ -178,14 +167,6 @@
             },
             "tkey": "Bool",
             "name": "Bool"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive natural number value. **%"
-            },
-            "tkey": "Nat",
-            "name": "Nat"
         },
         {
             "tag": "PrimitiveEntity",

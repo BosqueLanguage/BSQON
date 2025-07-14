@@ -34,26 +34,26 @@
 ;;String is String
 
 ;;no content -- ;;--ENUM_DECLS--;;
-;;no content -- ;;--TYPEDECL_DECLS--;;
+(declare-datatype Main@EMAIL ( (Main@EMAIL-mk (Main@EMAIL-value CString)) ))
 
 ;;
 ;; Entity datatypes 
 ;;
 (declare-datatypes (
-    ;;no content -- ;;--SPECIAL_DECLS--;;
+    (Some<Main@EMAIL> 0)
     ;;no content -- ;;--COLLECTION_DECLS--;;
-    ;;no content -- ;;--ENTITY_DECLS--;;
+    (Main@UserDTO 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
     (@Term 0)
     ) (
-        ;;no content -- ;;--SPECIAL_CONSTRUCTORS--;;
+        ((Some<Main@EMAIL>-mk (Some<Main@EMAIL>-value Main@EMAIL)))
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ;;no content -- ;;--ENTITY_CONSTRUCTORS--;;
+        ((Main@UserDTO-mk (Main@UserDTO-email @Term)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-None-mk)
             ;;no content -- ;;--TYPEDECL_TERM_CONSTRUCTORS--;;
-            ;;no content -- ;;--SPECIAL_TERM_CONSTRUCTORS--;;
+            (@Term-Some<Main@EMAIL>-mk (@Term-Some<Main@EMAIL>-value Some<Main@EMAIL>))
             ;;no content -- ;;--ENTITY_TERM_CONSTRUCTORS--;;
             ;;no content -- ;;--DATATYPE_TERM_CONSTRUCTORS--;;
         )
@@ -62,13 +62,17 @@
 
 ;;no content -- ;;--VFIELD_ACCESS--;;
 
-;;no content -- ;;--SUBTYPE_PREDICATES--;;
+(define-fun @SubtypeOf-Option<Main@EMAIL>((tt @Term)) Bool (or (is-@Term-Some<Main@EMAIL>-mk tt) (= tt @Term-None-mk)))
 
 ;;no content -- ;;--GLOBAL_DECLS--;;
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
-;;no content -- ;;--FUNCTION_DECLS--;;
+(define-fun Main@main ((user Main@UserDTO)) (@Result Main@UserDTO)
+    (ite (not (or (= (Main@UserDTO-email user) @Term-None-mk) (not (= (Some<Main@EMAIL>-value (@Term-Some<Main@EMAIL>-value (Main@UserDTO-email user))) (Main@EMAIL-mk "jch270@uky.edu"))))) ((as @Result-err (@Result Main@UserDTO)) @err-other)
+        (@Result-ok user)
+    )
+)
 
 ;;no content -- ;;--GLOBAL_IMPLS--;;
 
@@ -86,4 +90,40 @@
 (define-fun @Validate-CString ((v CString)) Bool (and (<= (str.len v) SMV_STR_LENGTH) (str.in.re v (re.* (re.union (str.to.re "\u{9}") (re.range " " "~"))))))
 (define-fun @Validate-String ((v String)) Bool (<= (str.len v) SMV_STR_LENGTH))
 
-;;no content -- ;;--VALIDATE_PREDICATES--;;
+(define-fun @Validate-Main@EMAIL ((v Main@EMAIL)) Bool
+    (and (@Validate-CString (Main@EMAIL-value v)) (str.in.re (Main@EMAIL-value v) (re.++ (re.+ (re.union (re.range "a" "z") (re.range "A" "Z") (re.range "0" "9") (str.to.re "-") (str.to.re "_"))) (re.* (re.++ (str.to.re ".") (re.union (re.range "a" "z") (re.range "A" "Z") (re.range "0" "9") (str.to.re "-") (str.to.re "_")))) (str.to.re "@") (re.+ (re.++ (re.+ (re.union (re.range "a" "z") (re.range "A" "Z") (re.range "0" "9") (str.to.re "-") (str.to.re "_"))) (str.to.re "."))) (re.+ (re.union (re.range "a" "z") (re.range "A" "Z"))))))
+)
+(define-fun @Validate-Some<Main@EMAIL> ((v Some<Main@EMAIL>)) Bool
+    (@Validate-Main@EMAIL (Some<Main@EMAIL>-value v))
+)
+(define-fun @Validate-Option<Main@EMAIL> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@EMAIL> (@Term-Some<Main@EMAIL>-value v)) true)
+)
+(define-fun @Validate-Main@UserDTO ((v Main@UserDTO)) Bool
+    (@Validate-Option<Main@EMAIL> (Main@UserDTO-email v))
+)
+(define-fun @ValidateRoot-Main@EMAIL ((v Main@EMAIL)) Bool
+    (@Validate-Main@EMAIL v)
+)
+(define-fun @ValidateRoot-Some<Main@EMAIL> ((v Some<Main@EMAIL>)) Bool
+    (@Validate-Some<Main@EMAIL> v)
+)
+(define-fun @ValidateRoot-Option<Main@EMAIL> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@EMAIL> (@Term-Some<Main@EMAIL>-value v)) true)
+)
+(define-fun @ValidateRoot-Main@UserDTO ((v Main@UserDTO)) Bool
+    (@Validate-Main@UserDTO v)
+)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare-const user Main@UserDTO)
+(declare-const res (@Result Main@UserDTO))
+
+(assert (= res (Main@main user)))
+(assert (= res ((as @Result-err (@Result Main@UserDTO)) @err-other)))
+
+(check-sat)
+(get-model)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

@@ -1,9 +1,0 @@
-declare namespace Main;
-
-public function main(f: Some<Int>): Option<Int> { 
-	let x = some(33i);
-
-	assert(x !== f@some);
-
-	return f;
-}

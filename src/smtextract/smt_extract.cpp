@@ -42,6 +42,7 @@ bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
     return nullptr;
 }
 
+// Only accept expr that have (Seq Int) sort
 z3::expr ValueSolver::extractSequenceLen(z3::expr ex)
 {
     // Check Z3 interpretation z3 expr
@@ -483,7 +484,7 @@ bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr e
             fieldvalues.push_back(field_val);
         }
         catch(const std::exception& e) {
-            std::cerr << "ERR: " << e.what() << "\n";
+            std::cerr << "extractEntity ERR: " << e.what() << "\n";
         }
     }
 
@@ -493,7 +494,6 @@ bsqon::Value* ValueSolver::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr e
 // ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
 bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 {
-    std::cout << "Triggered err?" << ex << "\n";
     z3::sort some_sort = ex.get_sort();
 
     //(declare-fun Some<Int>-mk (Int) Some<Int>)
@@ -519,8 +519,8 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     z3::func_decl opt_some_is = opt_recogs[1];
 
     //--------------------------------------------------------------------------
-    auto none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
-    std::optional<z3::func_decl> none_mk_fn = findConstruct(opt_cs, none_name.value());
+    std::string none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
+    std::optional<z3::func_decl> none_mk_fn = findConstruct(opt_cs, none_name);
 
     z3::expr none_mk = none_mk_fn.value()();
     this->s.push();
@@ -530,7 +530,6 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 
     this->s.pop();
 
-    // Negation was the only way to get this working.
     if(r_none == z3::sat) {
         this->s.add(opt_none_is(ex));
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
@@ -538,12 +537,11 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     //--------------------------------------------------------------------------
 
     bsqon::TypeKey some_tk = opt_subtype.at(0);
-    auto some_name = tKeyToSmtName(some_tk, STRUCT_TERM_CONSTRUCT);
+    std::string some_name = tKeyToSmtName(some_tk, STRUCT_TERM_CONSTRUCT);
 
     //(declare-fun @Term-Some<Int>-mk (Some<T>) @Term)
-    std::optional<z3::func_decl> term_some_mk = findConstruct(opt_cs, some_name.value());
+    std::optional<z3::func_decl> term_some_mk = findConstruct(opt_cs, some_name);
     //(declare-fun @Term-Some<Int>-value (@Term) Some<T>)
-    std::cout << "GOT:\n" << term_some_mk.value() << "\n";
     z3::func_decl term_some_acc = term_some_mk.value().accessors()[0];
 
     this->s.add(opt_some_is(ex));
@@ -598,6 +596,18 @@ bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
 }
 
+// Ex must return the TypeDecl primitive that is representing.
+bsqon::Value* ValueSolver::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex)
+{
+    z3::func_decl t_cs = ex.get_sort().constructors()[0];
+    z3::func_decl t_accs = t_cs.accessors()[0];
+
+    z3::expr p_ex = t_accs(ex);
+
+    bsqon::Type* ptype = this->asm_info->lookupTypeKey(bsq_t->primitivetype);
+    return this->extractValue(ptype, p_ex);
+}
+
 bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
 
@@ -611,11 +621,12 @@ bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT || tg == bsqon::TypeTag::TYPE_OPTION) {
         return extractConcept(static_cast<bsqon::ConceptType*>(bsq_t), ex);
     }
-    else
-        (tg == bsqon::TypeTag::TYPE_LIST)
-        {
-            return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
-        }
+    else if(tg == bsqon::TypeTag::TYPE_LIST) {
+        return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_TYPE_DECL) {
+        return extractTypeDecl(static_cast<bsqon::TypedeclType*>(bsq_t), ex);
+    }
 
     return nullptr;
 }
@@ -640,7 +651,7 @@ ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::
     : asm_info(asm_info), s(solver), ex([&]() {
           auto tmp = getBsqTypeExpr(target, solver);
           if(!tmp.has_value()) {
-              std::cout << "Const not found in not found in .smt2 file" << "\n";
+              std::cout << "ARG: " << target << "not in .smt2 file" << "\n";
               exit(1);
           }
           return tmp.value();
