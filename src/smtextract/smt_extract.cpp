@@ -596,7 +596,6 @@ bsqon::Value* ValueSolver::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
 }
 
-// Ex must return the TypeDecl primitive that is representing.
 bsqon::Value* ValueSolver::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex)
 {
     z3::func_decl t_cs = ex.get_sort().constructors()[0];
