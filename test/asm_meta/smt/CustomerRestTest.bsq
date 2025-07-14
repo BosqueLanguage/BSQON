@@ -3,20 +3,24 @@ declare namespace Main;
 const re_SAFEIDENTIFIERCHAR: CRegex = /[a-zA-Z0-9-_]/c;
 type EMAIL = CString of /${re_SAFEIDENTIFIERCHAR}+('.'${re_SAFEIDENTIFIERCHAR})* '@' (${re_SAFEIDENTIFIERCHAR}+ '.')+ [a-zA-Z]+ /c;
 
+type ALPHANUMERIC = CString of / [a-zA-Z0-9]+/c;
+
+const re_USERNAME: CRegex = /.{1, 50}/c;
+type USER_NAME = CString of / ${re_USERNAME} /c;
+
 entity UserDTO {
     field email: Option<EMAIL>;
-}
-
-function userEmailNotEmpty(x: Option<EMAIL>) : Bool {
-    if(x)@@none {
-        return false;
-    }
-    return !x.value.empty() && x.value.size() <= 50n;
+    field password: ALPHANUMERIC;
+	field name: Option<USER_NAME>;
 }
 
 public function main(user: UserDTO): UserDTO{
 
-	assert \/(user.email !== 'jch270@uky.edu'<EMAIL> );
+	assert \/(
+			user.name !== 'James Chen'<USER_NAME>,
+	user.email !== 'jch270@uky.edu'<EMAIL>,
+	user.password !== '12345678'<ALPHANUMERIC>,
+	);
 
     return user;
 }

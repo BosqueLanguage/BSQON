@@ -11,6 +11,14 @@
                     "Main::EMAIL"
                 ],
                 [
+                    "ALPHANUMERIC",
+                    "Main::ALPHANUMERIC"
+                ],
+                [
+                    "USER_NAME",
+                    "Main::USER_NAME"
+                ],
+                [
                     "UserDTO",
                     "Main::UserDTO"
                 ]
@@ -81,11 +89,19 @@
             "types": [
                 [
                     "Option",
+                    "Option<Main::USER_NAME>"
+                ],
+                [
+                    "Option",
                     "Option<Main::EMAIL>"
                 ],
                 [
                     "None",
                     "None"
+                ],
+                [
+                    "Some",
+                    "Some<Main::USER_NAME>"
                 ],
                 [
                     "Some",
@@ -119,17 +135,58 @@
             "name": "EMAIL"
         },
         {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/ [a-zA-Z0-9]+/c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::ALPHANUMERIC",
+            "name": "ALPHANUMERIC"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/ ${re_USERNAME} /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_NAME",
+            "name": "USER_NAME"
+        },
+        {
             "tag": "StdEntity",
             "fields": [
                 {
                     "fname": "email",
                     "ftype": "Option<Main::EMAIL>",
                     "isoptional": false
+                },
+                {
+                    "fname": "password",
+                    "ftype": "Main::ALPHANUMERIC",
+                    "isoptional": false
+                },
+                {
+                    "fname": "name",
+                    "ftype": "Option<Main::USER_NAME>",
+                    "isoptional": false
                 }
             ],
             "hasvalidations": false,
             "tkey": "Main::UserDTO",
             "name": "UserDTO"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::USER_NAME>",
+            "name": "Option",
+            "oftype": "Main::USER_NAME"
         },
         {
             "tag": "Option",
@@ -147,6 +204,18 @@
             },
             "tkey": "None",
             "name": "None"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::USER_NAME>"
+            ],
+            "tkey": "Some<Main::USER_NAME>",
+            "name": "Some",
+            "oftype": "Main::USER_NAME"
         },
         {
             "tag": "Some",
@@ -196,6 +265,10 @@
                 {
                     "name": "re_SAFEIDENTIFIERCHAR",
                     "restr": "/[a-zA-Z0-9-_]/c"
+                },
+                {
+                    "name": "re_USERNAME",
+                    "restr": "/.{1, 50}/c"
                 }
             ]
         }
