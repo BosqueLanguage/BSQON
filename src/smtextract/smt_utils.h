@@ -20,6 +20,9 @@ enum SmtNameType
 // Utils
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
-std::optional<z3::expr> getBsqTypeExpr(bsqon::Type* bsq_t, z3::solver& s);
 std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n);
 std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::string target);
+
+// Initialize Class
+std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
+std::unordered_map<std::string, z3::func_decl> getSmtValidators(z3::solver& s);

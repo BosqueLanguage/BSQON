@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cstring>
 #include <optional>
+#include <string>
+#include <unordered_map>
 #include <vector>
 #include "smt_extract.h"
 #include "smt_utils.h"
@@ -376,8 +378,26 @@ bsqon::Value* ValueSolver::extractBigInt(const bsqon::PrimitiveType* bsq_t, z3::
     return new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, search_int);
 }
 
+std::optional<z3::func_decl> ValueSolver::getValidator(z3::sort srt)
+{
+    std::string srt_name = srt.name().str();
+    std::string validator_key = "@Validate-" + srt_name;
+
+    auto search = this->validators.find(validator_key);
+    if(search != this->validators.end()) {
+        return search->second;
+    }
+    else {
+        return std::nullopt;
+    }
+}
+
 bsqon::Value* ValueSolver::extractInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
+
+    // std::optional<z3::func_decl> validator = this->getValidator(ex.get_sort());
+    // this->s.add(validator.value()(ex));
+
     // Check Z3 interpretation z3 expr
     if(this->s.check() == z3::sat) {
         z3::expr z3_eval = this->s.get_model().eval(ex, true);
@@ -609,7 +629,6 @@ bsqon::Value* ValueSolver::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr 
 
 bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
-
     auto tg = bsq_t->tag;
     if(tg == bsqon::TypeTag::TYPE_STD_ENTITY) {
         return extractEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
@@ -630,22 +649,6 @@ bsqon::Value* ValueSolver::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     return nullptr;
 }
 
-// Use Type* to find the func_decl in the z3::model.
-std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s)
-{
-    if(s.check() == z3::sat) {
-        z3::model m = s.get_model();
-        for(uint i = 0; i < m.num_consts(); ++i) {
-            z3::func_decl fn = m.get_const_decl(i);
-            if(fn.name().str() == target) {
-                return fn();
-            }
-        }
-    }
-
-    return std::nullopt;
-}
-
 ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& solver)
     : asm_info(asm_info), s(solver), ex([&]() {
           auto tmp = getBsqTypeExpr(target, solver);
@@ -654,7 +657,57 @@ ValueSolver::ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::
               exit(1);
           }
           return tmp.value();
+      }()),
+      validators([&]() {
+          std::unordered_map<std::string, z3::func_decl> vs = getSmtValidators(solver);
+          if(vs.empty()) {
+              std::cout << "No validators in .smt2 file.\n";
+              exit(1);
+          }
+          return vs;
       }())
 {
     ;
+}
+
+std::unordered_map<std::string, z3::func_decl> getSmtValidators(z3::solver& s)
+{
+    std::unordered_map<std::string, z3::func_decl> valids_map;
+    if(s.check() != z3::sat) {
+        return valids_map;
+    }
+
+    z3::model m = s.get_model();
+    for(uint i = 0; i < m.num_funcs(); ++i) {
+        z3::func_decl fn = m.get_func_decl(i);
+        std::string fn_name = fn.name().str();
+
+        if(fn_name.find("@Validate") != std::string::npos) {
+            valids_map.insert({fn_name, fn});
+        }
+    }
+
+    // for(auto& [k, v] : valids_map) {
+    //     std::cout << "FN_NAME: " << k << "\n" << "Validator_DECL: " << v << "\n";
+    // }
+
+    return valids_map;
+}
+
+// Use Type* to find the func_decl in the z3::model.
+std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s)
+{
+    if(s.check() != z3::sat) {
+        return std::nullopt;
+    }
+
+    z3::model m = s.get_model();
+    for(uint i = 0; i < m.num_consts(); ++i) {
+        z3::func_decl fn = m.get_const_decl(i);
+        if(fn.name().str() == target) {
+            return fn();
+        }
+    }
+
+    return std::nullopt;
 }

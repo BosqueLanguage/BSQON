@@ -37,6 +37,8 @@
 (declare-datatype Main@EMAIL ( (Main@EMAIL-mk (Main@EMAIL-value CString)) ))
 (declare-datatype Main@ALPHANUMERIC ( (Main@ALPHANUMERIC-mk (Main@ALPHANUMERIC-value CString)) ))
 (declare-datatype Main@USER_NAME ( (Main@USER_NAME-mk (Main@USER_NAME-value CString)) ))
+(declare-datatype Main@USER_PHONE ( (Main@USER_PHONE-mk (Main@USER_PHONE-value CString)) ))
+(declare-datatype Main@USER_ADDRESS ( (Main@USER_ADDRESS-mk (Main@USER_ADDRESS-value CString)) ))
 
 ;;
 ;; Entity datatypes 
@@ -44,6 +46,8 @@
 (declare-datatypes (
     (Some<Main@USER_NAME> 0)
     (Some<Main@EMAIL> 0)
+    (Some<Main@USER_PHONE> 0)
+    (Some<Main@USER_ADDRESS> 0)
     ;;no content -- ;;--COLLECTION_DECLS--;;
     (Main@UserDTO 0)
     ;;no content -- ;;--DATATYPE_DECLS--;;
@@ -51,14 +55,18 @@
     ) (
         ((Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-value Main@USER_NAME)))
         ((Some<Main@EMAIL>-mk (Some<Main@EMAIL>-value Main@EMAIL)))
+        ((Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-value Main@USER_PHONE)))
+        ((Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-value Main@USER_ADDRESS)))
         ;;no content -- ;;--COLLECTION_CONSTRUCTORS--;;
-        ((Main@UserDTO-mk (Main@UserDTO-email @Term) (Main@UserDTO-password Main@ALPHANUMERIC) (Main@UserDTO-name @Term)))
+        ((Main@UserDTO-mk (Main@UserDTO-email @Term) (Main@UserDTO-password Main@ALPHANUMERIC) (Main@UserDTO-name @Term) (Main@UserDTO-phone @Term) (Main@UserDTO-address @Term)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
             (@Term-None-mk)
             ;;no content -- ;;--TYPEDECL_TERM_CONSTRUCTORS--;;
             (@Term-Some<Main@USER_NAME>-mk (@Term-Some<Main@USER_NAME>-value Some<Main@USER_NAME>))
             (@Term-Some<Main@EMAIL>-mk (@Term-Some<Main@EMAIL>-value Some<Main@EMAIL>))
+            (@Term-Some<Main@USER_PHONE>-mk (@Term-Some<Main@USER_PHONE>-value Some<Main@USER_PHONE>))
+            (@Term-Some<Main@USER_ADDRESS>-mk (@Term-Some<Main@USER_ADDRESS>-value Some<Main@USER_ADDRESS>))
             ;;no content -- ;;--ENTITY_TERM_CONSTRUCTORS--;;
             ;;no content -- ;;--DATATYPE_TERM_CONSTRUCTORS--;;
         )
@@ -69,13 +77,15 @@
 
 (define-fun @SubtypeOf-Option<Main@USER_NAME>((tt @Term)) Bool (or (is-@Term-Some<Main@USER_NAME>-mk tt) (= tt @Term-None-mk)))
 (define-fun @SubtypeOf-Option<Main@EMAIL>((tt @Term)) Bool (or (is-@Term-Some<Main@EMAIL>-mk tt) (= tt @Term-None-mk)))
+(define-fun @SubtypeOf-Option<Main@USER_PHONE>((tt @Term)) Bool (or (is-@Term-Some<Main@USER_PHONE>-mk tt) (= tt @Term-None-mk)))
+(define-fun @SubtypeOf-Option<Main@USER_ADDRESS>((tt @Term)) Bool (or (is-@Term-Some<Main@USER_ADDRESS>-mk tt) (= tt @Term-None-mk)))
 
 ;;no content -- ;;--GLOBAL_DECLS--;;
 
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((user Main@UserDTO)) (@Result Main@UserDTO)
-    (ite (not (or (or (= (Main@UserDTO-name user) @Term-None-mk) (not (= (Some<Main@USER_NAME>-value (@Term-Some<Main@USER_NAME>-value (Main@UserDTO-name user))) (Main@USER_NAME-mk "James Chen")))) (or (= (Main@UserDTO-email user) @Term-None-mk) (not (= (Some<Main@EMAIL>-value (@Term-Some<Main@EMAIL>-value (Main@UserDTO-email user))) (Main@EMAIL-mk "jch270@uky.edu")))) (not (= (Main@UserDTO-password user) (Main@ALPHANUMERIC-mk "12345678"))))) ((as @Result-err (@Result Main@UserDTO)) @err-other)
+    (ite (not (or (or (= (Main@UserDTO-name user) @Term-None-mk) (not (= (Some<Main@USER_NAME>-value (@Term-Some<Main@USER_NAME>-value (Main@UserDTO-name user))) (Main@USER_NAME-mk "James Chen")))) (or (= (Main@UserDTO-email user) @Term-None-mk) (not (= (Some<Main@EMAIL>-value (@Term-Some<Main@EMAIL>-value (Main@UserDTO-email user))) (Main@EMAIL-mk "jch270@uky.edu")))) (not (= (Main@UserDTO-password user) (Main@ALPHANUMERIC-mk "12345678"))) (or (= (Main@UserDTO-phone user) @Term-None-mk) (not (= (Some<Main@USER_PHONE>-value (@Term-Some<Main@USER_PHONE>-value (Main@UserDTO-phone user))) (Main@USER_PHONE-mk "+12 111 111 11 11")))) (or (= (Main@UserDTO-address user) @Term-None-mk) (not (= (Some<Main@USER_ADDRESS>-value (@Term-Some<Main@USER_ADDRESS>-value (Main@UserDTO-address user))) (Main@USER_ADDRESS-mk "123 Fake Street")))))) ((as @Result-err (@Result Main@UserDTO)) @err-other)
         (@Result-ok user)
     )
 )
@@ -102,8 +112,26 @@
 (define-fun @Validate-Main@EMAIL ((v Main@EMAIL)) Bool
     (and (@Validate-CString (Main@EMAIL-value v)) (str.in.re (Main@EMAIL-value v) (re.++ (re.+ (re.union (re.range "a" "z") (re.range "A" "Z") (re.range "0" "9") (str.to.re "-") (str.to.re "_"))) (re.* (re.++ (str.to.re ".") (re.union (re.range "a" "z") (re.range "A" "Z") (re.range "0" "9") (str.to.re "-") (str.to.re "_")))) (str.to.re "@") (re.+ (re.++ (re.+ (re.union (re.range "a" "z") (re.range "A" "Z") (re.range "0" "9") (str.to.re "-") (str.to.re "_"))) (str.to.re "."))) (re.+ (re.union (re.range "a" "z") (re.range "A" "Z"))))))
 )
+(define-fun @Validate-Main@USER_ADDRESS ((v Main@USER_ADDRESS)) Bool
+    (and (@Validate-CString (Main@USER_ADDRESS-value v)) (str.in.re (Main@USER_ADDRESS-value v) (re.++ (re.* (re.range "0" "9")) (re.union (str.to.re "\u{27}") (str.to.re " ") (str.to.re "\u{27}")) (re.+ (re.range "A" "Z")) (re.* (re.range "a" "z")) (re.union (str.to.re "\u{27}") (str.to.re " ") (str.to.re "\u{27}")) (re.+ (re.range "A" "Z")) (re.* (re.range "a" "z")))))
+)
 (define-fun @Validate-Main@USER_NAME ((v Main@USER_NAME)) Bool
     (and (@Validate-CString (Main@USER_NAME-value v)) (str.in.re (Main@USER_NAME-value v) ((_ re.loop 1 50) re.allchar)))
+)
+(define-fun @Validate-Main@USER_PHONE ((v Main@USER_PHONE)) Bool
+    (and (@Validate-CString (Main@USER_PHONE-value v)) (str.in.re (Main@USER_PHONE-value v) (re.++ (str.to.re "+") (re.range "1" "9") (re.opt (re.range "0" "9")) (re.* (re.union (str.to.re "\u{27}") (str.to.re " ") (str.to.re "\u{27}"))) (re.opt (str.to.re "(")) ((_ re.loop 3 3) (re.range "0" "9")) (re.opt (str.to.re ")")) (re.opt (re.union (str.to.re "\u{27}") (str.to.re " ") (str.to.re "\u{27}") (str.to.re "\u{27}"))) ((_ re.loop 3 3) (re.range "0" "9")) (re.opt (re.union (str.to.re "\u{27}") (str.to.re " ") (str.to.re "\u{27}") (str.to.re "\u{27}"))) ((_ re.loop 2 2) (re.range "0" "9")) (re.opt (re.union (str.to.re "\u{27}") (str.to.re " ") (str.to.re "\u{27}") (str.to.re "\u{27}"))) ((_ re.loop 2 2) (re.range "0" "9")))))
+)
+(define-fun @Validate-Some<Main@USER_ADDRESS> ((v Some<Main@USER_ADDRESS>)) Bool
+    (@Validate-Main@USER_ADDRESS (Some<Main@USER_ADDRESS>-value v))
+)
+(define-fun @Validate-Option<Main@USER_ADDRESS> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@USER_ADDRESS> (@Term-Some<Main@USER_ADDRESS>-value v)) true)
+)
+(define-fun @Validate-Some<Main@USER_PHONE> ((v Some<Main@USER_PHONE>)) Bool
+    (@Validate-Main@USER_PHONE (Some<Main@USER_PHONE>-value v))
+)
+(define-fun @Validate-Option<Main@USER_PHONE> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@USER_PHONE> (@Term-Some<Main@USER_PHONE>-value v)) true)
 )
 (define-fun @Validate-Some<Main@USER_NAME> ((v Some<Main@USER_NAME>)) Bool
     (@Validate-Main@USER_NAME (Some<Main@USER_NAME>-value v))
@@ -118,7 +146,7 @@
     (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@EMAIL> (@Term-Some<Main@EMAIL>-value v)) true)
 )
 (define-fun @Validate-Main@UserDTO ((v Main@UserDTO)) Bool
-    (and (@Validate-Option<Main@EMAIL> (Main@UserDTO-email v)) (@Validate-Main@ALPHANUMERIC (Main@UserDTO-password v)) (@Validate-Option<Main@USER_NAME> (Main@UserDTO-name v)))
+    (and (@Validate-Option<Main@EMAIL> (Main@UserDTO-email v)) (@Validate-Main@ALPHANUMERIC (Main@UserDTO-password v)) (@Validate-Option<Main@USER_NAME> (Main@UserDTO-name v)) (@Validate-Option<Main@USER_PHONE> (Main@UserDTO-phone v)) (@Validate-Option<Main@USER_ADDRESS> (Main@UserDTO-address v)))
 )
 (define-fun @ValidateRoot-Main@ALPHANUMERIC ((v Main@ALPHANUMERIC)) Bool
     (@Validate-Main@ALPHANUMERIC v)
@@ -126,8 +154,26 @@
 (define-fun @ValidateRoot-Main@EMAIL ((v Main@EMAIL)) Bool
     (@Validate-Main@EMAIL v)
 )
+(define-fun @ValidateRoot-Main@USER_ADDRESS ((v Main@USER_ADDRESS)) Bool
+    (@Validate-Main@USER_ADDRESS v)
+)
 (define-fun @ValidateRoot-Main@USER_NAME ((v Main@USER_NAME)) Bool
     (@Validate-Main@USER_NAME v)
+)
+(define-fun @ValidateRoot-Main@USER_PHONE ((v Main@USER_PHONE)) Bool
+    (@Validate-Main@USER_PHONE v)
+)
+(define-fun @ValidateRoot-Some<Main@USER_ADDRESS> ((v Some<Main@USER_ADDRESS>)) Bool
+    (@Validate-Some<Main@USER_ADDRESS> v)
+)
+(define-fun @ValidateRoot-Option<Main@USER_ADDRESS> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@USER_ADDRESS> (@Term-Some<Main@USER_ADDRESS>-value v)) true)
+)
+(define-fun @ValidateRoot-Some<Main@USER_PHONE> ((v Some<Main@USER_PHONE>)) Bool
+    (@Validate-Some<Main@USER_PHONE> v)
+)
+(define-fun @ValidateRoot-Option<Main@USER_PHONE> ((v @Term)) Bool
+    (ite (not (= v @Term-None-mk)) (@Validate-Some<Main@USER_PHONE> (@Term-Some<Main@USER_PHONE>-value v)) true)
 )
 (define-fun @ValidateRoot-Some<Main@USER_NAME> ((v Some<Main@USER_NAME>)) Bool
     (@Validate-Some<Main@USER_NAME> v)

@@ -2,8 +2,12 @@ declare namespace Main;
 
 public function main(f: List<Int>): List<Int>{
 
-	assert(f.size() !== 3n);
-	assert \/(f.get(2n) !== 7i, f.get(0n) !== 10i, f.get(1n) !== 2i);
+	assert \/(
+			f.get(0n) != 10i,
+			f.get(1n) != 2i,
+			f.get(2n) != 7i,
+	);
+
 
 	return f;
 }

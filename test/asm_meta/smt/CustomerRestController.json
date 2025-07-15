@@ -19,12 +19,12 @@
                     "Main::USER_PHONE"
                 ],
                 [
-                    "USER_ADDRESS",
-                    "Main::USER_ADDRESS"
-                ],
-                [
                     "USER_NAME",
                     "Main::USER_NAME"
+                ],
+                [
+                    "USER_ADDRESS",
+                    "Main::USER_ADDRESS"
                 ],
                 [
                     "UserDTO",
@@ -101,15 +101,15 @@
                 ],
                 [
                     "Option",
+                    "Option<Main::USER_NAME>"
+                ],
+                [
+                    "Option",
                     "Option<Main::USER_PHONE>"
                 ],
                 [
                     "Option",
                     "Option<Main::USER_ADDRESS>"
-                ],
-                [
-                    "Option",
-                    "Option<Main::USER_NAME>"
                 ],
                 [
                     "None",
@@ -140,16 +140,8 @@
                     "Nat"
                 ],
                 [
-                    "String",
-                    "String"
-                ],
-                [
                     "CString",
                     "CString"
-                ],
-                [
-                    "Regex",
-                    "Regex"
                 ],
                 [
                     "CRegex",
@@ -202,24 +194,24 @@
         {
             "tag": "TypeDecl",
             "ofvalidators": [
-                "/ !['#$%;^*()'']* /c",
+                "/ ${re_USERNAME} /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_NAME",
+            "name": "USER_NAME"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/[0-9]*[' '][A-Z]+[a-z]*[' '][A-Z]+[a-z]*/c",
                 "Main"
             ],
             "hasvalidations": false,
             "valuetype": "CString",
             "tkey": "Main::USER_ADDRESS",
             "name": "USER_ADDRESS"
-        },
-        {
-            "tag": "TypeDecl",
-            "ofvalidators": [
-                "/ ${re_USERNAME} /",
-                "Main"
-            ],
-            "hasvalidations": false,
-            "valuetype": "String",
-            "tkey": "Main::USER_NAME",
-            "name": "USER_NAME"
         },
         {
             "tag": "StdEntity",
@@ -268,6 +260,15 @@
             "attributes": {
                 "docstring": "%** Type for representing the option value. **%"
             },
+            "tkey": "Option<Main::USER_NAME>",
+            "name": "Option",
+            "oftype": "Main::USER_NAME"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
             "tkey": "Option<Main::USER_PHONE>",
             "name": "Option",
             "oftype": "Main::USER_PHONE"
@@ -280,15 +281,6 @@
             "tkey": "Option<Main::USER_ADDRESS>",
             "name": "Option",
             "oftype": "Main::USER_ADDRESS"
-        },
-        {
-            "tag": "Option",
-            "attributes": {
-                "docstring": "%** Type for representing the option value. **%"
-            },
-            "tkey": "Option<Main::USER_NAME>",
-            "name": "Option",
-            "oftype": "Main::USER_NAME"
         },
         {
             "tag": "PrimitiveEntity",
@@ -367,24 +359,8 @@
             "attributes": {
                 "docstring": "%** Primitive string value. **%"
             },
-            "tkey": "String",
-            "name": "String"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive string value. **%"
-            },
             "tkey": "CString",
             "name": "CString"
-        },
-        {
-            "tag": "PrimitiveEntity",
-            "attributes": {
-                "docstring": "%** Primitive unicode regex value. **%"
-            },
-            "tkey": "Regex",
-            "name": "Regex"
         },
         {
             "tag": "PrimitiveEntity",
@@ -409,7 +385,7 @@
                 },
                 {
                     "name": "re_USERNAME",
-                    "restr": "/ .{1, 50} /"
+                    "restr": "/ .{1, 50} /c"
                 }
             ]
         }

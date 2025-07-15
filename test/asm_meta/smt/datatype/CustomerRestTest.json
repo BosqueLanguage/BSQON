@@ -19,6 +19,14 @@
                     "Main::USER_NAME"
                 ],
                 [
+                    "USER_PHONE",
+                    "Main::USER_PHONE"
+                ],
+                [
+                    "USER_ADDRESS",
+                    "Main::USER_ADDRESS"
+                ],
+                [
                     "UserDTO",
                     "Main::UserDTO"
                 ]
@@ -96,6 +104,14 @@
                     "Option<Main::EMAIL>"
                 ],
                 [
+                    "Option",
+                    "Option<Main::USER_PHONE>"
+                ],
+                [
+                    "Option",
+                    "Option<Main::USER_ADDRESS>"
+                ],
+                [
                     "None",
                     "None"
                 ],
@@ -106,6 +122,14 @@
                 [
                     "Some",
                     "Some<Main::EMAIL>"
+                ],
+                [
+                    "Some",
+                    "Some<Main::USER_PHONE>"
+                ],
+                [
+                    "Some",
+                    "Some<Main::USER_ADDRESS>"
                 ],
                 [
                     "Bool",
@@ -157,6 +181,28 @@
             "name": "USER_NAME"
         },
         {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/[+] [1-9][0-9]?[' ']* [(]? [0-9]{3} [)]? [' ''-']?[0-9]{3}[' ''-']?[0-9]{2}[' ''-']?[0-9]{2} /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_PHONE",
+            "name": "USER_PHONE"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/[0-9]*[' '][A-Z]+[a-z]*[' '][A-Z]+[a-z]*/c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_ADDRESS",
+            "name": "USER_ADDRESS"
+        },
+        {
             "tag": "StdEntity",
             "fields": [
                 {
@@ -172,6 +218,16 @@
                 {
                     "fname": "name",
                     "ftype": "Option<Main::USER_NAME>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "phone",
+                    "ftype": "Option<Main::USER_PHONE>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "address",
+                    "ftype": "Option<Main::USER_ADDRESS>",
                     "isoptional": false
                 }
             ],
@@ -196,6 +252,24 @@
             "tkey": "Option<Main::EMAIL>",
             "name": "Option",
             "oftype": "Main::EMAIL"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::USER_PHONE>",
+            "name": "Option",
+            "oftype": "Main::USER_PHONE"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::USER_ADDRESS>",
+            "name": "Option",
+            "oftype": "Main::USER_ADDRESS"
         },
         {
             "tag": "PrimitiveEntity",
@@ -228,6 +302,30 @@
             "tkey": "Some<Main::EMAIL>",
             "name": "Some",
             "oftype": "Main::EMAIL"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::USER_PHONE>"
+            ],
+            "tkey": "Some<Main::USER_PHONE>",
+            "name": "Some",
+            "oftype": "Main::USER_PHONE"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::USER_ADDRESS>"
+            ],
+            "tkey": "Some<Main::USER_ADDRESS>",
+            "name": "Some",
+            "oftype": "Main::USER_ADDRESS"
         },
         {
             "tag": "PrimitiveEntity",

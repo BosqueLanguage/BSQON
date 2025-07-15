@@ -77,7 +77,6 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
     return std::nullopt;
 };
 
-// Also converts Boque Datatype '::' to SMT Datatype '@'
 // SmtNameType Options:
 // STRUCT_CONSTRUCT			= tk-mk,
 // STRUCT_FIELD				= //TODO,
@@ -86,13 +85,16 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 // NAMESPACE_NAME			= //TODO,
 // TYPE_CONST_NAME			= //TODO,
 // TERM_SUBTYPE_FN_NAME		= @SubtypeOf-tk,
+// Also converts Bosque Datatype '::' to SMT Datatype '@'
 std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
 {
 
     // Replace "::" to "@"
     std::string new_tk = tk;
-    std::regex bsq_ns_accessor("::");
-    new_tk = std::regex_replace(new_tk, bsq_ns_accessor, "@");
+    if(tk.find("::") != std::string::npos) {
+        std::regex bsq_ns_accessor("::");
+        new_tk = std::regex_replace(new_tk, bsq_ns_accessor, "@");
+    }
 
     if(n == STRUCT_CONSTRUCT) {
         return new_tk + "-mk";

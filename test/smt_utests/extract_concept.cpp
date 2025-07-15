@@ -19,13 +19,14 @@ BOOST_AUTO_TEST_CASE(concept_list)
 
 BOOST_AUTO_TEST_CASE(option_some)
 {
-    TEST_IT("concepts/concept_option_some", "concepts/concept_option_some", "concepts/concept_option_some",
+    TEST_IT("concepts/concept_option_some", "concepts/concept_option_some_fn", "concepts/concept_option_some",
             u8"Some<Int>{3i}\n");
 }
 
 BOOST_AUTO_TEST_CASE(option_none)
 {
-    TEST_IT("concepts/concept_option_none", "concepts/concept_option_some", "concepts/concept_option_some", u8"none\n");
+    TEST_IT("concepts/concept_option_none", "concepts/concept_option_none_fn", "concepts/concept_option_none",
+            u8"none\n");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // DataType
