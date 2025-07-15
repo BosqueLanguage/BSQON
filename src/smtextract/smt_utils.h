@@ -25,4 +25,3 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 
 // Initialize Class
 std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
-std::unordered_map<std::string, z3::func_decl> getSmtValidators(z3::solver& s);

@@ -27,7 +27,6 @@ class ValueSolver
     bsqon::AssemblyInfo* asm_info;
     z3::solver& s;
     z3::expr ex;
-    std::unordered_map<std::string, z3::func_decl> validators;
 
     ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
 
@@ -49,6 +48,5 @@ class ValueSolver
     std::optional<z3::expr> getExprFromVal(bsqon::Value* v);
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
 
-    std::optional<z3::func_decl> getValidator(z3::sort srt);
     z3::expr extractSequenceLen(z3::expr ex);
 };
