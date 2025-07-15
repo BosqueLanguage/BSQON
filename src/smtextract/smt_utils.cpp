@@ -1,6 +1,7 @@
 #include "smt_utils.h"
 #include "smt_extract.h"
 #include <cstdio>
+#include <iterator>
 #include <optional>
 #include <regex>
 
@@ -68,7 +69,6 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 {
     for(size_t i = 0; i < terms.size(); ++i) {
         z3::func_decl ith_term = terms[i];
-
         if(ith_term.name().str() == target) {
             return ith_term;
         }
@@ -78,27 +78,35 @@ std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::stri
 };
 
 // SmtNameType Options:
-// STRUCT_CONSTRUCT,
-// STRUCT_FIELD,
-// STRUCT_TERM_CONSTRUCT,
-// STRUCT_TERM_FIELD,
-// NAMESPACE_NAME,
-// TYPE_CONST_NAME,
-// TERM_SUBTYPE_FN_NAME,
-
-std::optional<std::string> tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
+// STRUCT_CONSTRUCT			= tk-mk,
+// STRUCT_FIELD				= //TODO,
+// STRUCT_TERM_CONSTRUCT	= @Term-tk-mk,
+// STRUCT_TERM_FIELD		= @Term-tk-value,
+// NAMESPACE_NAME			= //TODO,
+// TYPE_CONST_NAME			= //TODO,
+// TERM_SUBTYPE_FN_NAME		= @SubtypeOf-tk,
+// Also converts Bosque Datatype '::' to SMT Datatype '@'
+std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
 {
+
+    // Replace "::" to "@"
+    std::string new_tk = tk;
+    if(tk.find("::") != std::string::npos) {
+        std::regex bsq_ns_accessor("::");
+        new_tk = std::regex_replace(new_tk, bsq_ns_accessor, "@");
+    }
+
     if(n == STRUCT_CONSTRUCT) {
-        return tk + "-mk";
+        return new_tk + "-mk";
     }
     else if(n == STRUCT_FIELD) {
         // TODO
     }
     else if(n == STRUCT_TERM_CONSTRUCT) {
-        return "@Term-" + tk + "-mk";
+        return "@Term-" + new_tk + "-mk";
     }
     else if(n == STRUCT_TERM_FIELD) {
-        return "@Term-" + tk + "-value";
+        return "@Term-" + new_tk + "-value";
     }
     else if(n == NAMESPACE_NAME) {
         // TODO
@@ -107,8 +115,8 @@ std::optional<std::string> tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
         // TODO
     }
     else if(n == TERM_SUBTYPE_FN_NAME) {
-        return "@SubtypeOf-" + tk;
+        return "@SubtypeOf-" + new_tk;
     }
 
-    return std::nullopt;
+    return new_tk;
 }

@@ -5,6 +5,7 @@
 #include "../info/type_info.h"
 #include "../info/bsqon.h"
 #include <cstdio>
+#include <unordered_map>
 
 #define BSQ_INT_MIN -500
 #define BSQ_INT_MAX 500
@@ -29,14 +30,17 @@ class ValueSolver
 
     ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
 
-    bsqon::Value* extractCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* extractBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-    bsqon::Value* extractList(const bsqon::ListType* bsq_t, z3::expr ex);
     bsqon::Value* extractBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+    bsqon::Value* extractBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractList(bsqon::ListType* bsq_t, z3::expr ex);
+    bsqon::Value* extractSome(bsqon::SomeType* bsq_t, z3::expr ex);
+    bsqon::Value* extractOption(bsqon::OptionType* bsq_t, z3::expr ex);
+    bsqon::Value* extractConcept(bsqon::ConceptType* t, z3::expr ex);
+    bsqon::Value* extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex);
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
     bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);

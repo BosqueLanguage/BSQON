@@ -86,15 +86,14 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
-    // FIND VALUES FOR ALL FN ARGUMENTS
     for(const auto& [key, value] : arg_refs) {
         ValueSolver sol(&asm_info, key, s);
         bsqon::Value* res = sol.extractValue(value, sol.ex);
+
         if(res == NULL) {
             printf("solveValue returned NULL \n");
             exit(1);
         }
-
         result += res->toString() + u8"\n";
     }
 
