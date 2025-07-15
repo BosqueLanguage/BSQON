@@ -79,7 +79,14 @@ public function createCustomer(user: UserDTO): UserDTO {
 public function main(user: UserDTO): UserDTO{
 	let james = getCustomer();
 
-	assert (james.name@some !== user.name@some);
+	assert \/(
+	user.email !== james.email@some,
+	user.name !== james.name@some,
+	user.password !== james.password,
+	user.phone !== james.phone@some,
+	user.address !== james.address@some,
+	);
+
 
     return user;
 }
