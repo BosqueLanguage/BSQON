@@ -29,4 +29,11 @@ BOOST_AUTO_TEST_CASE(option_none)
             u8"none\n");
 }
 
+BOOST_AUTO_TEST_CASE(Optional_CRegexes_entity_invariants)
+{
+    TEST_IT("concepts/CustomerRestController", "concepts/CustomerRestController_fn", "concepts/CustomerRestController",
+            u8"Main::UserDTO{Some<Main::EMAIL>{'jch270@uky.edu'}, '12345678', Some<Main::USER_NAME>{'James Chen'}, "
+            u8"Some<Main::USER_PHONE>{'+12 111-111-1111'}, Some<Main::USER_ADDRESS>{'123 Fake Street'}}\n");
+}
+
 BOOST_AUTO_TEST_SUITE_END() // DataType

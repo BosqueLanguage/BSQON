@@ -70,7 +70,7 @@
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((digit Int) (big_digit BigInt)) (@Result Int)
-    (ite (not (or (not (= digit 33)) (not (= big_digit 457)))) ((as @Result-err (@Result Int)) @err-other)
+    (ite (not (or (not (= digit 31)) (not (= big_digit 13)))) ((as @Result-err (@Result Int)) @err-other)
         (@Result-ok digit)
     )
 )
@@ -101,8 +101,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (declare-const digit Int)
 (declare-const big_digit BigInt)
-(declare-const res (@Result (Int)))
 
+(assert (@Validate-Int digit))
+(assert (@Validate-BigInt big_digit))
+
+
+(declare-const res (@Result (Int)))
 (assert (= res (Main@main digit big_digit)))
 (assert (= res ((as @Result-err (@Result Int)) @err-other)))
 
@@ -111,3 +115,6 @@
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+

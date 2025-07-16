@@ -65,12 +65,17 @@ std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
 }
 
 // Look for a "-mk" contruct from @Term.
-std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::string target)
+std::optional<TermType> findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers, std::string target)
 {
+
     for(size_t i = 0; i < terms.size(); ++i) {
         z3::func_decl ith_term = terms[i];
         if(ith_term.name().str() == target) {
-            return ith_term;
+            TermType term = {
+                .mk = ith_term,
+                .rg = recognizers[i],
+            };
+            return term;
         }
     }
 
