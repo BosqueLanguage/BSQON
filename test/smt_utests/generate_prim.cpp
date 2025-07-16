@@ -10,26 +10,11 @@
         checkAndReport(result, expected);                                                                              \
     }
 
-BOOST_AUTO_TEST_SUITE(Extract_Primitives)
+BOOST_AUTO_TEST_SUITE(Generate_Primitives)
 
-BOOST_AUTO_TEST_CASE(Exract_CString)
+BOOST_AUTO_TEST_CASE(Generate_Int)
 {
-    TEST_IT("primitives/prim_CString", "primitives/prim_CString_fn", "primitives/prim_CString", u8"'Manchester'\n");
+    TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", u8"");
 }
 
-BOOST_AUTO_TEST_CASE(Extract_Bool)
-{
-    TEST_IT("primitives/prim_Bool", "primitives/prim_Bool_fn", "primitives/prim_Bool", u8"false\n");
-}
-
-BOOST_AUTO_TEST_CASE(Extract_Int)
-{
-    TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", u8"13I\n31i\n");
-}
-
-BOOST_AUTO_TEST_CASE(Extract_Nat)
-{
-    TEST_IT("primitives/prim_Nat", "primitives/prim_Nat_fn", "primitives/prim_Nat", u8"92n\n");
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // Primitives

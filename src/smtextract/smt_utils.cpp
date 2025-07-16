@@ -33,7 +33,7 @@ bool validPath(const char* filepath, const char* extension)
     return valid;
 }
 
-std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
+std::optional<z3::expr> ValueExtractor::getExprFromVal(bsqon::Value* v)
 {
     auto vk = v->kind;
     if(vk == bsqon::ValueKind::IntNumberValueKind) {

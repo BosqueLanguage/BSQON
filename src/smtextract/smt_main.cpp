@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     }
 
     for(const auto& [key, value] : arg_refs) {
-        ValueSolver sol(&asm_info, key, s);
+        ValueExtractor sol(&asm_info, key, s);
         bsqon::Value* result = sol.extractValue(value, sol.ex);
         if(result == NULL) {
             printf("solveValue returned NULL \n");

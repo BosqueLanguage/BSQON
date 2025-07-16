@@ -22,14 +22,14 @@
 #define ASCII_MIN 0
 #define ASCII_MAX 255
 
-class ValueSolver
+class ValueExtractor
 {
   public:
     bsqon::AssemblyInfo* asm_info;
     z3::solver& s;
     z3::expr ex;
 
-    ValueSolver(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
+    ValueExtractor(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
 
     bsqon::Value* extractBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
