@@ -1,4 +1,6 @@
+#include <cerrno>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <optional>
 #include <string>
@@ -142,13 +144,16 @@ std::optional<char> ValueSolver::BinSearchChar(z3::expr str_exp, z3::expr index,
 
 bsqon::Value* ValueSolver::extractCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
-    // // Check Z3 interpretation z3 expr
-    if(this->s.check() == z3::sat) {
-        z3::expr z3_eval = this->s.get_model().eval(ex, true);
-        bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
-        if(interp != NULL) {
-            return interp;
-        }
+    if(this->s.check() != z3::sat) {
+        std::cout << "GOT: " << this->s.check() << " solver for CString: " << ex.decl() << "\n";
+        exit(1);
+    }
+
+    // Check Z3 interpretation z3 expr
+    z3::expr z3_eval = this->s.get_model().eval(ex, true);
+    bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
+    if(interp != NULL) {
+        return interp;
     }
 
     std::string str_tmp("");
@@ -519,27 +524,28 @@ bsqon::Value* ValueSolver::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 
 bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 {
-    z3::func_decl_vector opt_cs = ex.get_sort().constructors();
-    const std::vector<bsqon::TypeKey>& opt_subtype = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
+    // ex.get_sort() is always @Term
+    z3::sort term = ex.get_sort();
 
-    z3::func_decl_vector opt_recogs = ex.get_sort().recognizers();
-    z3::func_decl opt_none_is = opt_recogs[0];
-    z3::func_decl opt_some_is = opt_recogs[1];
+    z3::func_decl_vector opt_mks = term.constructors();
+    z3::func_decl_vector opt_rgs = term.recognizers();
+    const std::vector<bsqon::TypeKey>& opt_subtype = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
 
     //--------------------------------------------------------------------------
     std::string none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
-    std::optional<z3::func_decl> none_mk_fn = findConstruct(opt_cs, none_name);
+    std::optional<TermType> none_term = findConstruct(opt_mks, opt_rgs, none_name);
+    z3::func_decl none_mk = none_term.value().mk;
+    z3::func_decl none_is = none_term.value().rg;
 
-    z3::expr none_mk = none_mk_fn.value()();
     this->s.push();
 
-    this->s.add(opt_none_is(ex));
+    this->s.add(none_is(ex));
     z3::check_result r_none = this->s.check();
 
     this->s.pop();
 
     if(r_none == z3::sat) {
-        this->s.add(opt_none_is(ex));
+        this->s.add(none_is(ex));
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
     //--------------------------------------------------------------------------
@@ -548,17 +554,20 @@ bsqon::Value* ValueSolver::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
     std::string some_name = tKeyToSmtName(some_tk, STRUCT_TERM_CONSTRUCT);
 
     //(declare-fun @Term-Some<Int>-mk (Some<T>) @Term)
-    std::optional<z3::func_decl> term_some_mk = findConstruct(opt_cs, some_name);
-    //(declare-fun @Term-Some<Int>-value (@Term) Some<T>)
-    z3::func_decl term_some_acc = term_some_mk.value().accessors()[0];
+    std::optional<TermType> some_term = findConstruct(opt_mks, opt_rgs, some_name);
+    z3::func_decl some_mk = some_term.value().mk;
+    z3::func_decl some_is = some_term.value().rg;
 
-    this->s.add(opt_some_is(ex));
+    //(declare-fun @Term-Some<Int>-value (@Term) Some<T>)
+    z3::func_decl some_acc = some_mk.accessors()[0];
+
+    this->s.add(some_is(ex));
 
     z3::check_result r_some = this->s.check();
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
-        z3::expr some_expr = term_some_acc(ex);
+        z3::expr some_expr = some_acc(ex);
         bsqon::Type* some_type = this->asm_info->lookupTypeKey(some_tk);
 
         some_val = this->extractSome(dynamic_cast<bsqon::SomeType*>(some_type), some_expr);

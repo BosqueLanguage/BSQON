@@ -1,17 +1,18 @@
 declare namespace Main;
 
 const re_SAFEIDENTIFIERCHAR: CRegex = /[a-zA-Z0-9-_]/c;
-type EMAIL = CString of /${re_SAFEIDENTIFIERCHAR}+('.'${re_SAFEIDENTIFIERCHAR})* '@' (${re_SAFEIDENTIFIERCHAR}+ '.')+ [a-zA-Z]+ /c;
 
 type ALPHANUMERIC = CString of / [a-zA-Z0-9]+/c;
+type EMAIL = CString of /${Main::re_SAFEIDENTIFIERCHAR}+('.'${Main::re_SAFEIDENTIFIERCHAR})* '@' (${Main::re_SAFEIDENTIFIERCHAR}+ '.')+ [a-zA-Z]+ /c;
 
-const re_USERNAME: CRegex = /.{1, 50}/c;
-type USER_NAME = CString of / ${re_USERNAME} /c;
+type USER_PHONE = CString of /[+]? [1-9][0-9]?' '* '('? [0-9]{3} ')'? [ -]?[0-9]{3}[ -]?[0-9]{4} /c;
 
-type USER_PHONE =  CString of /[+] [1-9][0-9]?[' ']* [(]? [0-9]{3} [)]? [' ''-']?[0-9]{3}[' ''-']?[0-9]{2}[' ''-']?[0-9]{2} /c;
+type CCNUMBER = CString of /[0-9 -]{13,16}/c;
+%% Should be a String
+const re_USERNAME: CRegex = / .{1, 50} /c;
+type USER_NAME = CString of / ${Main::re_USERNAME} /c;
 
-type USER_ADDRESS = CString of /[0-9]*[' '][A-Z]+[a-z]*[' '][A-Z]+[a-z]*/c;
-
+type USER_ADDRESS = CString of /[0-9a-zA-Z -,.#()]+/c;
 
 entity UserDTO {
     field email: Option<EMAIL>;
@@ -27,7 +28,7 @@ public function main(user: UserDTO): UserDTO{
 	user.name !== 'James Chen'<USER_NAME>,
 	user.email !== 'jch270@uky.edu'<EMAIL>,
 	user.password !== '12345678'<ALPHANUMERIC>,
-	user.phone !== '+12 111 111 11 11'<USER_PHONE>,
+	user.phone !== '+12 111-111-1111'<USER_PHONE>,
 	user.address !== '123 Fake Street'<USER_ADDRESS>,
 	);
 

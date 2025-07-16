@@ -64,6 +64,7 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
         exit(1);
     }
     bsqon::AssemblyInfo::parse(j_type, asm_info);
+    bsqon::loadAssembly(j_type, asm_info);
 
     // Load FN INFO FILE
     const char* fn_info_file = fn_in.c_str();

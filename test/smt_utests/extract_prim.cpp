@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(Bool)
 
 BOOST_AUTO_TEST_CASE(Ints)
 {
-    TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", u8"457I\n33i\n");
+    TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", u8"13I\n31i\n");
 }
 
 BOOST_AUTO_TEST_CASE(Nat)

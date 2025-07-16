@@ -5,6 +5,12 @@
 #include "../info/bsqon.h"
 #include <cstdio>
 
+typedef struct TermType
+{
+    z3::func_decl mk;
+    z3::func_decl rg;
+} TermType;
+
 enum SmtNameType
 {
     NONE_NAME,
@@ -21,7 +27,4 @@ enum SmtNameType
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
 std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n);
-std::optional<z3::func_decl> findConstruct(z3::func_decl_vector terms, std::string target);
-
-// Initialize Class
-std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
+std::optional<TermType> findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers, std::string target);

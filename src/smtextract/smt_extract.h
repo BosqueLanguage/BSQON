@@ -5,6 +5,7 @@
 #include "../info/type_info.h"
 #include "../info/bsqon.h"
 #include <cstdio>
+#include <map>
 #include <unordered_map>
 
 #define BSQ_INT_MIN -500
@@ -50,3 +51,5 @@ class ValueSolver
 
     z3::expr extractSequenceLen(z3::expr ex);
 };
+
+std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
