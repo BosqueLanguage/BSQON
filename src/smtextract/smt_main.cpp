@@ -4,8 +4,12 @@
 
 int main(int argc, char** argv)
 {
-    if(argc != 4) {
+    if(argc != 5) {
         badArgs("");
+    }
+
+    if(argc == 4) {
+        badArgs("Missing --<MODE>");
     }
 
     // Load SMT FILE
@@ -15,10 +19,10 @@ int main(int argc, char** argv)
     }
 
     z3::context c;
-    z3::solver s(c);
-    s.from_file(smt_file);
+    z3::solver sol(c);
+    sol.from_file(smt_file);
 
-    z3::check_result chk_smt = s.check();
+    z3::check_result chk_smt = sol.check();
     if(chk_smt == z3::unsat) {
         badArgs("Unsat smt file\n");
     }
@@ -66,16 +70,21 @@ int main(int argc, char** argv)
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
-    for(const auto& [key, value] : arg_refs) {
-        ValueExtractor sol(&asm_info, key, s);
-        bsqon::Value* result = sol.extractValue(value, sol.ex);
-        if(result == NULL) {
-            printf("solveValue returned NULL \n");
-            exit(1);
-        }
+    std::string mode(argv[4]);
 
-        std::u8string rstr = result->toString();
-        printf("%s\n", (const char*)rstr.c_str());
+    if(mode == "-e" || mode == "--extract") {
+        for(const auto& [id, type] : arg_refs) {
+            ValueExtractor extract(&asm_info, type, id, sol);
+        }
+    }
+    else if(mode == "-g" || mode == "--generate") {
+        for(const auto& [id, type] : arg_refs) {
+            ValueGenerator generate(&asm_info, type, id, sol);
+        }
+    }
+    else {
+        std::string err = mode + " is not a valid <MODE>.";
+        badArgs(err.c_str());
     }
 
     Z3_finalize_memory();

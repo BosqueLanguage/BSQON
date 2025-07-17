@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "gen",
+            "type": "Int"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Int"
+}

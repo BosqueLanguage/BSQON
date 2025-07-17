@@ -5,6 +5,7 @@
 #include "../info/type_info.h"
 #include "../info/bsqon.h"
 #include <cstdio>
+#include <string>
 #include <map>
 #include <unordered_map>
 
@@ -22,15 +23,20 @@
 #define ASCII_MIN 0
 #define ASCII_MAX 255
 
+#define FILLER_POS bsqon::SourcePos{0, 0, 0, 0}
+
+std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
+
 class ValueExtractor
 {
   public:
     bsqon::AssemblyInfo* asm_info;
+    bsqon::Type* t;
     z3::solver& s;
     z3::expr ex;
 
-    ValueExtractor(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& s);
-
+    ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* t, std::string key, z3::solver& solver);
+    bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);
     bsqon::Value* extractBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractBigInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
@@ -44,12 +50,23 @@ class ValueExtractor
     bsqon::Value* extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex);
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
-    bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);
 
-    std::optional<z3::expr> getExprFromVal(bsqon::Value* v);
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
 
+    std::optional<z3::expr> getExprFromVal(bsqon::Value* v);
     z3::expr extractSequenceLen(z3::expr ex);
 };
 
-std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
+class ValueGenerator
+{
+  public:
+    bsqon::AssemblyInfo* asm_info;
+    bsqon::Type* t;
+    z3::solver& s;
+    z3::expr ex;
+
+    ValueGenerator(bsqon::AssemblyInfo* asm_info, bsqon::Type* t, std::string key, z3::solver& solver);
+    bsqon::Value* generateInt(const bsqon::PrimitiveType* t_i, z3::expr ex_i);
+    bsqon::Value* generatePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
+    bsqon::Value* generateValue(bsqon::Type* bsq_t, z3::expr ex_t);
+};

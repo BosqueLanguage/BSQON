@@ -7,7 +7,9 @@
 
 void badArgs(const char* msg)
 {
-    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json>";
+    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
+                        "\t-e|--extract\t- Extract Err Values from SMT\n"
+                        "\t-g|--generate\t- Generate Test Values from SMT";
 
     printf("%s\n", usage);
     printf("%s\n", msg);

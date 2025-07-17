@@ -1,5 +1,5 @@
-#include <cerrno>
 #include <cstdio>
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <optional>
@@ -8,8 +8,6 @@
 #include <vector>
 #include "smt_extract.h"
 #include "smt_utils.h"
-
-#define FILLER_POS bsqon::SourcePos{0, 0, 0, 0}
 
 bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
 {
@@ -46,7 +44,7 @@ bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
     return nullptr;
 }
 
-// Only accept expr that have (Seq Int) sort
+// Only accept an expr that is of (Seq Int) sort
 z3::expr ValueExtractor::extractSequenceLen(z3::expr ex)
 {
     // Check Z3 interpretation z3 expr
@@ -646,17 +644,22 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     return nullptr;
 }
 
-ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, std::string target, z3::solver& solver)
-    : asm_info(asm_info), s(solver), ex([&]() {
-          auto tmp = getBsqTypeExpr(target, solver);
+ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* type, std::string key, z3::solver& solver)
+    : asm_info(asm_info), t(type), s(solver), ex([&]() {
+          auto tmp = getBsqTypeExpr(key, solver);
           if(!tmp.has_value()) {
-              std::cout << "ARG: " << target << " not in .smt2 file" << "\n";
+              std::cout << "ARG: " << key << " not in .smt2 file" << "\n";
               exit(1);
           }
           return tmp.value();
       }())
 {
-    ;
+    bsqon::Value* result = this->extractValue(this->t, this->ex);
+    if(result == NULL) {
+        printf("solveValue returned NULL \n");
+        exit(1);
+    }
+    printf("%s\n", (const char*)result->toString().c_str());
 }
 
 // Use Type* to find the func_decl in the z3::model.
