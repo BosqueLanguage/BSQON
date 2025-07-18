@@ -175,7 +175,6 @@ bsqon::Value* ValueExtractor::extractBigNat(const bsqon::PrimitiveType* bsq_t, z
 
     // Vector SAT value search
     std::vector<uint> choices = {0, 1, 2, 10, 255};
-    bsqon::BigNatNumberValue* res;
 
     for(size_t i = 0; i < choices.size(); i++) {
         this->s.push();
@@ -188,8 +187,7 @@ bsqon::Value* ValueExtractor::extractBigNat(const bsqon::PrimitiveType* bsq_t, z
 
         if(rr == z3::sat) {
             this->s.add(ex == int_tmp);
-            res = new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, uint64_t(choices.at(i)));
-            return res;
+            return new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, uint64_t(choices.at(i)));
         }
     }
 

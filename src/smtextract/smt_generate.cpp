@@ -2,6 +2,55 @@
 #include "./smt_utils.h"
 #include <cstdio>
 #include <optional>
+#include <sys/types.h>
+
+bsqon::Value* ValueGenerator::generateBigNat(const bsqon::PrimitiveType* t, z3::expr ex)
+{
+    u_int16_t N = 0;
+
+    if(this->s.check() == z3::sat) {
+        z3::expr z3_eval = this->s.get_model().eval(ex, true);
+        bsqon::Value* interp = checkValidEval(t, z3_eval);
+        if(interp != NULL) {
+            this->s.add(z3_eval == ex);
+            return interp;
+        }
+    }
+
+    return new bsqon::BigNatNumberValue(t, FILLER_POS, N);
+}
+
+bsqon::Value* ValueGenerator::generateNat(const bsqon::PrimitiveType* t, z3::expr ex)
+{
+    uint n = 0;
+
+    if(this->s.check() == z3::sat) {
+        z3::expr z3_eval = this->s.get_model().eval(ex, true);
+        bsqon::Value* interp = checkValidEval(t, z3_eval);
+        if(interp != NULL) {
+            this->s.add(z3_eval == ex);
+            return interp;
+        }
+    }
+
+    return new bsqon::BigNatNumberValue(t, FILLER_POS, n);
+}
+
+bsqon::Value* ValueGenerator::generateBigInt(const bsqon::PrimitiveType* t, z3::expr ex)
+{
+    int ival = 0;
+
+    if(this->s.check() == z3::sat) {
+        z3::expr z3_eval = this->s.get_model().eval(ex, true);
+        bsqon::Value* interp = checkValidEval(t, z3_eval);
+        if(interp != NULL) {
+            this->s.add(z3_eval == ex);
+            return interp;
+        }
+    }
+
+    return new bsqon::BigIntNumberValue(t, FILLER_POS, ival);
+}
 
 bsqon::Value* ValueGenerator::generateInt(const bsqon::PrimitiveType* t, z3::expr ex)
 {
@@ -17,6 +66,26 @@ bsqon::Value* ValueGenerator::generateInt(const bsqon::PrimitiveType* t, z3::exp
     }
 
     return new bsqon::IntNumberValue(t, FILLER_POS, ival);
+}
+
+bsqon::Value* ValueGenerator::generateBool(const bsqon::PrimitiveType* t, z3::expr ex)
+{
+    this->s.push();
+
+    this->s.add(ex);
+    z3::check_result rr = this->s.check();
+
+    this->s.pop();
+
+    if(rr == z3::sat) {
+        this->s.add(ex);
+        return new bsqon::BoolValue(t, FILLER_POS, true);
+    }
+    else {
+        z3::expr alt = this->s.ctx().bool_val(false);
+        this->s.add(ex == alt);
+        return new bsqon::BoolValue(t, FILLER_POS, false);
+    }
 }
 
 bsqon::Value* ValueGenerator::generateCString(const bsqon::PrimitiveType* t, z3::expr ex)
@@ -164,7 +233,7 @@ bsqon::Value* ValueGenerator::generateOption(bsqon::OptionType* t, z3::expr ex)
     return some_val;
 }
 
-bsqon::Value* ValueGenerator::generateList(bsqon::ListType* bsq_t, z3::expr ex)
+bsqon::Value* ValueGenerator::generateList(bsqon::ListType* t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
     assert(constructs.size() == 1);
@@ -174,7 +243,7 @@ bsqon::Value* ValueGenerator::generateList(bsqon::ListType* bsq_t, z3::expr ex)
     z3::expr list_expr = c_accs(ex);
     z3::expr list_len = this->generateSequenceLen(list_expr);
 
-    bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
+    bsqon::Type* list_t = this->asm_info->lookupTypeKey(t->oftype);
     std::vector<bsqon::Value*> vals;
 
     for(int i = 0; i < list_len.get_numeral_int(); ++i) {
@@ -188,7 +257,7 @@ bsqon::Value* ValueGenerator::generateList(bsqon::ListType* bsq_t, z3::expr ex)
     }
 
     this->s.add(ex == c(list_expr));
-    return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
+    return new bsqon::ListValue(t, FILLER_POS, std::move(vals));
 }
 
 bsqon::Value* ValueGenerator::generateTypeDecl(bsqon::TypedeclType* t, z3::expr ex)
