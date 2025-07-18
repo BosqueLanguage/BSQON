@@ -88,7 +88,7 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
     }
 
     for(const auto& [key, value] : arg_refs) {
-        ValueSolver sol(&asm_info, key, s);
+        ValueExtractor sol(&asm_info, key, s);
         bsqon::Value* res = sol.extractValue(value, sol.ex);
 
         if(res == NULL) {

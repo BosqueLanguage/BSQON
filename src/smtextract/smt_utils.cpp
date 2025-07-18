@@ -7,7 +7,9 @@
 
 void badArgs(const char* msg)
 {
-    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json>";
+    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
+                        "\t-e|--extract\t- Extract Err Values from SMT\n"
+                        "\t-g|--generate\t- Generate Test Values from SMT";
 
     printf("%s\n", usage);
     printf("%s\n", msg);
@@ -33,7 +35,7 @@ bool validPath(const char* filepath, const char* extension)
     return valid;
 }
 
-std::optional<z3::expr> ValueSolver::getExprFromVal(bsqon::Value* v)
+std::optional<z3::expr> ValueExtractor::getExprFromVal(bsqon::Value* v)
 {
     auto vk = v->kind;
     if(vk == bsqon::ValueKind::IntNumberValueKind) {
@@ -124,4 +126,39 @@ std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
     }
 
     return new_tk;
+}
+
+bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+{
+    auto tk = bsq_t->tkey;
+    if(tk == "Int" && ex.is_int()) {
+        int ival;
+        ex.is_numeral_i(ival);
+        return new bsqon::IntNumberValue(bsq_t, FILLER_POS, ival);
+    }
+    else if(tk == "Nat" && ex.is_int()) {
+        uint nval;
+        ex.is_numeral_u(nval);
+        return new bsqon::NatNumberValue(bsq_t, FILLER_POS, nval);
+    }
+    else if(tk == "BigInt" && ex.is_int()) {
+        int64_t Ival;
+        ex.is_numeral_i64(Ival);
+        return new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, Ival);
+    }
+    else if(tk == "BigNat" && ex.is_int()) {
+        uint64_t Nval;
+        ex.is_numeral_u64(Nval);
+        return new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, Nval);
+    }
+    else if(tk == "CString" && ex.is_string_value()) {
+        std::string csval = ex.get_string();
+        return bsqon::CStringValue::createFromGenerator(bsq_t, FILLER_POS, csval);
+    }
+    else if(tk == "String" && ex.is_string_value()) {
+        std::string sval = ex.get_string();
+        return bsqon::StringValue::createFromGenerator(bsq_t, FILLER_POS, sval);
+    }
+
+    return nullptr;
 }

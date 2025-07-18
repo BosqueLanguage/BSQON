@@ -196,6 +196,10 @@
 
 (assert (@ValidateRoot-Main@UserDTO user))
 
+;; DO THIS IN GENERATOR
+;;(declare-const test Main@UserDTO)
+;;(assert (@ValidateRoot-Main@UserDTO test))
+
 (assert (= res (Main@main user)))
 (assert (= res ((as @Result-err (@Result Main@UserDTO)) @err-other)))
 

@@ -27,4 +27,5 @@ enum SmtNameType
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
 std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n);
+bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
 std::optional<TermType> findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers, std::string target);
