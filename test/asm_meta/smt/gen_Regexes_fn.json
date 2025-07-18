@@ -2,11 +2,11 @@
     "fname": "Main::main",
     "args": [
         {
-            "name": "gen",
-            "type": "Int"
+            "name": "user",
+            "type": "Main::UserDTO"
         }
     ],
     "precondition": [],
     "postcondition": [],
-    "return": "Int"
+    "return": "Main::UserDTO"
 }

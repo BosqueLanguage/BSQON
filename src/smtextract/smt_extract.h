@@ -66,7 +66,16 @@ class ValueGenerator
     z3::expr ex;
 
     ValueGenerator(bsqon::AssemblyInfo* asm_info, bsqon::Type* t, std::string key, z3::solver& solver);
-    bsqon::Value* generateInt(const bsqon::PrimitiveType* t_i, z3::expr ex_i);
+    bsqon::Value* generateCString(const bsqon::PrimitiveType* t, z3::expr ex);
+    bsqon::Value* generateInt(const bsqon::PrimitiveType* t, z3::expr ex);
+    bsqon::Value* generateSome(bsqon::SomeType* t, z3::expr ex);
+    bsqon::Value* generateOption(bsqon::OptionType* t, z3::expr ex);
+    bsqon::Value* generateEntity(bsqon::StdEntityType* t, z3::expr ex);
+    bsqon::Value* generateList(bsqon::ListType* bsq_t, z3::expr ex);
+    bsqon::Value* generateTypeDecl(bsqon::TypedeclType* t, z3::expr ex);
     bsqon::Value* generatePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateValue(bsqon::Type* bsq_t, z3::expr ex_t);
+    bsqon::Value* generateValue(bsqon::Type* bsq_t, z3::expr ex);
+
+    std::optional<z3::func_decl> GetValidatorFor(z3::sort srt);
+    z3::expr generateSequenceLen(z3::expr ex);
 };

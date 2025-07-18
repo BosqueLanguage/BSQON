@@ -9,41 +9,6 @@
 #include "smt_extract.h"
 #include "smt_utils.h"
 
-bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
-{
-    auto tk = bsq_t->tkey;
-    if(tk == "Int" && ex.is_int()) {
-        int ival;
-        ex.is_numeral_i(ival);
-        return new bsqon::IntNumberValue(bsq_t, FILLER_POS, ival);
-    }
-    else if(tk == "Nat" && ex.is_int()) {
-        uint nval;
-        ex.is_numeral_u(nval);
-        return new bsqon::NatNumberValue(bsq_t, FILLER_POS, nval);
-    }
-    else if(tk == "BigInt" && ex.is_int()) {
-        int64_t Ival;
-        ex.is_numeral_i64(Ival);
-        return new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, Ival);
-    }
-    else if(tk == "BigNat" && ex.is_int()) {
-        uint64_t Nval;
-        ex.is_numeral_u64(Nval);
-        return new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, Nval);
-    }
-    else if(tk == "CString" && ex.is_string_value()) {
-        std::string csval = ex.get_string();
-        return bsqon::CStringValue::createFromGenerator(bsq_t, FILLER_POS, csval);
-    }
-    else if(tk == "String" && ex.is_string_value()) {
-        std::string sval = ex.get_string();
-        return bsqon::StringValue::createFromGenerator(bsq_t, FILLER_POS, sval);
-    }
-
-    return nullptr;
-}
-
 // Only accept an expr that is of (Seq Int) sort
 z3::expr ValueExtractor::extractSequenceLen(z3::expr ex)
 {
@@ -51,6 +16,7 @@ z3::expr ValueExtractor::extractSequenceLen(z3::expr ex)
     if(this->s.check() == z3::sat) {
         z3::expr z3_eval = this->s.get_model().eval(ex.length(), true);
         if(z3_eval.is_int()) {
+            this->s.add(z3_eval == ex);
             return z3_eval;
         }
     }
@@ -151,6 +117,7 @@ bsqon::Value* ValueExtractor::extractCString(const bsqon::PrimitiveType* bsq_t, 
     z3::expr z3_eval = this->s.get_model().eval(ex, true);
     bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
     if(interp != NULL) {
+        this->s.add(z3_eval == ex);
         return interp;
     }
 
@@ -201,6 +168,7 @@ bsqon::Value* ValueExtractor::extractBigNat(const bsqon::PrimitiveType* bsq_t, z
         z3::expr z3_eval = this->s.get_model().eval(ex, true);
         bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
         if(interp != NULL) {
+            this->s.add(z3_eval == ex);
             return interp;
         }
     }
@@ -264,6 +232,7 @@ bsqon::Value* ValueExtractor::extractNat(const bsqon::PrimitiveType* bsq_t, z3::
 
         bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
         if(interp != NULL) {
+            this->s.add(z3_eval == ex);
             return interp;
         }
     }
@@ -329,6 +298,7 @@ bsqon::Value* ValueExtractor::extractBigInt(const bsqon::PrimitiveType* bsq_t, z
 
         bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
         if(interp != NULL) {
+            this->s.add(z3_eval == ex);
             return interp;
         }
     }
@@ -394,6 +364,7 @@ bsqon::Value* ValueExtractor::extractInt(const bsqon::PrimitiveType* bsq_t, z3::
 
         bsqon::Value* interp = checkValidEval(bsq_t, z3_eval);
         if(interp != NULL) {
+            this->s.add(z3_eval == ex);
             return interp;
         }
     }

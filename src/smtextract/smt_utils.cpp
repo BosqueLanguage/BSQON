@@ -127,3 +127,38 @@ std::string tKeyToSmtName(bsqon::TypeKey tk, SmtNameType n)
 
     return new_tk;
 }
+
+bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
+{
+    auto tk = bsq_t->tkey;
+    if(tk == "Int" && ex.is_int()) {
+        int ival;
+        ex.is_numeral_i(ival);
+        return new bsqon::IntNumberValue(bsq_t, FILLER_POS, ival);
+    }
+    else if(tk == "Nat" && ex.is_int()) {
+        uint nval;
+        ex.is_numeral_u(nval);
+        return new bsqon::NatNumberValue(bsq_t, FILLER_POS, nval);
+    }
+    else if(tk == "BigInt" && ex.is_int()) {
+        int64_t Ival;
+        ex.is_numeral_i64(Ival);
+        return new bsqon::BigIntNumberValue(bsq_t, FILLER_POS, Ival);
+    }
+    else if(tk == "BigNat" && ex.is_int()) {
+        uint64_t Nval;
+        ex.is_numeral_u64(Nval);
+        return new bsqon::BigNatNumberValue(bsq_t, FILLER_POS, Nval);
+    }
+    else if(tk == "CString" && ex.is_string_value()) {
+        std::string csval = ex.get_string();
+        return bsqon::CStringValue::createFromGenerator(bsq_t, FILLER_POS, csval);
+    }
+    else if(tk == "String" && ex.is_string_value()) {
+        std::string sval = ex.get_string();
+        return bsqon::StringValue::createFromGenerator(bsq_t, FILLER_POS, sval);
+    }
+
+    return nullptr;
+}
