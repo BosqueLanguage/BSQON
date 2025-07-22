@@ -1,0 +1,301 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "WindCategory",
+                    "Main::WindCategory"
+                ],
+                [
+                    "WindDirection",
+                    "Main::WindDirection"
+                ],
+                [
+                    "ForecastDetail",
+                    "Main::ForecastDetail"
+                ],
+                [
+                    "TempRange",
+                    "Main::TempRange"
+                ],
+                [
+                    "WindSpeedInfo",
+                    "Main::WindSpeedInfo"
+                ],
+                [
+                    "Forecast",
+                    "Main::Forecast"
+                ],
+                [
+                    "RentalAvailabilityInfo",
+                    "Main::RentalAvailabilityInfo"
+                ],
+                [
+                    "Reason",
+                    "Main::Reason"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "AlgorithmOps",
+                    "AlgorithmOps"
+                ],
+                [
+                    "Algorithm",
+                    "Algorithm"
+                ],
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CCharBufferOps",
+                    "CCharBufferOps"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "UnicodeCharBufferOps",
+                    "UnicodeCharBufferOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "calm",
+                "windy",
+                "high",
+                "dangerous"
+            ],
+            "supertypes": [],
+            "tkey": "Main::WindCategory",
+            "name": "WindCategory"
+        },
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "north",
+                "south",
+                "east",
+                "west"
+            ],
+            "supertypes": [],
+            "tkey": "Main::WindDirection",
+            "name": "WindDirection"
+        },
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "sun",
+                "showers",
+                "thunderstorms",
+                "snow",
+                "fog"
+            ],
+            "supertypes": [],
+            "tkey": "Main::ForecastDetail",
+            "name": "ForecastDetail"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "low",
+                    "ftype": "Int",
+                    "isoptional": false
+                },
+                {
+                    "fname": "high",
+                    "ftype": "Int",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": true,
+            "tkey": "Main::TempRange",
+            "name": "TempRange"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "min",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "max",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "windDirection",
+                    "ftype": "Main::WindDirection",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": true,
+            "tkey": "Main::WindSpeedInfo",
+            "name": "WindSpeedInfo"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "temp",
+                    "ftype": "Main::TempRange",
+                    "isoptional": false
+                },
+                {
+                    "fname": "winds",
+                    "ftype": "Main::WindSpeedInfo",
+                    "isoptional": false
+                },
+                {
+                    "fname": "info",
+                    "ftype": "Main::ForecastDetail",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": false,
+            "tkey": "Main::Forecast",
+            "name": "Forecast"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "inventory",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "reservations",
+                    "ftype": "Nat",
+                    "isoptional": false
+                },
+                {
+                    "fname": "returns",
+                    "ftype": "Nat",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": true,
+            "tkey": "Main::RentalAvailabilityInfo",
+            "name": "RentalAvailabilityInfo"
+        },
+        {
+            "tag": "EnumEntity",
+            "attributes": {},
+            "variants": [
+                "approved",
+                "insufficientAvailability",
+                "closedDueToConditions"
+            ],
+            "supertypes": [],
+            "tkey": "Main::Reason",
+            "name": "Reason"
+        },
+        "TODO -- EList Emit",
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

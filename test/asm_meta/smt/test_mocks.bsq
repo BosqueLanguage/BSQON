@@ -1,0 +1,30 @@
+// Bosque files starting in test_, are used to 
+// 1. Declare behaiviours of the original file, also bounding them to avoid the HALTING problem.
+// 2. Makes the original statements of the file immutable here. Only able to add
+// on where they are in a specific state of the program.
+// 3. Every state should still maintain a nondeterministic state. As if it isn't
+// only one test value will be generated. Should we want this?
+
+
+// Compositionality
+// Reconfigurability of Data
+
+enum WindCategory {
+    calm,
+    windy,
+    high,
+    dangerous
+}
+
+//@unique 5n 
+assume ~input > 10n~ categorizeWinds(windSpeed: Nat): WindCategory {
+}
+
+//@unique 8n 
+assume ~input{
+	field a = any;
+	field b > 5i;
+	field c =< str.len 5;
+	field d < (b > 2);
+}~ categorizeWinds(windSpeed: entity): WindCategory {
+}
