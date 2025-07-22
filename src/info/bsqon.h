@@ -88,6 +88,7 @@ namespace bsqon
         virtual ~Value() = default;
 
         virtual std::u8string toString() const = 0;
+		virtual std::u8string toStmLib() const = 0;
         virtual json toJSON() const = 0;
 
         virtual bool isErrorValue() const
@@ -227,6 +228,11 @@ namespace bsqon
         virtual ~NoneValue() = default;
 
         virtual std::u8string toString() const override
+        {
+            return u8"none";
+        }
+
+        virtual std::u8string toStmLib() const override
         {
             return u8"none";
         }

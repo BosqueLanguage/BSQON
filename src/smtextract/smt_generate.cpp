@@ -332,6 +332,7 @@ ValueGenerator::ValueGenerator(bsqon::AssemblyInfo* asm_info, bsqon::Type* type,
 
     auto validate = GetValidatorFor(this->ex.get_sort());
     this->s.add(validate.value()(test_ex));
+    // this->s.add(z3::implies(ex, test_ex));
 
     if(this->s.check() != z3::sat) {
         std::cout << "No SAT for generating value for" << this->ex.decl() << "\n";
@@ -344,4 +345,5 @@ ValueGenerator::ValueGenerator(bsqon::AssemblyInfo* asm_info, bsqon::Type* type,
         exit(1);
     }
     printf("%s\n", (const char*)result->toString().c_str());
+    std::cout << s.statistics() << "\n";
 }
