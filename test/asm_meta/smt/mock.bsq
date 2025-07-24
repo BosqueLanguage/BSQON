@@ -1,4 +1,5 @@
 declare namespace Main;
+
 const re_SAFEIDENTIFIERCHAR: CRegex = /[a-zA-Z0-9-_]/c;
 
 type ALPHANUMERIC = CString of / [a-zA-Z0-9]+/c;
@@ -56,37 +57,12 @@ function userAddressNotEmpty(x: Option<USER_ADDRESS>): Bool {
 }
 
 
-public function getCustomer(): UserDTO {
-    return UserDTO {
-        some('jch270@uky.edu'<EMAIL>),
-        '12345678'<ALPHANUMERIC>,
-        some('James Chen'<USER_NAME>),
-        some('+12 111-111-1111'<USER_PHONE>),
-        some('123 Fake Street'<USER_ADDRESS>),
-    };
+function getCustomer(id:Int): UserDTO{
+	ensures $return.id == id;
 }
 
-public function createCustomer(user: UserDTO): UserDTO {
-    return UserDTO {
-        some('jch270@uky.edu'<EMAIL>),
-        '12345678'<ALPHANUMERIC>,
-        some('James Chen'<USER_NAME>),
-        some('+12 111-111-1111'<USER_PHONE>),
-        some('123 Fake Street'<USER_ADDRESS>),
-    };
+public function main(): UserDTO{
+	let c_id = 5i;
+	let user = getCustomer(c_id);
+	return user;
 }
-
-public function main(user: UserDTO): UserDTO{
-	let james = getCustomer();
-
-	let update_usr = UserDTO {
-					 name = james.name,
-					 password = james.password,
-					 email = user.email,
-					 phone = user.phone,
-					 address = user.address,
-					 };
-
-    return update_usr;
-}
-

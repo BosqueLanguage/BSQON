@@ -1,10 +1,10 @@
 
 #include "type_info.h"
 
-//DEBUGGING
+// DEBUGGING
 #include <iostream>
 
-namespace bsqon 
+namespace bsqon
 {
     static AssemblyInfo g_assembly;
 
@@ -79,7 +79,7 @@ namespace bsqon
             ttag = TypeTag::TYPE_MAP;
         }
         else {
-            //Missing tag
+            // Missing tag
             assert(false);
         }
 
@@ -91,107 +91,115 @@ namespace bsqon
         std::string ttag = j["tag"].get<std::string>();
         TypeTag tt = convertTagNameToEnum(ttag);
 
-        auto annotations = j.contains("annotations") && !j["annotations"].is_null() ? TypeAnnotationInfo::parse(j["annotations"]) : TypeAnnotationInfo("", std::nullopt);
-        
+        auto annotations = j.contains("annotations") && !j["annotations"].is_null()
+                               ? TypeAnnotationInfo::parse(j["annotations"])
+                               : TypeAnnotationInfo("", std::nullopt);
+
         std::vector<TypeKey> supertypes;
         if(j.contains("supertypes") && !j["supertypes"].is_null()) {
-            std::transform(j["supertypes"].begin(), j["supertypes"].end(), std::back_inserter(supertypes), [](const json& jv) { return jv.get<TypeKey>(); });
+            std::transform(j["supertypes"].begin(), j["supertypes"].end(), std::back_inserter(supertypes),
+                           [](const json& jv) { return jv.get<TypeKey>(); });
         }
 
         switch(tt) {
-            case TypeTag::TYPE_ELIST: {
-                std::vector<TypeKey> entries;
-                std::transform(j["entries"].begin(), j["entries"].end(), std::back_inserter(entries), [](const json& jv) { return jv.get<TypeKey>(); });
-                return new EListType(entries);
-            }
-            case TypeTag::TYPE_STD_ENTITY: {
-                std::vector<EntityTypeFieldEntry> fields;
-                std::transform(j["fields"].begin(), j["fields"].end(), std::back_inserter(fields), [](const json& jv) {
-                    FieldAnnotationInfo fsannotation("", std::nullopt);
-                    if(jv.contains("fsannotation") && !jv["fsannotation"].is_null()) {
-                        fsannotation = FieldAnnotationInfo::parse(jv["fsannotation"]);
-                    }
-
-                    return EntityTypeFieldEntry(jv["fname"].get<std::string>(), jv["ftype"].get<TypeKey>(), jv["isoptional"].get<bool>(), fsannotation); 
-                });
-                bool hasvalidations = j["hasvalidations"].get<bool>();
-                return new StdEntityType(j["tkey"].get<TypeKey>(), supertypes, annotations, fields, hasvalidations);
-            }
-            case TypeTag::TYPE_STD_CONCEPT: {
-                return new StdConceptType(j["tkey"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_PRIMITIVE: {
-                return new PrimitiveType(j["tkey"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_ENUM: {
-                std::vector<std::string> variants;
-                std::transform(j["variants"].begin(), j["variants"].end(), std::back_inserter(variants), [](const json& jv) { return jv.get<std::string>(); });
-                return new EnumType(j["tkey"].get<TypeKey>(), supertypes, annotations, variants);
-            }
-            case TypeTag::TYPE_TYPE_DECL: {
-                std::optional<std::pair<std::u8string, std::string>> optOfValidator = std::nullopt;
-                if(j.contains("ofvalidators") && !j["ofvalidators"].is_null()) {
-                    auto jvv = j["ofvalidators"][0].get<std::string>();
-                    auto inns = j["ofvalidators"][1].get<std::string>();
-
-                    std::pair<std::u8string, std::string> ovv = std::make_pair(std::u8string{jvv.cbegin(), jvv.cend()}, inns);
-                    optOfValidator = std::make_optional(ovv);
+        case TypeTag::TYPE_ELIST: {
+            std::vector<TypeKey> entries;
+            std::transform(j["entries"].begin(), j["entries"].end(), std::back_inserter(entries),
+                           [](const json& jv) { return jv.get<TypeKey>(); });
+            return new EListType(entries);
+        }
+        case TypeTag::TYPE_STD_ENTITY: {
+            std::vector<EntityTypeFieldEntry> fields;
+            std::transform(j["fields"].begin(), j["fields"].end(), std::back_inserter(fields), [](const json& jv) {
+                FieldAnnotationInfo fsannotation("", std::nullopt);
+                if(jv.contains("fsannotation") && !jv["fsannotation"].is_null()) {
+                    fsannotation = FieldAnnotationInfo::parse(jv["fsannotation"]);
                 }
 
-                bool hasvalidations = j["hasvalidations"].get<bool>();
-                return new TypedeclType(j["tkey"].get<TypeKey>(), supertypes, annotations, j["valuetype"].get<TypeKey>(), optOfValidator, hasvalidations);
+                return EntityTypeFieldEntry(jv["fname"].get<std::string>(), jv["ftype"].get<TypeKey>(),
+                                            jv["isoptional"].get<bool>(), fsannotation);
+            });
+            bool hasvalidations = j["hasvalidations"].get<bool>();
+            return new StdEntityType(j["tkey"].get<TypeKey>(), supertypes, annotations, fields, hasvalidations);
+        }
+        case TypeTag::TYPE_STD_CONCEPT: {
+            return new StdConceptType(j["tkey"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_PRIMITIVE: {
+            return new PrimitiveType(j["tkey"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_ENUM: {
+            std::vector<std::string> variants;
+            std::transform(j["variants"].begin(), j["variants"].end(), std::back_inserter(variants),
+                           [](const json& jv) { return jv.get<std::string>(); });
+            return new EnumType(j["tkey"].get<TypeKey>(), supertypes, annotations, variants);
+        }
+        case TypeTag::TYPE_TYPE_DECL: {
+            std::optional<std::pair<std::u8string, std::string>> optOfValidator = std::nullopt;
+            if(j.contains("ofvalidators") && !j["ofvalidators"].is_null()) {
+                auto jvv = j["ofvalidators"][0].get<std::string>();
+                auto inns = j["ofvalidators"][1].get<std::string>();
+
+                std::pair<std::u8string, std::string> ovv =
+                    std::make_pair(std::u8string{jvv.cbegin(), jvv.cend()}, inns);
+                optOfValidator = std::make_optional(ovv);
             }
-            case TypeTag::TYPE_SOME: {
-                return new SomeType(j["oftype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_OPTION: {
-                return new OptionType(j["oftype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_OK: {
-                return new OkType(j["ttype"].get<TypeKey>(), j["etype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_ERROR: {
-                return new ErrorType(j["ttype"].get<TypeKey>(), j["etype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_RESULT: {
-                return new ResultType(j["ttype"].get<TypeKey>(), j["etype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_APIREJECTED: {
-                return new APIRejectedType(j["ttype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_APIFAILED: {
-                return new APIFailedType(j["ttype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_APIERROR: {
-                return new APIErrorType(j["ttype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_APISUCCESS: {
-                return new APISuccessType(j["ttype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_APIRESULT: {
-                return new APIResultType(j["ttype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_LIST: {
-                return new ListType(j["oftype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_STACK: {
-                return new StackType(j["oftype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_QUEUE: {
-                return new QueueType(j["oftype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_SET: {
-                return new SetType(j["oftype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_MAP_ENTRY: {
-                return new MapEntryType(j["ktype"].get<TypeKey>(), j["vtype"].get<TypeKey>(), supertypes, annotations);
-            }
-            case TypeTag::TYPE_MAP: {
-                return new MapType(j["ktype"].get<TypeKey>(), j["vtype"].get<TypeKey>(), supertypes, annotations);
-            }
-            default: {
-                return UnresolvedType::singleton;
-            }
+
+            bool hasvalidations = j["hasvalidations"].get<bool>();
+            return new TypedeclType(j["tkey"].get<TypeKey>(), supertypes, annotations, j["valuetype"].get<TypeKey>(),
+                                    optOfValidator, hasvalidations);
+        }
+        case TypeTag::TYPE_SOME: {
+            return new SomeType(j["oftype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_OPTION: {
+            return new OptionType(j["oftype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_OK: {
+            return new OkType(j["ttype"].get<TypeKey>(), j["etype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_ERROR: {
+            return new ErrorType(j["ttype"].get<TypeKey>(), j["etype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_RESULT: {
+            return new ResultType(j["ttype"].get<TypeKey>(), j["etype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_APIREJECTED: {
+            return new APIRejectedType(j["ttype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_APIFAILED: {
+            return new APIFailedType(j["ttype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_APIERROR: {
+            return new APIErrorType(j["ttype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_APISUCCESS: {
+            return new APISuccessType(j["ttype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_APIRESULT: {
+            return new APIResultType(j["ttype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_LIST: {
+            return new ListType(j["oftype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_STACK: {
+            return new StackType(j["oftype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_QUEUE: {
+            return new QueueType(j["oftype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_SET: {
+            return new SetType(j["oftype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_MAP_ENTRY: {
+            return new MapEntryType(j["ktype"].get<TypeKey>(), j["vtype"].get<TypeKey>(), supertypes, annotations);
+        }
+        case TypeTag::TYPE_MAP: {
+            return new MapType(j["ktype"].get<TypeKey>(), j["vtype"].get<TypeKey>(), supertypes, annotations);
+        }
+        default: {
+            return UnresolvedType::singleton;
+        }
         }
     }
 
@@ -202,23 +210,28 @@ namespace bsqon
         bool istoplevel = j["istoplevel"].get<bool>();
 
         std::map<std::string, std::string> imports;
-        std::transform(j["imports"].begin(), j["imports"].end(), std::inserter(imports, imports.end()), [](const json& jv) { return std::make_pair(jv[0].get<std::string>(), jv[1].get<std::string>()); });
+        std::transform(
+            j["imports"].begin(), j["imports"].end(), std::inserter(imports, imports.end()),
+            [](const json& jv) { return std::make_pair(jv[0].get<std::string>(), jv[1].get<std::string>()); });
 
         FullyQualifiedNamespace fullns;
-        std::transform(j["fullns"].begin(), j["fullns"].end(), std::back_inserter(fullns), [](const json& jv) { return jv.get<std::string>(); });
+        std::transform(j["fullns"].begin(), j["fullns"].end(), std::back_inserter(fullns),
+                       [](const json& jv) { return jv.get<std::string>(); });
 
         std::string ns = j["ns"].get<std::string>();
 
         std::map<std::string, FullyQualifiedNamespace> subns;
-        std::transform(j["subns"].begin(), j["subns"].end(), std::inserter(subns, subns.end()), [](const json& jv) { 
+        std::transform(j["subns"].begin(), j["subns"].end(), std::inserter(subns, subns.end()), [](const json& jv) {
             FullyQualifiedNamespace fqn;
-            std::transform(jv[1].begin(), jv[1].end(), std::back_inserter(fqn), [](const json& jv) { return jv.get<std::string>(); });
+            std::transform(jv[1].begin(), jv[1].end(), std::back_inserter(fqn),
+                           [](const json& jv) { return jv.get<std::string>(); });
             return std::make_pair(jv[0].get<std::string>(), fqn);
         });
 
         std::map<std::string, TypeKey> types;
-        std::transform(j["types"].begin(), j["types"].end(), std::inserter(types, types.end()), [](const json& jv) { return std::make_pair(jv[0].get<std::string>(), jv[1].get<TypeKey>()); });
-        
+        std::transform(j["types"].begin(), j["types"].end(), std::inserter(types, types.end()),
+                       [](const json& jv) { return std::make_pair(jv[0].get<std::string>(), jv[1].get<TypeKey>()); });
+
         return new NamespaceDecl(istoplevel, imports, fullns, ns, subns, types);
     }
 
@@ -229,18 +242,21 @@ namespace bsqon
         std::vector<brex::RENSInfo> ninfos;
         for(size_t i = 0; i < j.size(); ++i) {
             auto ninfoentry = j[i];
-            assert(ninfoentry.is_object() && ninfoentry.contains("nsinfo") && ninfoentry["nsinfo"].is_object() && ninfoentry.contains("reinfos") && ninfoentry["reinfos"].is_array());
+            assert(ninfoentry.is_object() && ninfoentry.contains("nsinfo") && ninfoentry["nsinfo"].is_object() &&
+                   ninfoentry.contains("reinfos") && ninfoentry["reinfos"].is_array());
 
             auto remapinfo = ninfoentry["nsinfo"];
-            assert(remapinfo.contains("inns") && remapinfo["inns"].is_string() && remapinfo.contains("nsmappings") && remapinfo["nsmappings"].is_array());
-            
+            assert(remapinfo.contains("inns") && remapinfo["inns"].is_string() && remapinfo.contains("nsmappings") &&
+                   remapinfo["nsmappings"].is_array());
+
             std::vector<std::pair<std::string, std::string>> nsmappings;
             auto mappingarr = remapinfo["nsmappings"];
 
             size_t mappinglen = mappingarr.size();
             for(size_t j = 0; j < mappinglen; ++j) {
                 auto nsmappingentry = mappingarr[j];
-                assert(nsmappingentry.is_array() && nsmappingentry.size() == 2 && nsmappingentry[0].is_string() && nsmappingentry[1].is_string());
+                assert(nsmappingentry.is_array() && nsmappingentry.size() == 2 && nsmappingentry[0].is_string() &&
+                       nsmappingentry[1].is_string());
 
                 nsmappings.push_back({nsmappingentry[0].get<std::string>(), nsmappingentry[1].get<std::string>()});
             }
@@ -251,7 +267,8 @@ namespace bsqon
             size_t reinfoslen = reinfos.size();
             for(size_t j = 0; j < reinfoslen; ++j) {
                 auto reinfoentry = reinfos[j];
-                assert(reinfoentry.is_object() && reinfoentry.contains("name") && reinfoentry["name"].is_string() && reinfoentry.contains("restr") && reinfoentry["restr"].is_string());
+                assert(reinfoentry.is_object() && reinfoentry.contains("name") && reinfoentry["name"].is_string() &&
+                       reinfoentry.contains("restr") && reinfoentry["restr"].is_string());
 
                 std::string rename = reinfoentry["name"].get<std::string>();
                 std::string restring = reinfoentry["restr"].get<std::string>();
@@ -274,14 +291,16 @@ namespace bsqon
                 auto reentry = static_cast<brex::ReSystemUnicodeEntry*>(rsystem.entries[i]);
 
                 if(reentry->re->isValidNamedRegexComponent()) {
-                    assembly.namedUnicodeRegexMap[reentry->fullname] = static_cast<const brex::RegexSingleComponent*>(reentry->re->re)->entry.opt;
+                    assembly.namedUnicodeRegexMap[reentry->fullname] =
+                        static_cast<const brex::RegexSingleComponent*>(reentry->re->re)->entry.opt;
                 }
             }
             else {
                 auto reentry = static_cast<brex::ReSystemCEntry*>(rsystem.entries[i]);
 
                 if(reentry->re->isValidNamedRegexComponent()) {
-                    assembly.namedCRegexMap[reentry->fullname] = static_cast<const brex::RegexSingleComponent*>(reentry->re->re)->entry.opt;
+                    assembly.namedCRegexMap[reentry->fullname] =
+                        static_cast<const brex::RegexSingleComponent*>(reentry->re->re)->entry.opt;
                 }
             }
         }
@@ -291,19 +310,20 @@ namespace bsqon
 
     void AssemblyInfo::parse(json j, AssemblyInfo& assembly)
     {
-        std::for_each(j["namespaces"].begin(), j["namespaces"].end(), [&assembly](const json &ns) { 
+        std::for_each(j["namespaces"].begin(), j["namespaces"].end(), [&assembly](const json& ns) {
             auto nsd = NamespaceDecl::parse(ns);
-            assembly.namespaces[nsd->ns] = nsd; 
+            assembly.namespaces[nsd->ns] = nsd;
         });
 
-        std::for_each(j["typerefs"].begin(), j["typerefs"].end(), [&assembly](const json &tr) { 
+        std::for_each(j["typerefs"].begin(), j["typerefs"].end(), [&assembly](const json& tr) {
             auto t = Type::parse(tr);
-            assembly.typerefs[t->tkey] = t; 
+            assembly.typerefs[t->tkey] = t;
         });
 
-        std::for_each(j["recursiveSets"].begin(), j["recursiveSets"].end(), [&assembly](const json &rs) { 
+        std::for_each(j["recursiveSets"].begin(), j["recursiveSets"].end(), [&assembly](const json& rs) {
             std::set<TypeKey> rset;
-            std::transform(rs.begin(), rs.end(), std::inserter(rset, rset.end()), [](const json& jv) { return jv.get<TypeKey>(); });
+            std::transform(rs.begin(), rs.end(), std::inserter(rset, rset.end()),
+                           [](const json& jv) { return jv.get<TypeKey>(); });
             assembly.recursiveSets.push_back(rset);
         });
 
@@ -313,31 +333,67 @@ namespace bsqon
         }
     }
 
-    std::vector<TypeKey> g_primitiveTypes = {
-        "None", "Bool", 
-        "Nat", "Int", "BigInt", "BigNat", "Rational", "Float", "Decimal", 
-        "DecimalDegree", "LatLongCoordinate", 
-        "Complex",
-        "ByteBuffer", 
-        "UUIDv4", "UUIDv7", "SHAContentHash", 
-        "TZDateTime", "TAITime", "PlainDate", "PlainTime", "LogicalTime", "ISOTimestamp",
-        "DeltaDateTime", "DeltaSeconds", "DeltaLogicalTime", "DeltaISOTimestamp",
-        "String", "CString", 
-        "Regex", "CRegex", "PathRegex",
-        "Path", "PathItem", "Glob"
-    };
+    std::vector<TypeKey> g_primitiveTypes = {"None",
+                                             "Bool",
+                                             "Nat",
+                                             "Int",
+                                             "BigInt",
+                                             "BigNat",
+                                             "Rational",
+                                             "Float",
+                                             "Decimal",
+                                             "DecimalDegree",
+                                             "LatLongCoordinate",
+                                             "Complex",
+                                             "ByteBuffer",
+                                             "UUIDv4",
+                                             "UUIDv7",
+                                             "SHAContentHash",
+                                             "TZDateTime",
+                                             "TAITime",
+                                             "PlainDate",
+                                             "PlainTime",
+                                             "LogicalTime",
+                                             "ISOTimestamp",
+                                             "DeltaDateTime",
+                                             "DeltaSeconds",
+                                             "DeltaLogicalTime",
+                                             "DeltaISOTimestamp",
+                                             "String",
+                                             "CString",
+                                             "Regex",
+                                             "CRegex",
+                                             "PathRegex",
+                                             "Path",
+                                             "PathItem",
+                                             "Glob"};
 
-    std::vector<TypeKey> g_primitiveKeyTypes = {
-        "Bool", 
-        "Nat", "Int", "BigInt", "BigNat",
-        "UUIDv4", "UUIDv7", "SHAContentHash", 
-        "TZDateTime", "TAITime", "PlainDate", "PlainTime", "LogicalTime", "ISOTimestamp",
-        "DeltaDateTime", "DeltaSeconds", "DeltaLogicalTime", "DeltaISOTimestamp",
-        "String", "CString", 
-        "Path", "PathItem", "Glob"
-    };
+    std::vector<TypeKey> g_primitiveKeyTypes = {"Bool",
+                                                "Nat",
+                                                "Int",
+                                                "BigInt",
+                                                "BigNat",
+                                                "UUIDv4",
+                                                "UUIDv7",
+                                                "SHAContentHash",
+                                                "TZDateTime",
+                                                "TAITime",
+                                                "PlainDate",
+                                                "PlainTime",
+                                                "LogicalTime",
+                                                "ISOTimestamp",
+                                                "DeltaDateTime",
+                                                "DeltaSeconds",
+                                                "DeltaLogicalTime",
+                                                "DeltaISOTimestamp",
+                                                "String",
+                                                "CString",
+                                                "Path",
+                                                "PathItem",
+                                                "Glob"};
 
-    std::u8string AssemblyInfo::resolveConstantRegexValue(const std::u8string& reexp, bool isutf) const {
+    std::u8string AssemblyInfo::resolveConstantRegexValue(const std::u8string& reexp, bool isutf) const
+    {
         if(reexp.starts_with(u8'/')) {
             return reexp;
         }
@@ -346,27 +402,30 @@ namespace bsqon
         }
     }
 
-    void AssemblyInfo::processUnicodeRegex(const std::string& inns, const std::u8string& regex) 
+    void AssemblyInfo::processUnicodeRegex(const std::string& inns, const std::u8string& regex)
     {
         auto pr = brex::RegexParser::parseUnicodeRegex(regex, false);
         assert(pr.first.has_value());
 
         std::vector<brex::RegexCompileError> compileerror;
         auto rmp = brex::ReSystemResolverInfo(inns, &nsremapper);
-        auto executor = brex::RegexCompiler::compileUnicodeRegexToExecutor(pr.first.value(), this->namedUnicodeRegexMap, {}, false, &rmp, &brex::ReSystem::resolveREName, compileerror);
+        auto executor =
+            brex::RegexCompiler::compileUnicodeRegexToExecutor(pr.first.value(), this->namedUnicodeRegexMap, {}, false,
+                                                               &rmp, &brex::ReSystem::resolveREName, compileerror);
         assert(compileerror.empty());
 
         this->executableUnicodeRegexMap[regex] = executor;
     }
 
-    void AssemblyInfo::processCRegex(const std::string& inns, const std::u8string& regex) 
+    void AssemblyInfo::processCRegex(const std::string& inns, const std::u8string& regex)
     {
         auto pr = brex::RegexParser::parseCRegex(regex, false);
         assert(pr.first.has_value());
 
         std::vector<brex::RegexCompileError> compileerror;
         auto rmp = brex::ReSystemResolverInfo(inns, &nsremapper);
-        auto executor = brex::RegexCompiler::compileCRegexToExecutor(pr.first.value(), this->namedCRegexMap, {}, false, &rmp, &brex::ReSystem::resolveREName, compileerror);
+        auto executor = brex::RegexCompiler::compileCRegexToExecutor(
+            pr.first.value(), this->namedCRegexMap, {}, false, &rmp, &brex::ReSystem::resolveREName, compileerror);
         assert(compileerror.empty());
 
         this->executableCRegexMap[regex] = executor;
@@ -376,10 +435,10 @@ namespace bsqon
     {
         auto uregex = this->resolveConstantRegexValue(regex, true);
         this->processUnicodeRegex(inns, uregex);
-    
+
         brex::ExecutorError err;
         bool accepts = this->executableUnicodeRegexMap[uregex]->test(ustr, err);
-    
+
         assert(err == brex::ExecutorError::Ok);
         return accepts;
     }
@@ -391,7 +450,7 @@ namespace bsqon
 
         brex::ExecutorError err;
         bool accepts = this->executableCRegexMap[cregex]->test(cstr, err);
-    
+
         assert(err == brex::ExecutorError::Ok);
         return accepts;
     }
@@ -442,4 +501,4 @@ namespace bsqon
 
         return g_assembly.checkSubtype(t, uu);
     }
-}
+} // namespace bsqon

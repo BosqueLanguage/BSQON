@@ -63,24 +63,21 @@ class ValueGenerator
     bsqon::AssemblyInfo* asm_info;
     bsqon::Type* t;
     z3::solver& s;
-    z3::expr ex;
+    bsqon::Value* v;
 
     ValueGenerator(bsqon::AssemblyInfo* asm_info, bsqon::Type* t, std::string key, z3::solver& solver);
 
-    bsqon::Value* generateBigNat(const bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateNat(const bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateBigInt(const bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateInt(const bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateBool(const bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateCString(const bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateSome(bsqon::SomeType* t, z3::expr ex);
-    bsqon::Value* generateOption(bsqon::OptionType* t, z3::expr ex);
-    bsqon::Value* generateEntity(bsqon::StdEntityType* t, z3::expr ex);
-    bsqon::Value* generateList(bsqon::ListType* t, z3::expr ex);
-    bsqon::Value* generateTypeDecl(bsqon::TypedeclType* t, z3::expr ex);
-    bsqon::Value* generatePrimitive(bsqon::PrimitiveType* t, z3::expr ex);
-    bsqon::Value* generateValue(bsqon::Type* t, z3::expr ex);
-
-    std::optional<z3::func_decl> GetValidatorFor(z3::sort srt);
-    z3::expr generateSequenceLen(z3::expr ex);
+    z3::expr generateBigNat(const bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateNat(const bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateBigInt(const bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateInt(const bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateBool(const bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateCString(const bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateSome(bsqon::SomeType* t, bsqon::Value* v);
+    z3::expr generateOption(bsqon::OptionType* t, bsqon::Value* v);
+    z3::expr generateEntity(bsqon::StdEntityType* t, bsqon::Value* v);
+    z3::expr generateList(bsqon::ListType* t, bsqon::Value* v);
+    z3::expr generateTypeDecl(bsqon::TypedeclType* t, bsqon::Value* v);
+    z3::expr generatePrimitive(bsqon::PrimitiveType* t, bsqon::Value* v);
+    z3::expr generateValue(bsqon::Type* t, bsqon::Value* v);
 };
