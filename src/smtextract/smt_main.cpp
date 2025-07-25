@@ -78,8 +78,11 @@ int main(int argc, char** argv)
         }
     }
     else if(mode == "-g" || mode == "--generate") {
+        // Input
+
         for(const auto& [id, type] : arg_refs) {
-            ValueGenerator generate(&asm_info, type, id, sol);
+            bsqon::Value* val = new bsqon::IntNumberValue(type, FILLER_POS, 5);
+            ValueGenerator generate(&asm_info, type, id, val, sol);
         }
     }
     else {

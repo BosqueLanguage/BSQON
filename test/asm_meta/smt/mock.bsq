@@ -16,6 +16,7 @@ type USER_ADDRESS = CString of /[0-9a-zA-Z -,.#()]+/c;
 
 
 entity UserDTO {
+	field id: Option<Int>;
     field email: Option<EMAIL>;
     invariant userEmailNotEmpty($email);
     field password: ALPHANUMERIC;
@@ -57,12 +58,20 @@ function userAddressNotEmpty(x: Option<USER_ADDRESS>): Bool {
 }
 
 
-function getCustomer(id:Int): UserDTO{
-	ensures $return.id == id;
+function getCustomer(id:Int): UserDTO ensures $return.id === id;{
+	let user = UserDTO{
+		 some(5i),
+		 some('jch270@uky.edu'<EMAIL>),
+         '12345678'<ALPHANUMERIC>,
+         some('James Chen'<USER_NAME>),
+         some('+12 111-111-1111'<USER_PHONE>),
+         some('123 Fake Street'<USER_ADDRESS>),
+	};
+
+	return user;
 }
 
-public function main(): UserDTO{
-	let c_id = 5i;
-	let user = getCustomer(c_id);
+public function main(id: Int): UserDTO{
+	let user = getCustomer(id);
 	return user;
 }

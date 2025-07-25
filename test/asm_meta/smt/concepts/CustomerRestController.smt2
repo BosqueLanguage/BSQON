@@ -274,6 +274,7 @@
 (define-fun @ValidateRoot-Main@UserDTO ((v Main@UserDTO)) Bool
     (@Validate-Main@UserDTO v)
 )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (declare-const user Main@UserDTO)
 (declare-const res (@Result Main@UserDTO))

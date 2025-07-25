@@ -1,0 +1,12 @@
+{
+    "fname": "Main::getCustomer",
+    "args": [
+        {
+            "name": "id",
+            "type": "Int"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Main::UserDTO"
+}
