@@ -287,7 +287,6 @@ namespace bsqon
 // NAMESPACE_NAME			= //TODO,
 // TYPE_CONST_NAME			= //TODO,
 // TERM_SUBTYPE_FN_NAME		= @SubtypeOf-tk,
-// Also converts Bosque Datatype '::' to SMT Datatype '@'
 std::string tKeyToSmtName(const std::string& tk, SmtNameType n)
 {
     // Replace "::" to "@"
@@ -295,6 +294,16 @@ std::string tKeyToSmtName(const std::string& tk, SmtNameType n)
     if(tk.find("::") != std::string::npos) {
         std::regex bsq_ns_accessor("::");
         new_tk = std::regex_replace(new_tk, bsq_ns_accessor, "@");
+    }
+
+    if((new_tk == "Int") || (new_tk == "BigInt") || (new_tk == "Nat") || (new_tk == "BigNat")) {
+        return "Int";
+    }
+    else if((new_tk == "String") || new_tk == "CString") {
+        return "String";
+    }
+    else if(new_tk == "Float") {
+        return "Real";
     }
 
     if(n == SMT_TYPE) {

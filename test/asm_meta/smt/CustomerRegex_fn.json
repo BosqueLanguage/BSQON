@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "user",
+            "type": "Main::UserDTO"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Main::UserDTO"
+}

@@ -588,7 +588,9 @@ bsqon::Value* ValueExtractor::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::ex
     z3::expr p_ex = t_accs(ex);
 
     bsqon::Type* ptype = this->asm_info->lookupTypeKey(bsq_t->primitivetype);
-    return this->extractValue(ptype, p_ex);
+    bsqon::Value* val = this->extractValue(ptype, p_ex);
+
+    return new bsqon::TypedeclValue(bsq_t, FILLER_POS, val);
 }
 
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)

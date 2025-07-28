@@ -1,5 +1,6 @@
 #include "smt_extract.h"
 #include "smt_utils.h"
+#include <cstdio>
 #include <fstream>
 
 int main(int argc, char** argv)
@@ -78,14 +79,16 @@ int main(int argc, char** argv)
         }
     }
     else if(mode == "-g" || mode == "--generate") {
-        // Input
-
         for(const auto& [id, type] : arg_refs) {
             ValueExtractor extract(&asm_info, type, id, sol);
             bsqon::Value* val = extract.value;
 
-            std::string key = "id";
-            std::string sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+            std::string key = id;
+            std::string sort_key = "";
+            sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+
+            std::cout << "Original:" << val->vtype->tkey << "\n";
+
             std::u8string val_sig = u8"(declare-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
                                     std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
 

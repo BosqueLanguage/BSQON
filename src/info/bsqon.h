@@ -266,6 +266,7 @@ namespace bsqon
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
+
             return u8"none";
         }
 
@@ -815,6 +816,7 @@ namespace bsqon
         // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
+            // Check if there is an regex on it.
             auto ustr = brex::escapeCString(this->sv);
             return u8"\"" + std::u8string(ustr.begin(), ustr.end()) + u8"\"";
         }
@@ -1616,17 +1618,14 @@ namespace bsqon
         // (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu")))
         virtual std::u8string toSMTLib() const override
         {
-            std::u8string some_val = u8"(";
             std::string term_some = tKeyToSmtName(this->vtype->tkey, STRUCT_TERM_CONSTRUCT);
             std::string construct_some = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
-            std::string construct_val = tKeyToSmtName(this->vtype->tkey, STRUCT_PRIM_CONSTRUCT);
+
+            std::u8string some_val = u8"(";
             some_val += std::u8string(term_some.cbegin(), term_some.cend());
             some_val += u8"(";
             some_val += std::u8string(construct_some.cbegin(), construct_some.cend());
-            some_val += u8"(";
-            some_val += std::u8string(construct_val.cbegin(), construct_val.cend()) + u8" ";
             some_val += this->v->toSMTLib();
-            some_val += u8")";
             some_val += u8")";
             some_val += u8")";
 
@@ -2262,11 +2261,16 @@ namespace bsqon
             return this->pvalue->toString() + u8'<' +
                    std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'>';
         }
+
+        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
-            // TODO: Working on toSMTLib
-            return this->pvalue->toString() + u8'<' +
-                   std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'>';
+            std::string td_smt = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            std::u8string td_val = u8"(";
+            td_val += std::u8string(td_smt.cbegin(), td_smt.cend()) + u8" ";
+            td_val += this->pvalue->toString();
+            td_val += u8")";
+            return td_val;
         }
 
         virtual json toJSON() const override
