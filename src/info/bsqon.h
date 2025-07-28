@@ -1616,17 +1616,6 @@ namespace bsqon
         // (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu")))
         virtual std::u8string toSMTLib() const override
         {
-            std::cout << "KIND" << this->v->kind << "\n";
-            if(this->vtype->isAbstractType()) {
-                std::cout << this->vtype->tkey << "== ABSTRACT TYPE" << "\n";
-            };
-            if(this->vtype->isConcreteType()) {
-                std::cout << this->vtype->tkey << "== CONCRETE TYPE" << "\n";
-            };
-            if(this->vtype->isUnresolved()) {
-                std::cout << this->vtype->tkey << "== UNRESOVLED TYPE" << "\n";
-            }
-
             std::u8string some_val = u8"(";
             std::string term_some = tKeyToSmtName(this->vtype->tkey, STRUCT_TERM_CONSTRUCT);
             std::string construct_some = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
