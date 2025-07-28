@@ -6,6 +6,21 @@
 using json = nlohmann::json;
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <regex>
+
+typedef enum SmtNameType
+{
+    SMT_TYPE,
+    STRUCT_CONSTRUCT,
+    STRUCT_TERM_FIELD,
+    STRUCT_TERM_CONSTRUCT,
+    STRUCT_PRIM_CONSTRUCT,
+    NAMESPACE_NAME,
+    TYPE_CONST_NAME,
+    TERM_SUBTYPE_FN_NAME,
+} SmtNameType;
+
+std::string tKeyToSmtName(const std::string& tk, SmtNameType n);
 
 namespace bsqon
 {
@@ -207,7 +222,7 @@ namespace bsqon
             return u8"error";
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             return u8"error";
@@ -276,7 +291,7 @@ namespace bsqon
         {
             return this->tv ? u8"true" : u8"false";
         }
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             return this->tv ? u8"true" : u8"false";
@@ -323,11 +338,12 @@ namespace bsqon
             auto sstr = std::to_string(this->cnv);
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"n";
         }
-        // TODO: Working on toSMTLib
+
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
-            return std::u8string(sstr.cbegin(), sstr.cend()) + u8"n";
+            return std::u8string(sstr.cbegin(), sstr.cend());
         }
 
         virtual bool isValidForTypedecl() const override
@@ -368,6 +384,10 @@ namespace bsqon
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
+            if(sstr.find("-") != std::string::npos) {
+                return u8"(" + std::u8string(sstr.cbegin(), sstr.cend()) + u8")";
+            }
+
             return std::u8string(sstr.cbegin(), sstr.cend());
         }
 
@@ -405,11 +425,11 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"N";
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
-            return std::u8string(sstr.cbegin(), sstr.cend()) + u8"N";
+            return std::u8string(sstr.cbegin(), sstr.cend());
         }
 
         virtual json toJSON() const override
@@ -446,11 +466,15 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"I";
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
-            return std::u8string(sstr.cbegin(), sstr.cend()) + u8"I";
+            if(sstr.find("-") != std::string::npos) {
+                return u8"(" + std::u8string(sstr.cbegin(), sstr.cend()) + u8")";
+            }
+
+            return std::u8string(sstr.cbegin(), sstr.cend());
         }
 
         virtual bool isValidForTypedecl() const override
@@ -486,11 +510,12 @@ namespace bsqon
             auto sstr = std::to_string(this->cnv);
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"f");
         }
-        // TODO: Working on toSMTLib
+
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
-            return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"f");
+            return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"");
         }
 
         virtual json toJSON() const override
@@ -523,11 +548,11 @@ namespace bsqon
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"d");
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
-            return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"d");
+            return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"");
         }
 
         virtual bool isValidForTypedecl() const override
@@ -559,11 +584,11 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"R";
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
-            return std::u8string(sstr.cbegin(), sstr.cend()) + u8"R";
+            return std::u8string(sstr.cbegin(), sstr.cend()) + u8"";
         }
 
         virtual bool isValidForTypedecl() const override
@@ -596,11 +621,11 @@ namespace bsqon
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"dd");
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
-            return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"dd");
+            return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"");
         }
 
         virtual bool isValidForTypedecl() const override
@@ -642,14 +667,15 @@ namespace bsqon
 
             return latstr + longstr;
         }
-        // TODO: Working on toSMTLib
+
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto llstr = this->latitude.str();
-            auto latstr = Value::tailingFloatZeroHelper(std::u8string(llstr.cbegin(), llstr.cend()), u8"lat");
+            auto latstr = Value::tailingFloatZeroHelper(std::u8string(llstr.cbegin(), llstr.cend()), u8"");
 
             auto lostr = this->longitude.str();
-            auto longstr = Value::tailingFloatZeroHelper(std::u8string(lostr.cbegin(), lostr.cend()), u8"long");
+            auto longstr = Value::tailingFloatZeroHelper(std::u8string(lostr.cbegin(), lostr.cend()), u8"");
 
             if(!longstr.starts_with(u8'-') && !longstr.starts_with(u8'+')) {
                 longstr = u8'+' + longstr;
@@ -704,7 +730,7 @@ namespace bsqon
             auto rstr = Value::tailingFloatZeroHelper(std::u8string(rrstr.cbegin(), rrstr.cend()), u8"");
 
             auto iistr = std::to_string(this->imag);
-            auto istr = Value::tailingFloatZeroHelper(std::u8string(iistr.cbegin(), iistr.cend()), u8"i");
+            auto istr = Value::tailingFloatZeroHelper(std::u8string(iistr.cbegin(), iistr.cend()), u8"");
 
             if(!istr.starts_with(u8'-') && !istr.starts_with(u8'+')) {
                 istr = u8'+' + istr;
@@ -740,7 +766,7 @@ namespace bsqon
             return u8"\"" + std::u8string(ustr.begin(), ustr.end()) + u8"\"";
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto ustr = brex::escapeUnicodeString(this->sv);
@@ -785,11 +811,12 @@ namespace bsqon
             auto ustr = brex::escapeCString(this->sv);
             return u8"'" + std::u8string(ustr.begin(), ustr.end()) + u8"'";
         }
-        // TODO: Working on toSMTLib
+
+        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto ustr = brex::escapeCString(this->sv);
-            return u8"'" + std::u8string(ustr.begin(), ustr.end()) + u8"'";
+            return u8"\"" + std::u8string(ustr.begin(), ustr.end()) + u8"\"";
         }
 
         virtual json toJSON() const override
@@ -838,6 +865,7 @@ namespace bsqon
 
             return u8"0x[" + bstr + u8"]";
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1585,10 +1613,34 @@ namespace bsqon
         }
 
         // TODO: Working on toSMTLib
+        // (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu")))
         virtual std::u8string toSMTLib() const override
         {
-            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
-                   u8'}';
+            if(this->vtype->isAbstractType()) {
+                std::cout << this->vtype->tkey << "== ABSTRACT TYPE" << "\n";
+            };
+            if(this->vtype->isConcreteType()) {
+                std::cout << this->vtype->tkey << "== CONCRETE TYPE" << "\n";
+            };
+            if(this->vtype->isUnresolved()) {
+                std::cout << this->vtype->tkey << "== UNRESOVLED TYPE" << "\n";
+            }
+
+            std::u8string some_val = u8"(";
+            std::string term_some = tKeyToSmtName(this->vtype->tkey, STRUCT_TERM_CONSTRUCT);
+            std::string construct_some = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            std::string construct_val = tKeyToSmtName(this->vtype->tkey, STRUCT_PRIM_CONSTRUCT);
+            some_val += std::u8string(term_some.cbegin(), term_some.cend());
+            some_val += u8"(";
+            some_val += std::u8string(construct_some.cbegin(), construct_some.cend());
+            some_val += u8"(";
+            some_val += std::u8string(construct_val.cbegin(), construct_val.cend()) + u8" ";
+            some_val += this->v->toSMTLib();
+            some_val += u8")";
+            some_val += u8")";
+            some_val += u8")";
+
+            return some_val;
         }
 
         virtual json toJSON() const override
@@ -2277,30 +2329,15 @@ namespace bsqon
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
-            auto etype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
+            std::string constructor = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            auto sort = std::u8string(constructor.cbegin(), constructor.cend());
 
-            std::u8string efields = u8"";
-            auto isSimplePositional = std::all_of(this->fieldvalues.cbegin(), this->fieldvalues.cend(),
-                                                  [](const Value* v) { return v != nullptr; });
-            if(isSimplePositional) {
-                for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
-                    efields += (efields == u8"" ? u8"" : u8", ") + this->fieldvalues[i]->toSMTLib();
-                }
-            }
-            else {
-                const std::vector<EntityTypeFieldEntry>& fields =
-                    static_cast<const StdEntityType*>(this->vtype)->fields;
-
-                for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
-                    if(this->fieldvalues[i] != nullptr) {
-                        auto fstr = std::u8string(fields[i].fname.cbegin(), fields[i].fname.cend());
-                        efields +=
-                            (efields == u8"" ? u8"" : u8", ") + (fstr + u8"=" + this->fieldvalues[i]->toSMTLib());
-                    }
-                }
+            std::u8string arguments = u8"";
+            for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
+                arguments += (arguments == u8"" ? u8"" : u8" ") + this->fieldvalues[i]->toSMTLib();
             }
 
-            return etype + u8'{' + efields + u8'}';
+            return u8'(' + sort + u8' ' + arguments + u8')';
         }
 
         virtual json toJSON() const override

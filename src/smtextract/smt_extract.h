@@ -34,6 +34,7 @@ class ValueExtractor
     bsqon::Type* t;
     z3::solver& s;
     z3::expr ex;
+    bsqon::Value* value;
 
     ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* t, std::string key, z3::solver& solver);
     bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);
@@ -53,8 +54,8 @@ class ValueExtractor
 
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
 
-    std::optional<z3::expr> getExprFromVal(bsqon::Value* v);
     z3::expr extractSequenceLen(z3::expr ex);
+    bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
 };
 
 class ValueGenerator

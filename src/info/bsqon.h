@@ -6,6 +6,21 @@
 using json = nlohmann::json;
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <regex>
+
+typedef enum SmtNameType
+{
+    SMT_TYPE,
+    STRUCT_CONSTRUCT,
+    STRUCT_TERM_FIELD,
+    STRUCT_TERM_CONSTRUCT,
+    STRUCT_PRIM_CONSTRUCT,
+    NAMESPACE_NAME,
+    TYPE_CONST_NAME,
+    TERM_SUBTYPE_FN_NAME,
+} SmtNameType;
+
+std::string tKeyToSmtName(const std::string& tk, SmtNameType n);
 
 namespace bsqon
 {
@@ -369,6 +384,10 @@ namespace bsqon
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
+            if(sstr.find("-") != std::string::npos) {
+                return u8"(" + std::u8string(sstr.cbegin(), sstr.cend()) + u8")";
+            }
+
             return std::u8string(sstr.cbegin(), sstr.cend());
         }
 
@@ -451,6 +470,10 @@ namespace bsqon
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
+            if(sstr.find("-") != std::string::npos) {
+                return u8"(" + std::u8string(sstr.cbegin(), sstr.cend()) + u8")";
+            }
+
             return std::u8string(sstr.cbegin(), sstr.cend());
         }
 
@@ -1590,10 +1613,35 @@ namespace bsqon
         }
 
         // TODO: Working on toSMTLib
+        // (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu")))
         virtual std::u8string toSMTLib() const override
         {
-            return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
-                   u8'}';
+            std::cout << "KIND" << this->v->kind << "\n";
+            if(this->vtype->isAbstractType()) {
+                std::cout << this->vtype->tkey << "== ABSTRACT TYPE" << "\n";
+            };
+            if(this->vtype->isConcreteType()) {
+                std::cout << this->vtype->tkey << "== CONCRETE TYPE" << "\n";
+            };
+            if(this->vtype->isUnresolved()) {
+                std::cout << this->vtype->tkey << "== UNRESOVLED TYPE" << "\n";
+            }
+
+            std::u8string some_val = u8"(";
+            std::string term_some = tKeyToSmtName(this->vtype->tkey, STRUCT_TERM_CONSTRUCT);
+            std::string construct_some = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            std::string construct_val = tKeyToSmtName(this->vtype->tkey, STRUCT_PRIM_CONSTRUCT);
+            some_val += std::u8string(term_some.cbegin(), term_some.cend());
+            some_val += u8"(";
+            some_val += std::u8string(construct_some.cbegin(), construct_some.cend());
+            some_val += u8"(";
+            some_val += std::u8string(construct_val.cbegin(), construct_val.cend()) + u8" ";
+            some_val += this->v->toSMTLib();
+            some_val += u8")";
+            some_val += u8")";
+            some_val += u8")";
+
+            return some_val;
         }
 
         virtual json toJSON() const override
@@ -2282,30 +2330,15 @@ namespace bsqon
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
-            auto etype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
+            std::string constructor = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            auto sort = std::u8string(constructor.cbegin(), constructor.cend());
 
-            std::u8string efields = u8"";
-            auto isSimplePositional = std::all_of(this->fieldvalues.cbegin(), this->fieldvalues.cend(),
-                                                  [](const Value* v) { return v != nullptr; });
-            if(isSimplePositional) {
-                for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
-                    efields += (efields == u8"" ? u8"" : u8", ") + this->fieldvalues[i]->toSMTLib();
-                }
-            }
-            else {
-                const std::vector<EntityTypeFieldEntry>& fields =
-                    static_cast<const StdEntityType*>(this->vtype)->fields;
-
-                for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
-                    if(this->fieldvalues[i] != nullptr) {
-                        auto fstr = std::u8string(fields[i].fname.cbegin(), fields[i].fname.cend());
-                        efields +=
-                            (efields == u8"" ? u8"" : u8", ") + (fstr + u8"=" + this->fieldvalues[i]->toSMTLib());
-                    }
-                }
+            std::u8string arguments = u8"";
+            for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
+                arguments += (arguments == u8"" ? u8"" : u8" ") + this->fieldvalues[i]->toSMTLib();
             }
 
-            return etype + u8'{' + efields + u8'}';
+            return u8'(' + sort + u8' ' + arguments + u8')';
         }
 
         virtual json toJSON() const override

@@ -81,8 +81,19 @@ int main(int argc, char** argv)
         // Input
 
         for(const auto& [id, type] : arg_refs) {
-            bsqon::Value* val = new bsqon::IntNumberValue(type, FILLER_POS, 5);
-            ValueGenerator generate(&asm_info, type, id, val, sol);
+            ValueExtractor extract(&asm_info, type, id, sol);
+            bsqon::Value* val = extract.value;
+
+            std::string key = "id";
+            std::string sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+            std::u8string val_sig = u8"(declare-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
+                                    std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
+
+            std::u8string val_ex = val->toSMTLib();
+
+            std::u8string final = val_sig + val_ex + u8")";
+
+            printf("%s\n", (const char*) final.c_str());
         }
     }
     else {
