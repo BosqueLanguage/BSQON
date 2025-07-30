@@ -85,9 +85,14 @@ int main(int argc, char** argv)
 
             std::string key = id;
             std::string sort_key = "";
-            sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
 
-            std::cout << "Original:" << val->vtype->tkey << "\n";
+            // TODO: Make this better.
+            if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
+                sort_key = "@Term";
+            }
+            else {
+                sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+            }
 
             std::u8string val_sig = u8"(declare-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
                                     std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";

@@ -222,7 +222,7 @@ namespace bsqon
             return u8"error";
         }
 
-        // NOTE: Needs to be tested.
+        // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
             return u8"error";
@@ -263,11 +263,11 @@ namespace bsqon
             return u8"none";
         }
 
-        // TODO: Working on toSMTLib
+        // NOTE: Requires Test
         virtual std::u8string toSMTLib() const override
         {
 
-            return u8"none";
+            return u8"@Term-None-mk";
         }
 
         virtual json toJSON() const override
@@ -868,7 +868,7 @@ namespace bsqon
             return u8"0x[" + bstr + u8"]";
         }
 
-        // TODO: Working on toSMTLib
+        // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
             std::u8string bstr;
@@ -913,7 +913,7 @@ namespace bsqon
         {
             return u8"uuid4{" + std::u8string(this->uuidstr.cbegin(), this->uuidstr.cend()) + u8'}';
         }
-        // TODO: Working on toSMTLib
+        // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
             return u8"uuid4{" + std::u8string(this->uuidstr.cbegin(), this->uuidstr.cend()) + u8'}';
@@ -952,7 +952,7 @@ namespace bsqon
         {
             return u8"uuid7{" + std::u8string(this->uuidstr.cbegin(), this->uuidstr.cend()) + u8'}';
         }
-        // TODO: Working on toSMTLib
+        // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
             return u8"uuid7{" + std::u8string(this->uuidstr.cbegin(), this->uuidstr.cend()) + u8'}';
@@ -1625,6 +1625,7 @@ namespace bsqon
             some_val += std::u8string(term_some.cbegin(), term_some.cend());
             some_val += u8"(";
             some_val += std::u8string(construct_some.cbegin(), construct_some.cend());
+            some_val += u8" ";
             some_val += this->v->toSMTLib();
             some_val += u8")";
             some_val += u8")";

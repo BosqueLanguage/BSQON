@@ -9,4 +9,4 @@ void checkAndReport(const std::u8string& result, const std::u8string& expected);
 std::string createSmtPathName(std::string tcc);
 std::string createSmtJSONPathName(std::string tcc);
 
-void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std::u8string& result);
+void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std::string mode, std::u8string& result);

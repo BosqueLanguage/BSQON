@@ -471,14 +471,13 @@ bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::exp
     return new bsqon::EntityValue(bsq_t, FILLER_POS, std::move(fieldvalues));
 }
 
-// ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
 bsqon::Value* ValueExtractor::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
 {
     z3::sort some_sort = ex.get_sort();
 
-    //(declare-fun Some<Int>-mk (Int) Some<Int>)
+    //(declare-fun Some<T>-mk (T) Some<Int>)
     z3::func_decl some_construct = some_sort.constructors()[0];
-    //(declare-fun Some<Int>-value (Some<Int>) Int)
+    //(declare-fun Some<T>-value (Some<T>) Int)
     z3::func_decl some_accesor = some_construct.accessors()[0];
 
     z3::expr target_some = some_accesor(ex);
@@ -489,6 +488,8 @@ bsqon::Value* ValueExtractor::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
     return new bsqon::SomeValue(bsq_t, FILLER_POS, some_val);
 }
 
+// The beauty of Cpp
+// ex.get_sort().constructors()[1].accessors()[0].range().constructors()[0].range().constructors()[0].accessors();
 bsqon::Value* ValueExtractor::extractOption(bsqon::OptionType* bsq_t, z3::expr ex)
 {
     // ex.get_sort() is always @Term
@@ -555,8 +556,13 @@ bsqon::Value* ValueExtractor::extractConcept(bsqon::ConceptType* bsq_t, z3::expr
 
 bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
-    z3::func_decl_vector constructs = ex.get_sort().constructors();
-    assert(constructs.size() == 1);
+    std::cout << ex.decl() << "\n";
+    z3::sort list_sort = ex.get_sort();
+    z3::func_decl_vector constructs = list_sort.constructors();
+    std::cout << "List Constructs: " << constructs << "\n";
+    z3::func_decl_vector recognizers = list_sort.recognizers();
+    std::cout << "List Constructs: " << recognizers << "\n";
+
     z3::func_decl c = constructs[0];
     z3::func_decl c_accs = c.accessors()[0];
 
@@ -564,8 +570,8 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     z3::expr list_len = this->extractSequenceLen(list_expr);
 
     bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
-    std::vector<bsqon::Value*> vals;
 
+    std::vector<bsqon::Value*> vals;
     for(int i = 0; i < list_len.get_numeral_int(); ++i) {
         z3::expr idx = this->s.ctx().int_val(i);
 
