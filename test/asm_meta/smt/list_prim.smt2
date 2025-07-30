@@ -242,6 +242,7 @@
 )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (declare-const f List<Int>)
+(assert(@ValidateRoot-List<Int> f))
 (declare-const res (@Result List<Int>))
 
 (assert (= res (Main@main f)))

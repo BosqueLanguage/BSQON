@@ -499,43 +499,25 @@ bsqon::Value* ValueExtractor::extractOption(bsqon::OptionType* bsq_t, z3::expr e
     z3::func_decl_vector opt_rgs = term.recognizers();
     const std::vector<bsqon::TypeKey>& opt_subtype = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
 
+    std::optional<TermType> opt_term = findConstruct(opt_mks, opt_rgs, ex);
+    z3::func_decl opt_mk = opt_term.value().mk;
+    z3::func_decl opt_is = opt_term.value().rg;
+    this->s.add(opt_is(ex));
+
     //--------------------------------------------------------------------------
     std::string none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
-    std::optional<TermType> none_term = findConstruct(opt_mks, opt_rgs, none_name);
-    z3::func_decl none_mk = none_term.value().mk;
-    z3::func_decl none_is = none_term.value().rg;
-
-    this->s.push();
-
-    this->s.add(none_is(ex));
-    z3::check_result r_none = this->s.check();
-
-    this->s.pop();
-
-    if(r_none == z3::sat) {
-        this->s.add(none_is(ex));
+    if(none_name == opt_mk.name().str()) {
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
     //--------------------------------------------------------------------------
-
-    bsqon::TypeKey some_tk = opt_subtype.at(0);
-    std::string some_name = tKeyToSmtName(some_tk, STRUCT_TERM_CONSTRUCT);
-
-    //(declare-fun @Term-Some<Int>-mk (Some<T>) @Term)
-    std::optional<TermType> some_term = findConstruct(opt_mks, opt_rgs, some_name);
-    z3::func_decl some_mk = some_term.value().mk;
-    z3::func_decl some_is = some_term.value().rg;
-
-    //(declare-fun @Term-Some<Int>-value (@Term) Some<T>)
-    z3::func_decl some_acc = some_mk.accessors()[0];
-
-    this->s.add(some_is(ex));
-
+    z3::func_decl some_acc = opt_mk.accessors()[0];
     z3::check_result r_some = this->s.check();
 
     bsqon::Value* some_val = nullptr;
     if(r_some == z3::sat) {
         z3::expr some_expr = some_acc(ex);
+
+        bsqon::TypeKey some_tk = opt_subtype.at(0);
         bsqon::Type* some_type = this->asm_info->lookupTypeKey(some_tk);
 
         some_val = this->extractSome(dynamic_cast<bsqon::SomeType*>(some_type), some_expr);
@@ -556,33 +538,43 @@ bsqon::Value* ValueExtractor::extractConcept(bsqon::ConceptType* bsq_t, z3::expr
 
 bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
-    std::cout << ex.decl() << "\n";
     z3::sort list_sort = ex.get_sort();
     z3::func_decl_vector constructs = list_sort.constructors();
-    std::cout << "List Constructs: " << constructs << "\n";
     z3::func_decl_vector recognizers = list_sort.recognizers();
-    std::cout << "List Constructs: " << recognizers << "\n";
 
     z3::func_decl c = constructs[0];
     z3::func_decl c_accs = c.accessors()[0];
 
-    z3::expr list_expr = c_accs(ex);
-    z3::expr list_len = this->extractSequenceLen(list_expr);
+    z3::expr list_term_construct = c_accs(ex);
+    z3::sort terms = list_term_construct.get_sort();
+    z3::func_decl_vector list_mks = terms.constructors();
+    z3::func_decl_vector list_recogs = terms.recognizers();
 
-    bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
+    std::optional<TermType> list_term = findConstruct(list_mks, list_recogs, list_term_construct);
+    z3::func_decl list_mk = list_term.value().mk;
+    z3::func_decl list_rg = list_term.value().rg;
+    this->s.add(list_rg(list_term_construct));
+
+    z3::sort list_n_sort = list_mk.accessors()[0](list_term_construct).get_sort();
+    z3::func_decl list_n_mk = list_n_sort.constructors()[0];
+    z3::func_decl_vector list_n_accs = list_n_mk.accessors();
+    std::cout << list_n_accs << "\n";
+    std::cout << "list_n_accs ACCS:" << list_n_accs[0].domain(0).constructors() << "\n";
 
     std::vector<bsqon::Value*> vals;
-    for(int i = 0; i < list_len.get_numeral_int(); ++i) {
-        z3::expr idx = this->s.ctx().int_val(i);
+    for(size_t i = 0; i < list_n_accs.size(); ++i) {
+        bsqon::Type* ith_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
 
-        z3::expr ith_val = list_expr.nth(idx);
-
-        bsqon::Type* t = this->asm_info->lookupTypeKey(list_t->tkey);
-        bsqon::Value* val = this->extractValue(t, ith_val);
-        vals.push_back(val);
+        z3::expr ith_ex = list_n_accs[i](ex);
+        try {
+            bsqon::Value* field_val = this->extractValue(ith_t, ith_ex);
+            vals.push_back(field_val);
+        }
+        catch(const std::exception& e) {
+            std::cerr << "extractEntity ERR: " << e.what() << "\n";
+        }
     }
 
-    this->s.add(ex == c(list_expr));
     return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
 }
 
@@ -692,3 +684,26 @@ bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, 
 
     return nullptr;
 }
+
+// Look for the SAT constructor of the ex in @Terms.
+std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers,
+                                                      z3::expr ex)
+{
+    std::optional<TermType> term;
+    for(size_t i = 0; i < recognizers.size(); ++i) {
+        z3::func_decl recognize = recognizers[i];
+        this->s.push();
+        this->s.add(recognize(ex));
+        z3::check_result rr = this->s.check();
+        this->s.pop();
+
+        if(rr == z3::sat) {
+            term = TermType{
+                .mk = terms[i],
+                .rg = recognize,
+            };
+        }
+    }
+
+    return term;
+};
