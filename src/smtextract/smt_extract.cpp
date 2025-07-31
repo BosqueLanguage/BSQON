@@ -538,37 +538,71 @@ bsqon::Value* ValueExtractor::extractConcept(bsqon::ConceptType* bsq_t, z3::expr
 
 bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
-    z3::sort list_sort = ex.get_sort();
-    z3::func_decl_vector constructs = list_sort.constructors();
-    z3::func_decl_vector recognizers = list_sort.recognizers();
+    z3::sort list_dt_sort = ex.get_sort();
+    z3::func_decl list_dt_construct = list_dt_sort.constructors()[0];
 
-    z3::func_decl c = constructs[0];
-    z3::func_decl c_accs = c.accessors()[0];
+    z3::func_decl list_dt_accs = list_dt_construct.accessors()[0];
 
-    z3::expr list_term_construct = c_accs(ex);
-    z3::sort terms = list_term_construct.get_sort();
+    z3::expr list_term_ex = list_dt_accs(ex);
+    z3::sort terms = list_term_ex.get_sort();
     z3::func_decl_vector list_mks = terms.constructors();
     z3::func_decl_vector list_recogs = terms.recognizers();
 
-    std::optional<TermType> list_term = findConstruct(list_mks, list_recogs, list_term_construct);
-    z3::func_decl list_mk = list_term.value().mk;
-    z3::func_decl list_rg = list_term.value().rg;
-    this->s.add(list_rg(list_term_construct));
+    std::optional<TermType> n_list = findConstruct(list_mks, list_recogs, list_term_ex);
+    z3::func_decl list_n_mk_term = n_list.value().mk;
+    z3::func_decl list_n_rg_term = n_list.value().rg;
 
-    z3::sort list_n_sort = list_mk.accessors()[0](list_term_construct).get_sort();
-    z3::func_decl list_n_mk = list_n_sort.constructors()[0];
-    z3::func_decl_vector list_n_accs = list_n_mk.accessors();
-    std::cout << list_n_accs << "\n";
-    std::cout << "list_n_accs ACCS:" << list_n_accs[0].domain(0).constructors() << "\n";
+    // Now we now which list to make.
+    this->s.add(list_n_rg_term(list_term_ex));
+
+    z3::expr list_n_ops = list_n_mk_term.accessors()[0](list_term_ex);
+
+    z3::sort list_n_ops_sort = list_n_ops.get_sort();
+    z3::func_decl list_n_ops_construct = list_n_ops_sort.constructors()[0];
+    z3::func_decl_vector list_n_ops_accs = list_n_ops_construct.accessors();
 
     std::vector<bsqon::Value*> vals;
-    for(size_t i = 0; i < list_n_accs.size(); ++i) {
-        bsqon::Type* ith_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
+    size_t list_size = list_n_ops_construct.arity();
+    if(list_size == 0) {
+        this->s.add(list_n_ops_construct == list_n_ops);
+        return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
+    }
 
-        z3::expr ith_ex = list_n_accs[i](ex);
+    z3::sort list_of_type = list_n_ops_accs[0].range();
+    z3::expr list_n = this->s.ctx().constant("tmp", list_of_type);
+    if(list_size == 1) {
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        list_n = list_n_ops_construct(unin_1);
+    }
+    else if(list_size == 2) {
+        // z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        // z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        // list_n = list_n_ops_construct(unin_1, unin_2);
+        // std::cout << list_n << "==" << list_n_ops << "\n";
+        // this->s.add(list_n == list_n_ops);
+    }
+    else if(list_size == 3) {
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        z3::expr unin_3 = this->s.ctx().constant("unin_3", list_of_type);
+        list_n = list_n_ops_construct(unin_1, unin_2, unin_3);
+    }
+
+    for(size_t i = 0; i < list_size; ++i) {
+        bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
+
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        list_n = list_n_ops_construct(unin_1, unin_2);
+        std::cout << list_n << "==" << list_n_ops << "\n";
+        this->s.add(list_n == list_n_ops);
+
+        z3::expr list_ith_val = list_n_ops_accs[i](list_n);
+        // THIST IS THE KEY HAHAHAHAHAHAHAHAHAHAHAHAHAHA
+        this->s.add(unin_2 == list_ith_val);
         try {
-            bsqon::Value* field_val = this->extractValue(ith_t, ith_ex);
-            vals.push_back(field_val);
+            bsqon::Value* ith_val = this->extractValue(list_t, list_ith_val);
+            vals.push_back(ith_val);
         }
         catch(const std::exception& e) {
             std::cerr << "extractEntity ERR: " << e.what() << "\n";
