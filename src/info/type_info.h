@@ -8,8 +8,7 @@
 namespace bsqon
 {
     //
-    // TODO: this is not very performant (easy to debug though) we should do a numeric ID map or intern to string
-    // pointers later
+    //TODO: this is not very performant (easy to debug though) we should do a numeric ID map or intern to string pointers later
     //
     using TypeKey = std::string;
 
@@ -44,34 +43,25 @@ namespace bsqon
 
     class TypeAnnotationInfo
     {
-      public:
+    public:
         std::string docstring;
         std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags;
 
-        TypeAnnotationInfo(std::string docstring,
-                           std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags)
-            : docstring(docstring), sensitivetags(sensitivetags)
-        {
-            ;
-        }
+        TypeAnnotationInfo(std::string docstring, std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags) : docstring(docstring), sensitivetags(sensitivetags) { ; }
 
-        bool isSensitive() const
-        {
+        bool isSensitive() const {
             return this->sensitivetags.has_value();
         }
 
-        static TypeAnnotationInfo parse(json j)
-        {
-            std::string docstring =
-                j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
+        static TypeAnnotationInfo parse(json j) {
+            std::string docstring = j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
 
             std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags = std::nullopt;
             if(j.contains("sensitive") && !j["sensitive"].is_null()) {
                 std::vector<std::pair<TypeKey, std::string>> tags;
-                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags),
-                               [](const json& jv) {
-                                   return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>());
-                               });
+                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags), [](const json& jv) { 
+                    return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>()); 
+                });
 
                 sensitivetags = std::make_optional(tags);
             }
@@ -82,34 +72,25 @@ namespace bsqon
 
     class FieldAnnotationInfo
     {
-      public:
+    public:
         std::string docstring;
         std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags;
 
-        FieldAnnotationInfo(std::string docstring,
-                            std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags)
-            : docstring(docstring), sensitivetags(sensitivetags)
-        {
-            ;
-        }
+        FieldAnnotationInfo(std::string docstring, std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags) : docstring(docstring), sensitivetags(sensitivetags) { ; }
 
-        bool isSensitive() const
-        {
+        bool isSensitive() const {
             return this->sensitivetags.has_value();
         }
 
-        static FieldAnnotationInfo parse(json j)
-        {
-            std::string docstring =
-                j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
+        static FieldAnnotationInfo parse(json j) {
+            std::string docstring = j.contains("docstring") && j["docstring"].is_string() ? j["docstring"].get<std::string>() : "";
 
             std::optional<std::vector<std::pair<TypeKey, std::string>>> sensitivetags = std::nullopt;
             if(j.contains("sensitive") && !j["sensitive"].is_null()) {
                 std::vector<std::pair<TypeKey, std::string>> tags;
-                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags),
-                               [](const json& jv) {
-                                   return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>());
-                               });
+                std::transform(j["sensitive"].begin(), j["sensitive"].end(), std::back_inserter(tags), [](const json& jv) { 
+                    return std::make_pair(jv["tkey"].get<TypeKey>(), jv["ename"].get<std::string>()); 
+                });
 
                 sensitivetags = std::make_optional(tags);
             }
@@ -120,7 +101,7 @@ namespace bsqon
 
     class Type
     {
-      public:
+    public:
         TypeTag tag;
         TypeKey tkey;
 
@@ -128,8 +109,7 @@ namespace bsqon
 
         TypeAnnotationInfo annotations;
 
-        Type(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : tag(tag), tkey(tkey), supertypes(supertypes), annotations(annotations)
+        Type(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : tag(tag), tkey(tkey), supertypes(supertypes), annotations(annotations) 
         {
             std::sort(this->supertypes.begin(), this->supertypes.end());
         }
@@ -150,12 +130,12 @@ namespace bsqon
 
         bool isConcreteType() const
         {
-            return !(this->tag == TypeTag::TYPE_UNRESOLVED || this->tag == TypeTag::TYPE_OPTION ||
-                     this->tag == TypeTag::TYPE_RESULT || this->tag == TypeTag::TYPE_STD_CONCEPT ||
-                     this->tag == TypeTag::TYPE_APIRESULT);
+            return !(this->tag == TypeTag::TYPE_UNRESOLVED 
+                || this->tag == TypeTag::TYPE_OPTION || this->tag == TypeTag::TYPE_RESULT
+                || this->tag == TypeTag::TYPE_STD_CONCEPT || this->tag == TypeTag::TYPE_APIRESULT);
         }
 
-        bool isAbstractType() const
+       bool isAbstractType() const
         {
             return !this->isConcreteType();
         }
@@ -163,11 +143,8 @@ namespace bsqon
 
     class UnresolvedType : public Type
     {
-      public:
-        UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {}, {"[UNRESOLVED]", std::nullopt})
-        {
-            ;
-        }
+    public:
+        UnresolvedType() : Type(TypeTag::TYPE_UNRESOLVED, "[UNRESOLVED]", {}, {"[UNRESOLVED]", std::nullopt}) { ; }
         virtual ~UnresolvedType() = default;
 
         static UnresolvedType* singleton;
@@ -175,360 +152,238 @@ namespace bsqon
 
     class EListType : public Type
     {
-      public:
+    public:
         std::vector<TypeKey> entries;
 
-        EListType(std::vector<TypeKey> entries)
-            : Type(TypeTag::TYPE_ELIST,
-                   "(|" +
-                       std::accumulate(
-                           entries.begin(), entries.end(), std::string(),
-                           [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) +
-                       "|)",
-                   {}, {"", {}}),
-              entries(entries)
-        {
-            ;
-        }
+        EListType(std::vector<TypeKey> entries) : Type(TypeTag::TYPE_ELIST, "(|" + std::accumulate(entries.begin(), entries.end(), std::string(), [](std::string&& a, TypeKey& b) { return (a == "" ? "" : std::move(a) + ", ") + b; }) + "|)", {}, {"", {}}), entries(entries) { ; }
         virtual ~EListType() = default;
     };
 
     class EntityType : public Type
     {
-      public:
-        EntityType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : Type(tag, tkey, supertypes, annotations)
-        {
-            ;
-        }
+    public:
+        EntityType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : Type(tag, tkey, supertypes, annotations) { ; }
         virtual ~EntityType() = default;
     };
 
     class ConceptType : public Type
     {
-      public:
-        ConceptType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : Type(tag, tkey, supertypes, annotations)
-        {
-            ;
-        }
+    public:
+        ConceptType(TypeTag tag, TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : Type(tag, tkey, supertypes, annotations) { ; }
         virtual ~ConceptType() = default;
     };
 
     class EntityTypeFieldEntry
     {
-      public:
+    public:
         std::string fname;
         TypeKey ftype;
         bool isOptional;
 
         FieldAnnotationInfo annotations;
 
-        EntityTypeFieldEntry(std::string fname, TypeKey ftype, bool isOptional, FieldAnnotationInfo annotations)
-            : fname(fname), ftype(ftype), isOptional(isOptional), annotations(annotations)
-        {
-            ;
-        }
+        EntityTypeFieldEntry(std::string fname, TypeKey ftype, bool isOptional, FieldAnnotationInfo annotations) : fname(fname), ftype(ftype), isOptional(isOptional), annotations(annotations) { ; }
     };
 
     class StdEntityType : public EntityType
     {
-      public:
+    public:
         std::vector<EntityTypeFieldEntry> fields;
         bool hasvalidations;
 
-        StdEntityType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations,
-                      std::vector<EntityTypeFieldEntry> fields, bool hasvalidations)
-            : EntityType(TypeTag::TYPE_STD_ENTITY, tkey, supertypes, annotations), fields(fields),
-              hasvalidations(hasvalidations)
-        {
-            ;
-        }
+        StdEntityType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, std::vector<EntityTypeFieldEntry> fields, bool hasvalidations) : EntityType(TypeTag::TYPE_STD_ENTITY, tkey, supertypes, annotations), fields(fields), hasvalidations(hasvalidations) { ; }
         virtual ~StdEntityType() = default;
     };
 
     class StdConceptType : public ConceptType
     {
-      public:
-        StdConceptType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : ConceptType(TypeTag::TYPE_STD_CONCEPT, tkey, supertypes, annotations)
-        {
-            ;
-        }
+    public:
+        StdConceptType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_STD_CONCEPT, tkey, supertypes, annotations) { ; }
         virtual ~StdConceptType() = default;
     };
 
     class PrimitiveType : public EntityType
     {
-      public:
-        PrimitiveType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_PRIMITIVE, tkey, supertypes, annotations)
-        {
-            ;
-        }
+    public:
+        PrimitiveType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_PRIMITIVE, tkey, supertypes, annotations) { ; }
         virtual ~PrimitiveType() = default;
     };
 
     class EnumType : public EntityType
     {
-      public:
+    public:
         std::vector<std::string> variants;
 
-        EnumType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations,
-                 std::vector<std::string> variants)
-            : EntityType(TypeTag::TYPE_ENUM, tkey, supertypes, annotations), variants(variants)
-        {
-            ;
-        }
+        EnumType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, std::vector<std::string> variants) : EntityType(TypeTag::TYPE_ENUM, tkey, supertypes, annotations), variants(variants) { ; }
         virtual ~EnumType() = default;
     };
 
     class TypedeclType : public EntityType
     {
-      public:
+    public:
         TypeKey primitivetype;
 
         std::optional<std::pair<std::u8string, std::string>> optOfValidator;
         bool hasvalidations;
 
-        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations,
-                     TypeKey primitivetype, std::optional<std::pair<std::u8string, std::string>> optOfValidator,
-                     bool hasvalidations)
-            : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype),
-              optOfValidator(optOfValidator), hasvalidations(hasvalidations)
-        {
-            ;
-        }
+        TypedeclType(TypeKey tkey, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations, TypeKey primitivetype, std::optional<std::pair<std::u8string, std::string>> optOfValidator, bool hasvalidations) : EntityType(TypeTag::TYPE_TYPE_DECL, tkey, supertypes, annotations), primitivetype(primitivetype), optOfValidator(optOfValidator), hasvalidations(hasvalidations) { ; }
         virtual ~TypedeclType() = default;
     };
 
     class SomeType : public EntityType
     {
-      public:
+    public:
         TypeKey oftype;
 
-        SomeType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_SOME, "Some<" + oftype + ">", supertypes, annotations), oftype(oftype)
-        {
-            ;
-        }
+        SomeType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_SOME, "Some<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~SomeType() = default;
     };
 
     class OptionType : public ConceptType
     {
-      public:
+    public:
         TypeKey oftype;
 
-        OptionType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : ConceptType(TypeTag::TYPE_OPTION, "Option<" + oftype + ">", supertypes, annotations), oftype(oftype)
-        {
-            ;
-        }
+        OptionType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_OPTION, "Option<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~OptionType() = default;
     };
 
     class OkType : public EntityType
     {
-      public:
+    public:
         TypeKey ttype;
         TypeKey etype;
 
-        OkType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_OK, "Result<" + ttype + ", " + etype + ">::Ok", supertypes, annotations),
-              ttype(ttype), etype(etype)
-        {
-            ;
-        }
+        OkType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_OK, "Result<" + ttype + ", " + etype + ">::Ok", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~OkType() = default;
     };
 
     class ErrorType : public EntityType
     {
-      public:
+    public:
         TypeKey ttype;
         TypeKey etype;
 
-        ErrorType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Fail", supertypes, annotations),
-              ttype(ttype), etype(etype)
-        {
-            ;
-        }
+        ErrorType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_ERROR, "Result<" + ttype + ", " + etype + ">::Fail", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ErrorType() = default;
     };
 
     class ResultType : public ConceptType
     {
-      public:
+    public:
         TypeKey ttype;
         TypeKey etype;
 
-        ResultType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : ConceptType(TypeTag::TYPE_RESULT, "Result<" + ttype + ", " + etype + ">", supertypes, annotations),
-              ttype(ttype), etype(etype)
-        {
-            ;
-        }
+        ResultType(TypeKey ttype, TypeKey etype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_RESULT, "Result<" + ttype + ", " + etype + ">", supertypes, annotations), ttype(ttype), etype(etype) { ; }
         virtual ~ResultType() = default;
     };
 
     class APIRejectedType : public EntityType
     {
-      public:
+    public:
         TypeKey ttype;
 
-        APIRejectedType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_APIREJECTED, "APIResult<" + ttype + ">::Rejected", supertypes, annotations),
-              ttype(ttype)
-        {
-            ;
-        }
+        APIRejectedType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APIREJECTED, "APIResult<" + ttype + ">::Rejected", supertypes, annotations), ttype(ttype) { ; }
         virtual ~APIRejectedType() = default;
     };
 
     class APIFailedType : public EntityType
     {
-      public:
+    public:
         TypeKey ttype;
 
-        APIFailedType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_APIFAILED, "APIResult<" + ttype + ">::Failed", supertypes, annotations),
-              ttype(ttype)
-        {
-            ;
-        }
+        APIFailedType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APIFAILED, "APIResult<" + ttype + ">::Failed", supertypes, annotations), ttype(ttype) { ; }
         virtual ~APIFailedType() = default;
     };
 
     class APIErrorType : public EntityType
     {
-      public:
+    public:
         TypeKey ttype;
 
-        APIErrorType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_APIERROR, "APIResult<" + ttype + ">::Error", supertypes, annotations),
-              ttype(ttype)
-        {
-            ;
-        }
+        APIErrorType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APIERROR, "APIResult<" + ttype + ">::Error", supertypes, annotations), ttype(ttype) { ; }
         virtual ~APIErrorType() = default;
     };
 
     class APISuccessType : public EntityType
     {
-      public:
+    public:
         TypeKey ttype;
 
-        APISuccessType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_APISUCCESS, "APIResult<" + ttype + ">::Success", supertypes, annotations),
-              ttype(ttype)
-        {
-            ;
-        }
+        APISuccessType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_APISUCCESS, "APIResult<" + ttype + ">::Success", supertypes, annotations), ttype(ttype) { ; }
         virtual ~APISuccessType() = default;
     };
 
     class APIResultType : public ConceptType
     {
-      public:
+    public:
         TypeKey ttype;
 
-        APIResultType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : ConceptType(TypeTag::TYPE_APIRESULT, "APIResult<" + ttype + ">", supertypes, annotations), ttype(ttype)
-        {
-            ;
-        }
+        APIResultType(TypeKey ttype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : ConceptType(TypeTag::TYPE_APIRESULT, "APIResult<" + ttype + ">", supertypes, annotations), ttype(ttype) { ; }
         virtual ~APIResultType() = default;
     };
 
     class ListType : public EntityType
     {
-      public:
+    public:
         TypeKey oftype;
 
-        ListType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_LIST, "List<" + oftype + ">", supertypes, annotations), oftype(oftype)
-        {
-            ;
-        }
+        ListType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_LIST, "List<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~ListType() = default;
     };
 
     class StackType : public EntityType
     {
-      public:
+    public:
         TypeKey oftype;
 
-        StackType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_STACK, "Stack<" + oftype + ">", supertypes, annotations), oftype(oftype)
-        {
-            ;
-        }
+        StackType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_STACK, "Stack<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~StackType() = default;
     };
 
     class QueueType : public EntityType
     {
-      public:
+    public:
         TypeKey oftype;
 
-        QueueType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_QUEUE, "Queue<" + oftype + ">", supertypes, annotations), oftype(oftype)
-        {
-            ;
-        }
+        QueueType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_QUEUE, "Queue<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~QueueType() = default;
     };
 
     class SetType : public EntityType
     {
-      public:
+    public:
         TypeKey oftype;
 
-        SetType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_SET, "Set<" + oftype + ">", supertypes, annotations), oftype(oftype)
-        {
-            ;
-        }
+        SetType(TypeKey oftype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_SET, "Set<" + oftype + ">", supertypes, annotations), oftype(oftype) { ; }
         virtual ~SetType() = default;
     };
 
     class MapEntryType : public EntityType
     {
-      public:
+    public:
         TypeKey ktype;
         TypeKey vtype;
 
-        MapEntryType(TypeKey ktype, TypeKey vtype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_MAP_ENTRY, "MapEntry<" + ktype + ", " + vtype + ">", supertypes, annotations),
-              ktype(ktype), vtype(vtype)
-        {
-            ;
-        }
+        MapEntryType(TypeKey ktype, TypeKey vtype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_MAP_ENTRY, "MapEntry<" + ktype + ", " + vtype + ">", supertypes, annotations), ktype(ktype), vtype(vtype) { ; }
         virtual ~MapEntryType() = default;
     };
 
     class MapType : public EntityType
     {
-      public:
+    public:
         TypeKey ktype;
         TypeKey vtype;
 
-        MapType(TypeKey ktype, TypeKey vtype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations)
-            : EntityType(TypeTag::TYPE_MAP, "Map<" + ktype + ", " + vtype + ">", supertypes, annotations), ktype(ktype),
-              vtype(vtype)
-        {
-            ;
-        }
+        MapType(TypeKey ktype, TypeKey vtype, std::vector<TypeKey> supertypes, TypeAnnotationInfo annotations) : EntityType(TypeTag::TYPE_MAP, "Map<" + ktype + ", " + vtype + ">", supertypes, annotations), ktype(ktype), vtype(vtype) { ; }
         virtual ~MapType() = default;
     };
 
     class NamespaceDecl
     {
-      public:
+    public:
         bool istoplevel;
-        std::map<std::string, std::string> imports; // copy over if not top-level
+        std::map<std::string, std::string> imports; //copy over if not top-level
 
         FullyQualifiedNamespace fullns;
         std::string ns;
@@ -536,13 +391,7 @@ namespace bsqon
         std::map<std::string, FullyQualifiedNamespace> subns;
         std::map<std::string, TypeKey> types;
 
-        NamespaceDecl(bool istoplevel, std::map<std::string, std::string> imports, FullyQualifiedNamespace fullns,
-                      std::string ns, std::map<std::string, FullyQualifiedNamespace> subns,
-                      std::map<std::string, TypeKey> types)
-            : istoplevel(istoplevel), imports(imports), fullns(fullns), ns(ns), subns(subns), types(types)
-        {
-            ;
-        }
+        NamespaceDecl(bool istoplevel, std::map<std::string, std::string> imports, FullyQualifiedNamespace fullns, std::string ns, std::map<std::string, FullyQualifiedNamespace> subns, std::map<std::string, TypeKey> types) : istoplevel(istoplevel), imports(imports), fullns(fullns), ns(ns), subns(subns), types(types) { ; }
         static NamespaceDecl* parse(json j);
 
         bool lookupNSReference(const std::string& name, std::string& out) const
@@ -560,7 +409,7 @@ namespace bsqon
 
     class AssemblyInfo
     {
-      public:
+    public:
         std::map<std::string, NamespaceDecl*> namespaces;
         std::map<TypeKey, Type*> typerefs;
 
@@ -568,26 +417,24 @@ namespace bsqon
 
         std::vector<std::set<TypeKey>> recursiveSets;
 
-        // maps from literal regex representations to their executable forms
+        //maps from literal regex representations to their executable forms
         std::map<std::u8string, brex::UnicodeRegexExecutor*> executableUnicodeRegexMap;
         std::map<std::u8string, brex::CRegexExecutor*> executableCRegexMap;
 
-        // maps from namespace const named Foo::bar regex representations to their named regex opt forms
+        //maps from namespace const named Foo::bar regex representations to their named regex opt forms
         std::map<std::string, const brex::RegexOpt*> namedUnicodeRegexMap;
         std::map<std::string, const brex::RegexOpt*> namedCRegexMap;
         brex::ReNSRemapper nsremapper;
 
-        AssemblyInfo()
-            : namespaces(), typerefs(), concreteSubtypesMap(), recursiveSets(), executableUnicodeRegexMap(),
-              executableCRegexMap(), namedUnicodeRegexMap(), namedCRegexMap(), nsremapper()
-        {
-            ;
+        AssemblyInfo() : namespaces(), typerefs(), concreteSubtypesMap(), recursiveSets(), executableUnicodeRegexMap(), executableCRegexMap(), namedUnicodeRegexMap(), namedCRegexMap(), nsremapper()
+        { 
+            ; 
         }
 
         ~AssemblyInfo()
         {
             //
-            // Should only be one assembly when executing -- so just let it hang out and get collected on shutdown
+            //Should only be one assembly when executing -- so just let it hang out and get collected on shutdown
             //
         }
 
@@ -618,7 +465,7 @@ namespace bsqon
 
         bool checkSubtype(const Type* t, const Type* oftype) const
         {
-            if(t->tkey == oftype->tkey) {
+            if (t->tkey == oftype->tkey) {
                 return true;
             }
             else {
@@ -637,7 +484,7 @@ namespace bsqon
         bool isKeyType(TypeKey tkey) const;
     };
 
-    void loadAssembly(json j, AssemblyInfo& g_assembly);
+    void loadAssembly(json j, AssemblyInfo & g_assembly);
 
     bool isSubtype(TypeKey tkey, TypeKey oftype);
-} // namespace bsqon
+}
