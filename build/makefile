@@ -66,10 +66,10 @@ GEN_SOURCES=$(GEN_DIR)component.cpp $(GEN_DIR)generator_rnd.cpp $(GEN_DIR)/gener
 GEN_OBJS=$(OUT_OBJ)component.o $(OUT_OBJ)generator_rnd.o $(OUT_OBJ)generator_ai.o
 
 SMT_HEADERS=$(SMT_DIR)smt_utils.h $(SMT_DIR)smt_extract.h
-SMT_SOURCES=$(SMT_DIR)smt_utils.cpp $(SMT_DIR)smt_extract.cpp
-SMT_OBJS=$(OUT_OBJ)smt_utils.o	$(OUT_OBJ)smt_extract.o
+SMT_SOURCES=$(SMT_DIR)smt_utils.cpp $(SMT_DIR)smt_extract.cpp $(SMT_DIR)smt_generate.cpp
+SMT_OBJS=$(OUT_OBJ)smt_utils.o	$(OUT_OBJ)smt_extract.o $(OUT_OBJ)smt_generate.o
 
-SMT_TEST_SOURCES= $(BSQON_TEST_DIR)smt_test_driver.cpp $(SMT_TEST_SRC_DIR)extract_prim.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)extract_concept.cpp $(SMT_TEST_SRC_DIR)main.cpp 
+SMT_TEST_SOURCES= $(BSQON_TEST_DIR)smt_test_driver.cpp $(SMT_TEST_SRC_DIR)extract_prim.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)extract_concepts.cpp $(SMT_TEST_SRC_DIR)main.cpp $(SMT_TEST_SRC_DIR)generate_prim.cpp $(SMT_TEST_SRC_DIR)generate_concepts.cpp
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
 
 MAKEFLAGS += -j4
@@ -162,6 +162,10 @@ $(OUT_OBJ)smt_utils.o: $(SMT_HEADERS) $(SMT_SOURCES)
 $(OUT_OBJ)smt_extract.o: $(SMT_HEADERS) $(SMT_SOURCES)
 	@mkdir -p $(OUT_OBJ)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -o $(OUT_OBJ)smt_extract.o -c $(SMT_DIR)smt_extract.cpp
+
+$(OUT_OBJ)smt_generate.o: $(SMT_HEADERS) $(SMT_SOURCES)
+	@mkdir -p $(OUT_OBJ)
+	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -o $(OUT_OBJ)smt_generate.o -c $(SMT_DIR)smt_generate.cpp
 
 smt_test_files: $(SMT_HEADERS) $(PARSER_HEADERS) $(OUT_EXE)libbsqon.a $(BSQON_TEST_DIR)smt_test_driver.h $(SMT_TEST_SOURCES) $(SMT_SOURCES)
 	@rm -rf $(BIN_DIR)

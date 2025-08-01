@@ -1,11 +1,16 @@
 #include "smt_extract.h"
 #include "smt_utils.h"
+#include <cstdio>
 #include <fstream>
 
 int main(int argc, char** argv)
 {
-    if(argc != 4) {
+    if(argc != 5) {
         badArgs("");
+    }
+
+    if(argc == 4) {
+        badArgs("Missing --<MODE>");
     }
 
     // Load SMT FILE
@@ -15,10 +20,10 @@ int main(int argc, char** argv)
     }
 
     z3::context c;
-    z3::solver s(c);
-    s.from_file(smt_file);
+    z3::solver sol(c);
+    sol.from_file(smt_file);
 
-    z3::check_result chk_smt = s.check();
+    z3::check_result chk_smt = sol.check();
     if(chk_smt == z3::unsat) {
         badArgs("Unsat smt file\n");
     }
@@ -66,16 +71,42 @@ int main(int argc, char** argv)
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
-    for(const auto& [key, value] : arg_refs) {
-        ValueSolver sol(&asm_info, key, s);
-        bsqon::Value* result = sol.extractValue(value, sol.ex);
-        if(result == NULL) {
-            printf("solveValue returned NULL \n");
-            exit(1);
-        }
+    std::string mode(argv[4]);
 
-        std::u8string rstr = result->toString();
-        printf("%s\n", (const char*)rstr.c_str());
+    if(mode == "-e" || mode == "--extract") {
+        for(const auto& [id, type] : arg_refs) {
+            ValueExtractor extract(&asm_info, type, id, sol);
+        }
+    }
+    else if(mode == "-g" || mode == "--generate") {
+        for(const auto& [id, type] : arg_refs) {
+            ValueExtractor extract(&asm_info, type, id, sol);
+            bsqon::Value* val = extract.value;
+
+            std::string key = id;
+            std::string sort_key = "";
+
+            // TODO: Make this better.
+            if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
+                sort_key = "@Term";
+            }
+            else {
+                sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+            }
+
+            std::u8string val_sig = u8"(define-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
+                                    std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
+
+            std::u8string val_ex = val->toSMTLib();
+
+            std::u8string final = val_sig + val_ex + u8")";
+
+            printf("%s\n", (const char*) final.c_str());
+        }
+    }
+    else {
+        std::string err = mode + " is not a valid <MODE>.";
+        badArgs(err.c_str());
     }
 
     Z3_finalize_memory();

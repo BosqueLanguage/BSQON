@@ -257,3 +257,69 @@ namespace bsqon
     }
 }
 
+// SmtNameType Options:
+// SMT_TYPE					= '::' -> '@',
+// STRUCT_CONSTRUCT			= tk-mk,
+// STRUCT_TERM_CONSTRUCT	= @Term-tk-mk,
+// STRUCT_TERM_FIELD		= @Term-tk-value,
+// STRUCT_PRIM_CONSTRUCT	= Get T-mk from X<T>,
+// PRIM_CONSTRUCT	        = Get T from X<T>,
+// NAMESPACE_NAME			= //TODO,
+// TYPE_CONST_NAME			= //TODO,
+// TERM_SUBTYPE_FN_NAME		= @SubtypeOf-tk,
+std::string tKeyToSmtName(const std::string& tk, SmtNameType n)
+{
+    // Replace "::" to "@"
+    std::string new_tk = tk;
+    if(tk.find("::") != std::string::npos) {
+        std::regex bsq_ns_accessor("::");
+        new_tk = std::regex_replace(new_tk, bsq_ns_accessor, "@");
+    }
+
+    if((new_tk == "Int") || (new_tk == "BigInt") || (new_tk == "Nat") || (new_tk == "BigNat")) {
+        return "Int";
+    }
+    else if((new_tk == "String") || new_tk == "CString") {
+        return "String";
+    }
+    else if(new_tk == "Float") {
+        return "Real";
+    }
+
+    if(n == SMT_TYPE) {
+        return new_tk;
+    }
+    else if(n == STRUCT_CONSTRUCT) {
+        return new_tk + "-mk";
+    }
+    else if(n == STRUCT_TERM_CONSTRUCT) {
+        return "@Term-" + new_tk + "-mk";
+    }
+    else if(n == STRUCT_TERM_FIELD) {
+        return "@Term-" + new_tk + "-value";
+    }
+    else if(n == NAMESPACE_NAME) {
+        // TODO
+    }
+    else if(n == TYPE_CONST_NAME) {
+        // TODO
+    }
+    else if(n == TERM_SUBTYPE_FN_NAME) {
+        return "@SubtypeOf-" + new_tk;
+    }
+    else if(n == STRUCT_PRIM_CONSTRUCT) {
+        size_t l = new_tk.find("<");
+        size_t r = new_tk.find(">");
+        std::string type = new_tk.substr(l + 1, r - l - 1);
+
+        return type + "-mk";
+    }
+    else if(n == STRUCT_PRIM) {
+        size_t l = new_tk.find("<");
+        size_t r = new_tk.find(">");
+        std::string type = new_tk.substr(l + 1, r - l - 1);
+        return type;
+    }
+
+    return new_tk;
+}

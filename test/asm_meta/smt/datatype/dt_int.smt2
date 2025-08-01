@@ -2,9 +2,10 @@
 ;;Template file for building SMTLIB models of Bosque code
 ;;
 
+(declare-datatypes () ((@ErrTag @err-trgt @err-other)))
+
 (declare-datatype @Result (par (T) (
-    (@Result-err-trgt)
-    (@Result-err-other) 
+    (@Result-err (@Result-etag @ErrTag)) 
     (@Result-ok (@Result-value T))
 )))
 
@@ -50,7 +51,7 @@
         ((Main@Foo-mk (Main@Foo-x Int) (Main@Foo-y Int)))
         ;;no content -- ;;--DATATYPE_CONSTRUCTORS--;;
         (
-            (@Term-mk-None)
+            (@Term-None-mk)
             ;;no content -- ;;--TYPEDECL_TERM_CONSTRUCTORS--;;
             ;;no content -- ;;--SPECIAL_TERM_CONSTRUCTORS--;;
             ;;no content -- ;;--ENTITY_TERM_CONSTRUCTORS--;;
@@ -58,6 +59,8 @@
         )
     )
 )
+
+;;no content -- ;;--VFIELD_ACCESS--;;
 
 ;;no content -- ;;--SUBTYPE_PREDICATES--;;
 
@@ -68,7 +71,7 @@
 
 (define-fun Main@main ((f Main@Foo)) (@Result Int)
     (let ((k (+ (Main@Foo-x f) (Main@Foo-y f))))
-        (ite (not (> k (Main@Foo-x f))) (as @Result-err-other (@Result Int))
+        (ite (not (> k (Main@Foo-x f))) ((as @Result-err (@Result Int)) @err-other)
             (@Result-ok k)
         )
     )
@@ -81,6 +84,26 @@
 (assert (is-@Result-ok Int@one-cc-temp))
 (assert (= Int@one (@Result-value Int@one-cc-temp)))
 
+(declare-const SMV_I_RANGE Int) (assert (= SMV_I_RANGE 32))
+(declare-const SMV_STR_LENGTH Int) (assert (= SMV_STR_LENGTH 16))
+
+(define-fun @Validate-None ((v None)) Bool true)
+(define-fun @Validate-Bool ((v Bool)) Bool true)
+(define-fun @Validate-Nat ((v Nat)) Bool (and (<= 0 v) (<= v SMV_I_RANGE)))
+(define-fun @Validate-Int ((v Int)) Bool (and (<= (- SMV_I_RANGE) v) (<= v SMV_I_RANGE)))
+(define-fun @Validate-BigNat ((v BigNat)) Bool (and (<= 0 v) (<= v SMV_I_RANGE)))
+(define-fun @Validate-BigInt ((v BigInt)) Bool (and (<= (- SMV_I_RANGE) v) (<= v SMV_I_RANGE)))
+(define-fun @Validate-Float ((v Float)) Bool (and (<= -1024.0 v) (<= v 1024.0)))
+(define-fun @Validate-CString ((v CString)) Bool (and (<= (str.len v) SMV_STR_LENGTH) (str.in.re v (re.* (re.union (str.to.re "\u{9}") (re.range " " "~"))))))
+(define-fun @Validate-String ((v String)) Bool (<= (str.len v) SMV_STR_LENGTH))
+
+(define-fun @Validate-Main@Foo ((v Main@Foo)) Bool
+    (and (@Validate-Int (Main@Foo-x v)) (@Validate-Int (Main@Foo-y v)))
+)
+(define-fun @ValidateRoot-Main@Foo ((v Main@Foo)) Bool
+    (@Validate-Main@Foo v)
+)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;Above is SMTLIB code generated from the Bosque Code
 ;;Below is the setup for checking for an error -- if we can trigger 
@@ -88,11 +111,11 @@
 ;;for the argument "f"
 
 (declare-const f Main@Foo)
+(assert (@ValidateRoot-Main@Foo f))
 (declare-const res (@Result Int))
 (assert (= res (Main@main f)))
 
-(assert (= res @Result-err-other))
+(assert (= res ((as @Result-err (@Result Int)) @err-other)))
 
 (check-sat)
 (get-model)
-

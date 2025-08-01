@@ -1,0 +1,6 @@
+declare namespace Main;
+
+public function main(f: List<Int>): List<Int>{
+	assert\/(f.size() !== 3n, f.get(0n) !== 8i, f.get(1n) !== 7i, f.get(2n) !== 6i);
+	return f;
+}

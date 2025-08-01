@@ -10,27 +10,12 @@
         checkAndReport(result, expected);                                                                              \
     }
 
-BOOST_AUTO_TEST_SUITE(Extract_Primitives)
+BOOST_AUTO_TEST_SUITE(Generate_Primitives)
 
-BOOST_AUTO_TEST_CASE(Exract_CString)
+BOOST_AUTO_TEST_CASE(Generate_Int)
 {
-    TEST_IT("primitives/prim_CString", "primitives/prim_CString_fn", "primitives/prim_CString", "--extract",
-            u8"'Manchester'");
+    TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", "--generate",
+            u8"(define-fun big_digit () Int 13)(define-fun digit () Int 31)");
 }
 
-BOOST_AUTO_TEST_CASE(Extract_Bool)
-{
-    TEST_IT("primitives/prim_Bool", "primitives/prim_Bool_fn", "primitives/prim_Bool", "--extract", u8"false");
-}
-
-BOOST_AUTO_TEST_CASE(Extract_Int)
-{
-    TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", "--extract", u8"13I31i");
-}
-
-BOOST_AUTO_TEST_CASE(Extract_Nat)
-{
-    TEST_IT("primitives/prim_Nat", "primitives/prim_Nat_fn", "primitives/prim_Nat", "--extract", u8"92n");
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() // Primitives
