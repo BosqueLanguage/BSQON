@@ -94,7 +94,7 @@ int main(int argc, char** argv)
                 sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
             }
 
-            std::u8string val_sig = u8"(declare-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
+            std::u8string val_sig = u8"(define-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
                                     std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
 
             std::u8string val_ex = val->toSMTLib();

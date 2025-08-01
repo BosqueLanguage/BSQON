@@ -283,7 +283,8 @@ namespace bsqon
 // STRUCT_CONSTRUCT			= tk-mk,
 // STRUCT_TERM_CONSTRUCT	= @Term-tk-mk,
 // STRUCT_TERM_FIELD		= @Term-tk-value,
-// STRUCT_PRIM_CONSTRUCT	= Get T from X<T>,
+// STRUCT_PRIM_CONSTRUCT	= Get T-mk from X<T>,
+// PRIM_CONSTRUCT	        = Get T from X<T>,
 // NAMESPACE_NAME			= //TODO,
 // TYPE_CONST_NAME			= //TODO,
 // TERM_SUBTYPE_FN_NAME		= @SubtypeOf-tk,
@@ -333,6 +334,12 @@ std::string tKeyToSmtName(const std::string& tk, SmtNameType n)
         std::string type = new_tk.substr(l + 1, r - l - 1);
 
         return type + "-mk";
+    }
+    else if(n == STRUCT_PRIM) {
+        size_t l = new_tk.find("<");
+        size_t r = new_tk.find(">");
+        std::string type = new_tk.substr(l + 1, r - l - 1);
+        return type;
     }
 
     return new_tk;

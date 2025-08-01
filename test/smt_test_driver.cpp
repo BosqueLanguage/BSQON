@@ -109,7 +109,7 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
                 sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
             }
 
-            std::u8string val_sig = u8"(declare-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
+            std::u8string val_sig = u8"(define-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
                                     std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
 
             std::u8string val_ex = val->toSMTLib();

@@ -18,6 +18,7 @@ typedef enum SmtNameType
     STRUCT_TERM_CONSTRUCT,
     STRUCT_PRIM_CONSTRUCT,
     NAMESPACE_NAME,
+    STRUCT_PRIM,
     TYPE_CONST_NAME,
     TERM_SUBTYPE_FN_NAME,
 } SmtNameType;
@@ -1985,27 +1986,29 @@ namespace bsqon
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
-            std::string l_v_type = "";
+            std::string l_v_type = tKeyToSmtName(this->vtype->tkey, STRUCT_PRIM);
             auto ltype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
             auto lvalues = std::accumulate(this->vals.cbegin(), this->vals.cend(), std::u8string{},
                                            [&](std::u8string&& a, const Value* v) {
-                                               l_v_type = v->vtype->tkey;
                                                return (a.empty() ? u8"" : std::move(a) + u8" ") + v->toSMTLib();
                                            });
 
             size_t l_size = vals.size();
-            std::string l_construct = "ListOps@Vector" + std::to_string(l_size) + "<" + l_v_type + ">";
 
             std::string l_type_construct = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            std::string l_construct = "ListOps@Vector" + std::to_string(l_size) + "<" + l_v_type + ">";
             std::string l_n_term_construct = tKeyToSmtName(l_construct, STRUCT_TERM_CONSTRUCT);
             std::string l_n_construct = tKeyToSmtName(l_construct, STRUCT_CONSTRUCT);
 
-            std::u8string l_value = u8"(";
-            l_value += std::u8string(l_construct.cbegin(), l_construct.cend());
+            std::u8string l_value;
+            l_value.reserve(200);
+            l_value += u8"(";
+            l_value += std::u8string(l_type_construct.cbegin(), l_type_construct.cend());
             l_value += u8"(";
             l_value += std::u8string(l_n_term_construct.cbegin(), l_n_term_construct.cend());
             l_value += u8"(";
-            l_value += std::u8string(l_n_construct.cbegin(), l_n_construct.cend()) + u8" ";
+            l_value += std::u8string(l_n_construct.cbegin(), l_n_construct.cend());
+            l_value += u8" ";
             l_value += lvalues;
             l_value += u8")";
             l_value += u8")";

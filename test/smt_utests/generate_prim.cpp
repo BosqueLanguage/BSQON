@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(Generate_Primitives)
 BOOST_AUTO_TEST_CASE(Generate_Int)
 {
     TEST_IT("primitives/prim_Int", "primitives/prim_Int_fn", "primitives/prim_Int", "--generate",
-            u8"(declare-fun big_digit () Int 13)(declare-fun digit () Int 31)");
+            u8"(define-fun big_digit () Int 13)(define-fun digit () Int 31)");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Primitives

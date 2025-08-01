@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE(DataType)
 
 BOOST_AUTO_TEST_CASE(int_entity)
 {
-    TEST_IT("datatype/dt_int", "datatype/dt_int_fn", "datatype/dt_int", "--extract", u8"Main::Foo{0i, 0i}");
+    TEST_IT("datatype/dt_int", "datatype/dt_int_fn", "datatype/dt_int", "--extract", u8"Main::Foo{0i, -2i}");
 }
 
 BOOST_AUTO_TEST_CASE(pixel_entity)
