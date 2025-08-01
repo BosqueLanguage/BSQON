@@ -3,6 +3,8 @@
 #include "../common.h"
 #include "type_info.h"
 #include "json.hpp"
+#include <boost/multiprecision/number.hpp>
+#include <string>
 using json = nlohmann::json;
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -1977,16 +1979,39 @@ namespace bsqon
 
             return ltype + u8'{' + lvalues + u8'}';
         }
+
+        // (define-fun f () List<Int>
+        //    (List<Int>-mk (@Term-ListOps@Vector2<Int>-mk (ListOps@Vector2<Int>-mk 8 7))))
+        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
-            // TODO: Working on toSMTLib
+            std::string l_v_type = "";
             auto ltype = std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend());
             auto lvalues = std::accumulate(this->vals.cbegin(), this->vals.cend(), std::u8string{},
-                                           [](std::u8string&& a, const Value* v) {
-                                               return (a.empty() ? u8"" : std::move(a) + u8", ") + v->toString();
+                                           [&](std::u8string&& a, const Value* v) {
+                                               l_v_type = v->vtype->tkey;
+                                               return (a.empty() ? u8"" : std::move(a) + u8" ") + v->toSMTLib();
                                            });
 
-            return ltype + u8'{' + lvalues + u8'}';
+            size_t l_size = vals.size();
+            std::string l_construct = "ListOps@Vector" + std::to_string(l_size) + "<" + l_v_type + ">";
+
+            std::string l_type_construct = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
+            std::string l_n_term_construct = tKeyToSmtName(l_construct, STRUCT_TERM_CONSTRUCT);
+            std::string l_n_construct = tKeyToSmtName(l_construct, STRUCT_CONSTRUCT);
+
+            std::u8string l_value = u8"(";
+            l_value += std::u8string(l_construct.cbegin(), l_construct.cend());
+            l_value += u8"(";
+            l_value += std::u8string(l_n_term_construct.cbegin(), l_n_term_construct.cend());
+            l_value += u8"(";
+            l_value += std::u8string(l_n_construct.cbegin(), l_n_construct.cend()) + u8" ";
+            l_value += lvalues;
+            l_value += u8")";
+            l_value += u8")";
+            l_value += u8")";
+
+            return l_value;
         }
 
         virtual json toJSON() const override

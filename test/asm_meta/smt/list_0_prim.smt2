@@ -86,32 +86,6 @@
     (List<Int>-mk (@Term-ListOps@Vector0<Int>-mk ListOps@Vector0<Int>-mk))
 )
 
-(define-fun Core@ListOps@s_list_get<Int> ((l List<Int>) (idx Nat)) Int
-    (let ((ll (List<Int>-value l)))
-        (ite (is-@Term-ListOps@Vector1<Int>-mk ll)
-        (let (($ll (@Term-ListOps@Vector1<Int>-value ll)))
-            (ListOps@Vector1<Int>-i0 $ll)
-        )
-        (ite (is-@Term-ListOps@Vector2<Int>-mk ll)
-        (let (($ll (@Term-ListOps@Vector2<Int>-value ll)))
-            (ite (= idx 0)
-                (ListOps@Vector2<Int>-i0 $ll)
-                (ListOps@Vector2<Int>-i1 $ll)
-            )
-        )
-                (let (($ll ll))
-        (let ((ll3 (@Term-ListOps@Vector3<Int>-value $ll)))
-            (ite (= idx 0)
-                (ListOps@Vector3<Int>-i0 ll3)
-                (ite (= idx 1)
-                    (ListOps@Vector3<Int>-i1 ll3)
-                    (ListOps@Vector3<Int>-i2 ll3)
-                )
-            )
-        ))))
-    )
-)
-
 (define-fun Core@ListOps@s_list_push_back<Int> ((l List<Int>) (v Int)) (@Result List<Int>)
     (let ((ll (List<Int>-value l)))
         (ite (is-@Term-ListOps@Vector0<Int>-mk ll)
@@ -144,20 +118,12 @@
     )
 )
 
-(define-fun List<Int>@get ((this List<Int>) (i Nat)) Int
-    (Core@ListOps@s_list_get<Int> this i)
-)
-
 (define-fun List<Int>@size ((this List<Int>)) Nat
     (Core@ListOps@s_list_size<Int> this)
 )
 
-(define-fun List<Int>@get_$_precond0 ((this List<Int>) (i Nat)) Bool
-    (< i (List<Int>@size this))
-)
-
 (define-fun Main@main ((f List<Int>)) (@Result List<Int>)
-    (ite (not (= (let ((@tmp-4-1 (let ((@tmp-1-0 (ite (not (List<Int>@get_$_precond0 f 0)) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (List<Int>@get f 0))))) (ite (not (is-@Result-ok @tmp-1-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-0)) (@Result-ok (not (= (@Result-value @tmp-1-0) 8))))))) (ite (not (is-@Result-ok @tmp-4-1)) @tmp-4-1 (let ((@tmp-4-2 (let ((@tmp-2-0 (ite (not (List<Int>@get_$_precond0 f 1)) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (List<Int>@get f 1))))) (ite (not (is-@Result-ok @tmp-2-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-2-0)) (@Result-ok (not (= (@Result-value @tmp-2-0) 7))))))) (ite (not (is-@Result-ok @tmp-4-2)) @tmp-4-2 (let ((@tmp-4-3 (let ((@tmp-3-0 (ite (not (List<Int>@get_$_precond0 f 2)) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (List<Int>@get f 2))))) (ite (not (is-@Result-ok @tmp-3-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-3-0)) (@Result-ok (not (= (@Result-value @tmp-3-0) 6))))))) (ite (not (is-@Result-ok @tmp-4-3)) @tmp-4-3 (@Result-ok (or (not (= (List<Int>@size f) 2)) (@Result-value @tmp-4-1) (@Result-value @tmp-4-2) (@Result-value @tmp-4-3))))))))) (@Result-ok true))) (let ((@failure (let ((@tmp-4-1 (let ((@tmp-1-0 (ite (not (List<Int>@get_$_precond0 f 0)) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (List<Int>@get f 0))))) (ite (not (is-@Result-ok @tmp-1-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-1-0)) (@Result-ok (not (= (@Result-value @tmp-1-0) 8))))))) (ite (not (is-@Result-ok @tmp-4-1)) @tmp-4-1 (let ((@tmp-4-2 (let ((@tmp-2-0 (ite (not (List<Int>@get_$_precond0 f 1)) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (List<Int>@get f 1))))) (ite (not (is-@Result-ok @tmp-2-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-2-0)) (@Result-ok (not (= (@Result-value @tmp-2-0) 7))))))) (ite (not (is-@Result-ok @tmp-4-2)) @tmp-4-2 (let ((@tmp-4-3 (let ((@tmp-3-0 (ite (not (List<Int>@get_$_precond0 f 2)) ((as @Result-err (@Result Int)) @err-other) (@Result-ok (List<Int>@get f 2))))) (ite (not (is-@Result-ok @tmp-3-0)) ((as @Result-err (@Result Bool)) (@Result-etag @tmp-3-0)) (@Result-ok (not (= (@Result-value @tmp-3-0) 6))))))) (ite (not (is-@Result-ok @tmp-4-3)) @tmp-4-3 (@Result-ok (or (not (= (List<Int>@size f) 2)) (@Result-value @tmp-4-1) (@Result-value @tmp-4-2) (@Result-value @tmp-4-3))))))))))) (ite (= @failure (@Result-ok false)) ((as @Result-err (@Result List<Int>)) @err-other) ((as @Result-err (@Result List<Int>)) (@Result-etag @failure))))
+    (ite (not (not (= (List<Int>@size f) 0))) ((as @Result-err (@Result List<Int>)) @err-other)
         (@Result-ok f)
     )
 )
@@ -251,3 +217,4 @@
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

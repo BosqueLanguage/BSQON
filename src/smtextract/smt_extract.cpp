@@ -552,7 +552,6 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     z3::func_decl list_n_mk_term = n_list.value().mk;
     z3::func_decl list_n_rg_term = n_list.value().rg;
 
-    // Now we now which list to make.
     this->s.add(list_n_rg_term(list_term_ex));
 
     z3::expr list_n_ops = list_n_mk_term.accessors()[0](list_term_ex);
@@ -564,22 +563,21 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     std::vector<bsqon::Value*> vals;
     size_t list_size = list_n_ops_construct.arity();
     if(list_size == 0) {
-        this->s.add(list_n_ops_construct == list_n_ops);
+        this->s.add(list_n_ops_construct() == list_n_ops);
         return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
     }
 
     z3::sort list_of_type = list_n_ops_accs[0].range();
     z3::expr list_n = this->s.ctx().constant("tmp", list_of_type);
+
     if(list_size == 1) {
         z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
         list_n = list_n_ops_construct(unin_1);
     }
     else if(list_size == 2) {
-        // z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
-        // z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
-        // list_n = list_n_ops_construct(unin_1, unin_2);
-        // std::cout << list_n << "==" << list_n_ops << "\n";
-        // this->s.add(list_n == list_n_ops);
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        list_n = list_n_ops_construct(unin_1, unin_2);
     }
     else if(list_size == 3) {
         z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
@@ -588,18 +586,13 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
         list_n = list_n_ops_construct(unin_1, unin_2, unin_3);
     }
 
-    for(size_t i = 0; i < list_size; ++i) {
+    this->s.add(list_n == list_n_ops);
+
+    for(size_t i = 0; i < list_n.args().size(); ++i) {
         bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->oftype);
 
-        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
-        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
-        list_n = list_n_ops_construct(unin_1, unin_2);
-        std::cout << list_n << "==" << list_n_ops << "\n";
-        this->s.add(list_n == list_n_ops);
-
         z3::expr list_ith_val = list_n_ops_accs[i](list_n);
-        // THIST IS THE KEY HAHAHAHAHAHAHAHAHAHAHAHAHAHA
-        this->s.add(unin_2 == list_ith_val);
+        this->s.add(list_n.args()[i] == list_ith_val);
         try {
             bsqon::Value* ith_val = this->extractValue(list_t, list_ith_val);
             vals.push_back(ith_val);
