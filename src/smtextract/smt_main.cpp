@@ -1,5 +1,4 @@
 #include "smt_extract.h"
-#include "smt_utils.h"
 #include <cstdio>
 #include <fstream>
 
@@ -76,33 +75,18 @@ int main(int argc, char** argv)
     if(mode == "-e" || mode == "--extract") {
         for(const auto& [id, type] : arg_refs) {
             ValueExtractor extract(&asm_info, type, id, sol);
+            bsqon::Value* v = extract.value;
+            printf("%s\n", (const char*)v->toString().c_str());
         }
     }
     else if(mode == "-g" || mode == "--generate") {
         for(const auto& [id, type] : arg_refs) {
             ValueExtractor extract(&asm_info, type, id, sol);
-            bsqon::Value* val = extract.value;
-
-            std::string key = id;
-            std::string sort_key = "";
-
-            // TODO: Make this better.
-            if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
-                sort_key = "@Term";
-            }
-            else {
-                sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
-            }
-
-            std::u8string val_sig = u8"(define-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
-                                    std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
-
-            std::u8string val_ex = val->toSMTLib();
-
-            std::u8string final = val_sig + val_ex + u8")";
-
-            printf("%s\n", (const char*) final.c_str());
+            std::cout << extract.extractSMTFromValue() << "\n";
         }
+    }
+    else if(mode == "-m" || mode == "--mock") {
+        BsqMock mock(&asm_info, arg_refs, sol);
     }
     else {
         std::string err = mode + " is not a valid <MODE>.";

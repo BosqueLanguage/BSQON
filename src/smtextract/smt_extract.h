@@ -31,13 +31,28 @@ typedef struct TermType
     z3::func_decl rg;
 } TermType;
 
+void badArgs(const char* msg);
+bool validPath(const char* filepath, const char* extension);
 std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
+
+class BsqMock
+{
+  public:
+    bsqon::AssemblyInfo* asm_info;
+    std::map<std::string, bsqon::Type*> fn_info;
+    z3::solver& s;
+    bsqon::Value* mock_val;
+
+    BsqMock(bsqon::AssemblyInfo* asm_info, std::map<std::string, bsqon::Type*>& fn_info, z3::solver& s);
+    z3::expr mockTest(z3::expr mock);
+};
 
 class ValueExtractor
 {
   public:
     bsqon::AssemblyInfo* asm_info;
     bsqon::Type* t;
+    std::string id;
     z3::solver& s;
     z3::expr ex;
     bsqon::Value* value;
@@ -58,10 +73,10 @@ class ValueExtractor
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
 
+    // TODO: Convert to z3::expr
+    std::string extractSMTFromValue();
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
-
     z3::expr extractSequenceLen(z3::expr ex);
     bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
-
     std::optional<TermType> findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers, z3::expr ex);
 };

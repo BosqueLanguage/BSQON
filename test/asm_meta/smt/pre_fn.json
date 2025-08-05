@@ -1,0 +1,7 @@
+{
+    "fname": "Main::main",
+    "args": [],
+    "precondition": [],
+    "postcondition": [],
+    "return": "Main::UserDTO"
+}

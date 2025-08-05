@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdio>
 #include <cerrno>
 #include <cstdlib>
@@ -7,7 +8,6 @@
 #include <unordered_map>
 #include <vector>
 #include "smt_extract.h"
-#include "smt_utils.h"
 
 // Only accept an expr that is of (Seq Int) sort
 z3::expr ValueExtractor::extractSequenceLen(z3::expr ex)
@@ -641,7 +641,7 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 }
 
 ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* type, std::string key, z3::solver& solver)
-    : asm_info(asm_info), t(type), s(solver), ex([&]() {
+    : asm_info(asm_info), t(type), id(key), s(solver), ex([&]() {
           auto tmp = getBsqTypeExpr(key, solver);
           if(!tmp.has_value()) {
               std::cout << "ARG: " << key << " not in .smt2 file" << "\n";
@@ -656,7 +656,6 @@ ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* type,
         exit(1);
     }
     this->value = result;
-    printf("%s\n", (const char*)this->value->toString().c_str());
 }
 
 // Use Type* to find the func_decl in the z3::model.
@@ -712,6 +711,32 @@ bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, 
     return nullptr;
 }
 
+std::string ValueExtractor::extractSMTFromValue()
+{
+    bsqon::Value* val = this->value;
+    if(val == nullptr) {
+        return "No value has been extracted.";
+    }
+
+    std::string key = this->id;
+    std::string sort_key = "";
+    if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
+        sort_key = "@Term";
+    }
+    else {
+        sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+    }
+
+    std::u8string val_sig = u8"(define-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
+                            std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
+
+    std::u8string val_ex = val->toSMTLib();
+
+    std::u8string final = val_sig + val_ex + u8")";
+
+    return std::string(final.begin(), final.end());
+}
+
 // Look for the SAT constructor of the ex in @Terms.
 std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers,
                                                       z3::expr ex)
@@ -734,3 +759,33 @@ std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms
 
     return term;
 };
+
+void badArgs(const char* msg)
+{
+    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
+                        "\t-e|--extract\t- Extract Err Values from SMT\n"
+                        "\t-g|--generate\t- Generate Test Values from SMT";
+
+    printf("%s\n", usage);
+    printf("%s\n", msg);
+    exit(1);
+}
+
+bool validPath(const char* filepath, const char* extension)
+{
+    char* og;
+    char* tokens;
+    char* track;
+    bool valid = false;
+
+    og = strdup(filepath);
+    track = og;
+
+    while((tokens = strtok_r(track, ".", &track))) {
+        if(strcmp(tokens, extension) == 0) {
+            valid = true;
+        }
+    }
+
+    return valid;
+}
