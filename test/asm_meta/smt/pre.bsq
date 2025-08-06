@@ -57,7 +57,7 @@ function userAddressNotEmpty(x: Option<USER_ADDRESS>): Bool {
     return !x.value.empty() && x.value.size() <= 100n;
 }
 
-function getCustomer(id: Int): UserDTO{
+function getCustomer(id: Int): UserDTO{ 
     return UserDTO {
         some('jch270@uky.edu'<EMAIL>),
         '12345678'<ALPHANUMERIC>,
@@ -68,9 +68,7 @@ function getCustomer(id: Int): UserDTO{
 	};
 }
 
-
-public function main(): UserDTO { 
-	let cust_id = 5i;
+public function main(cust_id: Int): UserDTO { 
 	let user = getCustomer(cust_id);
     return user;
 }

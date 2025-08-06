@@ -159,16 +159,7 @@
     (> $id 0)
 )
 
-(define-fun Main@getCustomer ((id Int)) (@Result Main@UserDTO)
-    (ite (not (Main@UserDTO_$_invariant0 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant1 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant2 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant3 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant4 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant5 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (@Result-ok (Main@UserDTO-mk (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id))))))))
-)
-
-(define-fun Main@main () (@Result Main@UserDTO)
-    (let ((cust_id 5))
-    (let ((@tmpe-user (Main@getCustomer cust_id))) (ite (not (is-@Result-ok @tmpe-user))  @tmpe-user (let ((user (@Result-value @tmpe-user)))
-        (@Result-ok user)
-    ))))
-)
+(declare-fun Main@getCustomer (Int) Main@UserDTO)
 
 (assert (= Nat@zero-cc-temp (@Result-ok 0)))
 (assert (is-@Result-ok Nat@zero-cc-temp))
@@ -281,8 +272,19 @@
     (@Validate-Main@UserDTO v)
 )
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;Find some way to make all of the functions visible in the API.
+
+(declare-const tracker Int)
+(assert (@Validate-Int tracker))
+(assert (= tracker 5))
+
+(declare-const return_val Main@UserDTO)
+(assert (@ValidateRoot-Main@UserDTO return_val))
+(assert (= return_val (Main@getCustomer tracker)))
+
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+

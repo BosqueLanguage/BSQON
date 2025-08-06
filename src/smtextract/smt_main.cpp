@@ -86,6 +86,7 @@ int main(int argc, char** argv)
         }
     }
     else if(mode == "-m" || mode == "--mock") {
+        printf("Starting Mocks... \n");
         BsqMock mock(&asm_info, arg_refs, sol);
     }
     else {

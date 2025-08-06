@@ -763,8 +763,9 @@ std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms
 void badArgs(const char* msg)
 {
     const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
-                        "\t-e|--extract\t- Extract Err Values from SMT\n"
-                        "\t-g|--generate\t- Generate Test Values from SMT";
+                        "\t-e|--extract   - Extract Err Values from SMT\n"
+                        "\t-g|--generate  - Generate Test Values from SMT\n"
+                        "\t-m|--mock      - Run Mock Tests";
 
     printf("%s\n", usage);
     printf("%s\n", msg);

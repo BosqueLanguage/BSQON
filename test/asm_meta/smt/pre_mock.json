@@ -1,8 +1,8 @@
 {
-    "fname": "Main::main",
+    "fname": "Main::getCustomer",
     "args": [
         {
-            "name": "cust_id",
+            "name": "id",
             "type": "Int"
         }
     ],
