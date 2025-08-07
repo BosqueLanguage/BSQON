@@ -37,6 +37,7 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, std::map<std::string, bsqon::Typ
 // Setup $return constraints.
 z3::expr BsqMock::mockTest(z3::expr mock, z3::sort return_type)
 {
+    // TODO: Read the .json for the specific mock function and try to extract the pre and post values.
     std::cout << "MOCK EX: " << mock << "RETURN: " << return_type << "\n";
     return this->s.ctx().bool_const("heyo");
 }
