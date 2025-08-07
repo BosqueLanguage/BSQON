@@ -159,7 +159,19 @@
     (> $id 0)
 )
 
-(declare-fun Main@getCustomer (Int) Main@UserDTO)
+(define-fun Main@getCustomer ((id Int)) (@Result Main@UserDTO)
+    (let ((@tmpe-customer_found (ite (not (Main@UserDTO_$_invariant0 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant1 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant2 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant3 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant4 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (ite (not (Main@UserDTO_$_invariant5 (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other) (@Result-ok (Main@UserDTO-mk (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu"))) (Main@ALPHANUMERIC-mk "12345678") (@Term-Some<Main@USER_NAME>-mk (Some<Main@USER_NAME>-mk (Main@USER_NAME-mk "James Chen"))) (@Term-Some<Main@USER_PHONE>-mk (Some<Main@USER_PHONE>-mk (Main@USER_PHONE-mk "+12 111-111-1111"))) (@Term-Some<Main@USER_ADDRESS>-mk (Some<Main@USER_ADDRESS>-mk (Main@USER_ADDRESS-mk "123 Fake Street"))) id)))))))))) (ite (not (is-@Result-ok @tmpe-customer_found))  @tmpe-customer_found (let ((customer_found (@Result-value @tmpe-customer_found)))
+        (ite (not (= (Main@UserDTO-id customer_found) id)) ((as @Result-err (@Result Main@UserDTO)) @err-other)
+            (@Result-ok customer_found)
+        )
+    )))
+)
+
+(define-fun Main@main ((cust_id Int)) (@Result Main@UserDTO)
+    (let ((@tmpe-user (Main@getCustomer cust_id))) (ite (not (is-@Result-ok @tmpe-user))  @tmpe-user (let ((user (@Result-value @tmpe-user)))
+        (@Result-ok user)
+    )))
+)
 
 (assert (= Nat@zero-cc-temp (@Result-ok 0)))
 (assert (is-@Result-ok Nat@zero-cc-temp))
@@ -271,20 +283,22 @@
 (define-fun @ValidateRoot-Main@UserDTO ((v Main@UserDTO)) Bool
     (@Validate-Main@UserDTO v)
 )
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;Find some way to make all of the functions visible in the API.
 
-(declare-const tracker Int)
-(assert (@Validate-Int tracker))
-(assert (= tracker 5))
+;;Only used to expose Main@getCustomer to the extractor...
 
-(declare-const return_val Main@UserDTO)
-(assert (@ValidateRoot-Main@UserDTO return_val))
-(assert (= return_val (Main@getCustomer tracker)))
+(declare-const tracker Int)
+(assert (= tracker 5 ))
+(assert (@Validate-Int tracker))
+(declare-const return_val (@Result Main@UserDTO))
+
+;;MockgetCustomer is required to expose the functions to the cpp API z3::model.
+(declare-fun MockgetCustomer (Int) (@Result Main@UserDTO))
+(assert (= (MockgetCustomer tracker) (Main@getCustomer tracker)))
+(assert (= return_val (MockgetCustomer tracker))) 
+
 
 (check-sat)
 (get-model)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-

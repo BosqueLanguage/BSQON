@@ -2,21 +2,29 @@
 #include <cassert>
 #include <cstdio>
 #include <string>
+#include <z3_api.h>
 
 // Prepare Mock function, validate datatypes and paramaters with the arguments used in bsq.
 // Right now the only way to see this is via the smt2 file.
 BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, std::map<std::string, bsqon::Type*>& fn_info, z3::solver& sol)
     : asm_info(asm_info), fn_info(fn_info), s(sol)
 {
+    if(this->s.check() != z3::sat) {
+        perror("Unsat smt2 file when looking for mock\n");
+        exit(1);
+    }
+
     z3::model m = this->s.get_model();
+
     uint fn_nums = m.num_funcs();
     assert(fn_nums > 0);
 
     this->s.push();
+    // Find Mock.
     for(uint i = 0; i < fn_nums; ++i) {
         z3::func_decl fn_ex = m.get_func_decl(i);
         if(fn_ex.name().str().find("getCustomer") != std::string::npos) {
-            // Build fn expr
+            // Prepare Mock
             z3::expr_vector args(this->s.ctx());
             for(uint j = 0; j < fn_ex.arity(); ++j) {
                 std::string arg_str_sym = "mock_arg_" + std::to_string(j);
@@ -28,12 +36,14 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, std::map<std::string, bsqon::Typ
             }
 
             z3::expr mock_ex = fn_ex(args);
+            // Run Mock
             z3::expr mock_res = mockTest(mock_ex, fn_ex.range());
         }
     }
     this->s.pop();
 }
 
+// Running Mock...
 // Setup $return constraints.
 z3::expr BsqMock::mockTest(z3::expr mock, z3::sort return_type)
 {
