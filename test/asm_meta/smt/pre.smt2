@@ -288,15 +288,15 @@
 
 ;;Only used to expose Main@getCustomer to the extractor...
 
-(declare-const tracker Int)
-(assert (= tracker 5 ))
-(assert (@Validate-Int tracker))
+(declare-const customer_id Int)
+(assert (> customer_id 0))
+(assert (@Validate-Int customer_id))
 (declare-const return_val (@Result Main@UserDTO))
 
 ;;MockgetCustomer is required to expose the functions to the cpp API z3::model.
-(declare-fun MockgetCustomer (Int) (@Result Main@UserDTO))
-(assert (= (MockgetCustomer tracker) (Main@getCustomer tracker)))
-(assert (= return_val (MockgetCustomer tracker))) 
+(declare-fun MockTest (Int) (@Result Main@UserDTO))
+(assert (= (MockTest customer_id) (Main@getCustomer customer_id)))
+(assert (= return_val (MockTest customer_id))) 
 
 
 (check-sat)

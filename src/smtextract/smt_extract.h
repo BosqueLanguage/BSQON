@@ -45,7 +45,6 @@ class BsqMock
     z3::expr* mock_fn;
 
     BsqMock(bsqon::AssemblyInfo* asm_info, std::map<std::string, bsqon::Type*>& fn_info, z3::solver& sol);
-    z3::expr mockTest(z3::expr mock, z3::sort return_type);
 };
 
 class ValueExtractor
