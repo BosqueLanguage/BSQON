@@ -33,31 +33,34 @@ typedef struct TermType
 
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
-std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s);
 
 class BsqMock
 {
   public:
     bsqon::AssemblyInfo* asm_info;
-    std::map<std::string, bsqon::Type*>& fn_info;
+    json mock_json;
     z3::solver& s;
     bsqon::Value* mock_val;
     z3::expr* mock_fn;
 
-    BsqMock(bsqon::AssemblyInfo* asm_info, std::map<std::string, bsqon::Type*>& fn_info, z3::solver& sol);
+    BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol);
+    std::optional<z3::func_decl> getMockFromSMT(std::string mock_name);
+    std::optional<z3::expr> addArgsToMock(z3::func_decl mock);
+    z3::expr_vector extractArgsFromMock(z3::expr mock);
+    std::map<std::string, std::pair<z3::expr, bsqon::Type*>> getArgMap(z3::func_decl mock_fn);
 };
 
 class ValueExtractor
 {
   public:
     bsqon::AssemblyInfo* asm_info;
-    bsqon::Type* t;
     std::string id;
-    z3::solver& s;
+    bsqon::Type* t;
     z3::expr ex;
+    z3::solver& s;
     bsqon::Value* value;
 
-    ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* t, std::string key, z3::solver& solver);
+    ValueExtractor(bsqon::AssemblyInfo* asm_info, std::string id, bsqon::Type* t, z3::expr ex, z3::solver& solver);
     bsqon::Value* extractValue(bsqon::Type* t, z3::expr ex);
     bsqon::Value* extractBigNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractNat(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
@@ -69,12 +72,14 @@ class ValueExtractor
     bsqon::Value* extractSome(bsqon::SomeType* bsq_t, z3::expr ex);
     bsqon::Value* extractOption(bsqon::OptionType* bsq_t, z3::expr ex);
     bsqon::Value* extractConcept(bsqon::ConceptType* t, z3::expr ex);
+    bsqon::Value* extractError(bsqon::ErrorType* t, z3::expr ex);
+    bsqon::Value* extractOk(bsqon::OkType* t, z3::expr ex);
+    bsqon::Value* extractResult(bsqon::ResultType* t, z3::expr ex);
     bsqon::Value* extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex);
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
 
-    // TODO: Convert to z3::expr
-    std::string extractSMTFromValue();
+    std::string valueToSMTStr();
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
     z3::expr extractSequenceLen(z3::expr ex);
     bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex);

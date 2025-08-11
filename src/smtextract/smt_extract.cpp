@@ -447,6 +447,8 @@ bsqon::Value* ValueExtractor::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::
 bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
+    // TODO: TMP
+    std::cout << constructs << "\n";
     assert(constructs.size() == 1);
 
     z3::func_decl c = constructs[0];
@@ -618,11 +620,24 @@ bsqon::Value* ValueExtractor::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::ex
     return new bsqon::TypedeclValue(bsq_t, FILLER_POS, val);
 }
 
+bsqon::Value* ValueExtractor::extractError(bsqon::ErrorType* t, z3::expr ex)
+{
+}
+bsqon::Value* ValueExtractor::extractOk(bsqon::OkType* t, z3::expr ex)
+{
+}
+bsqon::Value* ValueExtractor::extractResult(bsqon::ResultType* t, z3::expr ex)
+{
+}
+
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
     auto tg = bsq_t->tag;
     if(tg == bsqon::TypeTag::TYPE_STD_ENTITY) {
         return extractEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_RESULT) {
+        return extractResult(static_cast<bsqon::ResultType*>(bsq_t), ex);
     }
     else if(tg == bsqon::TypeTag::TYPE_PRIMITIVE) {
         return extractPrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
@@ -640,15 +655,9 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     return nullptr;
 }
 
-ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* type, std::string key, z3::solver& solver)
-    : asm_info(asm_info), t(type), id(key), s(solver), ex([&]() {
-          auto tmp = getBsqTypeExpr(key, solver);
-          if(!tmp.has_value()) {
-              std::cout << "ARG: " << key << " not in .smt2 file" << "\n";
-              exit(1);
-          }
-          return tmp.value();
-      }())
+ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, std::string id, bsqon::Type* t, z3::expr ex,
+                               z3::solver& solver)
+    : asm_info(asm_info), id(id), t(t), ex(ex), s(solver)
 {
     bsqon::Value* result = this->extractValue(this->t, this->ex);
     if(result == NULL) {
@@ -656,24 +665,6 @@ ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* type,
         exit(1);
     }
     this->value = result;
-}
-
-// Use Type* to find the func_decl in the z3::model.
-std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s)
-{
-    if(s.check() != z3::sat) {
-        return std::nullopt;
-    }
-
-    z3::model m = s.get_model();
-    for(uint i = 0; i < m.num_consts(); ++i) {
-        z3::func_decl fn = m.get_const_decl(i);
-        if(fn.name().str() == target) {
-            return fn();
-        }
-    }
-
-    return std::nullopt;
 }
 
 bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
@@ -711,7 +702,7 @@ bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, 
     return nullptr;
 }
 
-std::string ValueExtractor::extractSMTFromValue()
+std::string ValueExtractor::valueToSMTStr()
 {
     bsqon::Value* val = this->value;
     if(val == nullptr) {

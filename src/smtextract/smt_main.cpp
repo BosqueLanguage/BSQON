@@ -55,39 +55,43 @@ int main(int argc, char** argv)
         badArgs("Incorrect .json file");
     }
 
-    std::map<std::string, bsqon::Type*> arg_refs;
-    json j_fn;
+    json fn_json;
     try {
         std::ifstream infile(fn_info_file);
-        infile >> j_fn;
+        infile >> fn_json;
     }
     catch(const std::exception& e) {
         printf("Error parsing JSON: %s\n", e.what());
         exit(1);
     }
 
-    for(const auto& arg : j_fn["args"]) {
+    std::map<std::string, bsqon::Type*> arg_refs;
+    for(const auto& arg : fn_json["args"]) {
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
     std::string mode(argv[4]);
 
     if(mode == "-e" || mode == "--extract") {
-        for(const auto& [id, type] : arg_refs) {
-            ValueExtractor extract(&asm_info, type, id, sol);
-            bsqon::Value* v = extract.value;
-            printf("%s\n", (const char*)v->toString().c_str());
-        }
+        // for(const auto& [id, type] : arg_refs) {
+        //     z3::expr ex = getBsqTypeExpr(id, type, sol).value();
+        //
+        //     ValueExtractor extract(&asm_info, type, ex, sol);
+        //     bsqon::Value* v = extract.value;
+        //     printf("%s\n", (const char*)v->toString().c_str());
+        // }
     }
     else if(mode == "-g" || mode == "--generate") {
-        for(const auto& [id, type] : arg_refs) {
-            ValueExtractor extract(&asm_info, type, id, sol);
-            std::cout << extract.extractSMTFromValue() << "\n";
-        }
+        // for(const auto& [id, type] : arg_refs) {
+        //     z3::expr ex = getBsqTypeExpr(id, type, sol).value();
+        //
+        //     ValueExtractor extract(&asm_info, type, ex, sol);
+        //     std::cout << extract.valueToSMTExpr() << "\n";
+        // }
     }
     else if(mode == "-m" || mode == "--mock") {
         printf("Starting Mocks... \n");
-        BsqMock mock(&asm_info, arg_refs, sol);
+        BsqMock mock(&asm_info, fn_json, sol);
     }
     else {
         std::string err = mode + " is not a valid <MODE>.";
