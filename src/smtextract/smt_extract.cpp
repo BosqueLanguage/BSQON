@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdio>
 #include <cerrno>
 #include <cstdlib>
@@ -5,9 +6,9 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include "smt_extract.h"
-#include "smt_utils.h"
 
 // Only accept an expr that is of (Seq Int) sort
 z3::expr ValueExtractor::extractSequenceLen(z3::expr ex)
@@ -499,14 +500,14 @@ bsqon::Value* ValueExtractor::extractOption(bsqon::OptionType* bsq_t, z3::expr e
     z3::func_decl_vector opt_rgs = term.recognizers();
     const std::vector<bsqon::TypeKey>& opt_subtype = this->asm_info->concreteSubtypesMap.at(bsq_t->tkey);
 
-    std::optional<TermType> opt_term = findConstruct(opt_mks, opt_rgs, ex);
-    z3::func_decl opt_mk = opt_term.value().mk;
-    z3::func_decl opt_is = opt_term.value().rg;
+    auto opt_term = findConstruct(opt_mks, opt_rgs, ex).value();
+    z3::func_decl opt_mk = opt_term.first;
+    z3::func_decl opt_is = opt_term.second;
     this->s.add(opt_is(ex));
 
     //--------------------------------------------------------------------------
     std::string none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
-    if(none_name == opt_mk.name().str()) {
+    if(opt_mk.name().str() == none_name) {
         return new bsqon::NoneValue(bsq_t, FILLER_POS);
     }
     //--------------------------------------------------------------------------
@@ -548,9 +549,9 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
     z3::func_decl_vector list_mks = terms.constructors();
     z3::func_decl_vector list_recogs = terms.recognizers();
 
-    std::optional<TermType> n_list = findConstruct(list_mks, list_recogs, list_term_ex);
-    z3::func_decl list_n_mk_term = n_list.value().mk;
-    z3::func_decl list_n_rg_term = n_list.value().rg;
+    auto n_list = findConstruct(list_mks, list_recogs, list_term_ex).value();
+    z3::func_decl list_n_mk_term = n_list.first;
+    z3::func_decl list_n_rg_term = n_list.second;
 
     this->s.add(list_n_rg_term(list_term_ex));
 
@@ -618,8 +619,31 @@ bsqon::Value* ValueExtractor::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::ex
     return new bsqon::TypedeclValue(bsq_t, FILLER_POS, val);
 }
 
+z3::expr ValueExtractor::extractAtResultExpr(z3::expr ex)
+{
+    z3::func_decl_vector at_res_constructs = ex.get_sort().constructors();
+
+    z3::func_decl_vector at_res_recogs = ex.get_sort().recognizers();
+
+    auto at_res = findConstruct(at_res_constructs, at_res_recogs, ex).value();
+    z3::func_decl at_res_mk = at_res.first;
+    z3::func_decl at_res_is = at_res.second;
+
+    this->s.add(at_res_is(ex));
+
+    z3::func_decl at_res_acc = at_res_mk.accessors()[0];
+    z3::expr at_res_val = at_res_acc(ex);
+
+    return at_res_val;
+}
+
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
+    if(ex.get_sort().to_string().find("@Result") != std::string::npos) {
+        z3::expr result_val_ex = extractAtResultExpr(ex);
+        return extractValue(bsq_t, result_val_ex);
+    }
+
     auto tg = bsq_t->tag;
     if(tg == bsqon::TypeTag::TYPE_STD_ENTITY) {
         return extractEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
@@ -640,41 +664,8 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     return nullptr;
 }
 
-ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, bsqon::Type* type, std::string key, z3::solver& solver)
-    : asm_info(asm_info), t(type), s(solver), ex([&]() {
-          auto tmp = getBsqTypeExpr(key, solver);
-          if(!tmp.has_value()) {
-              std::cout << "ARG: " << key << " not in .smt2 file" << "\n";
-              exit(1);
-          }
-          return tmp.value();
-      }())
+ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, z3::solver& solver) : asm_info(asm_info), s(solver)
 {
-    bsqon::Value* result = this->extractValue(this->t, this->ex);
-    if(result == NULL) {
-        printf("solveValue returned NULL \n");
-        exit(1);
-    }
-    this->value = result;
-    printf("%s\n", (const char*)this->value->toString().c_str());
-}
-
-// Use Type* to find the func_decl in the z3::model.
-std::optional<z3::expr> getBsqTypeExpr(std::string target, z3::solver& s)
-{
-    if(s.check() != z3::sat) {
-        return std::nullopt;
-    }
-
-    z3::model m = s.get_model();
-    for(uint i = 0; i < m.num_consts(); ++i) {
-        z3::func_decl fn = m.get_const_decl(i);
-        if(fn.name().str() == target) {
-            return fn();
-        }
-    }
-
-    return std::nullopt;
 }
 
 bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
@@ -712,11 +703,35 @@ bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, 
     return nullptr;
 }
 
-// Look for the SAT constructor of the ex in @Terms.
-std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers,
-                                                      z3::expr ex)
+std::string valueToSMTStr(std::string id, bsqon::Value* val)
 {
-    std::optional<TermType> term;
+    if(val == nullptr) {
+        return "No value has been extracted.";
+    }
+
+    std::string sort_key = "";
+    if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
+        sort_key = "@Term";
+    }
+    else {
+        sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
+    }
+
+    std::u8string val_sig = u8"(define-fun " + std::u8string(id.cbegin(), id.cend()) + u8" () " +
+                            std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
+
+    std::u8string val_ex = val->toSMTLib();
+
+    std::u8string final = val_sig + val_ex + u8")";
+
+    return std::string(final.begin(), final.end());
+}
+
+std::optional<std::pair<z3::func_decl, z3::func_decl>> ValueExtractor::findConstruct(z3::func_decl_vector terms,
+                                                                                     z3::func_decl_vector recognizers,
+                                                                                     z3::expr ex)
+{
+    std::optional<std::pair<z3::func_decl, z3::func_decl>> term;
     for(size_t i = 0; i < recognizers.size(); ++i) {
         z3::func_decl recognize = recognizers[i];
         this->s.push();
@@ -725,12 +740,45 @@ std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms
         this->s.pop();
 
         if(rr == z3::sat) {
-            term = TermType{
-                .mk = terms[i],
-                .rg = recognize,
-            };
+            term = std::make_pair(terms[i], recognize);
         }
     }
 
-    return term;
+    if(term.has_value()) {
+        return term;
+    }
+    else {
+        return std::nullopt;
+    }
 };
+
+void badArgs(const char* msg)
+{
+    const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
+                        "\t-e|--extract   - Extract Err Values from SMT\n"
+                        "\t-g|--generate  - Generate Test Values from SMT\n"
+                        "\t-m|--mock      - Run Mock Tests";
+
+    printf("%s\n", usage);
+    printf("%s\n", msg);
+    exit(1);
+}
+
+bool validPath(const char* filepath, const char* extension)
+{
+    char* og;
+    char* tokens;
+    char* track;
+    bool valid = false;
+
+    og = strdup(filepath);
+    track = og;
+
+    while((tokens = strtok_r(track, ".", &track))) {
+        if(strcmp(tokens, extension) == 0) {
+            valid = true;
+        }
+    }
+
+    return valid;
+}

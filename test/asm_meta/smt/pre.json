@@ -1,0 +1,410 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": [
+                [
+                    "ALPHANUMERIC",
+                    "Main::ALPHANUMERIC"
+                ],
+                [
+                    "EMAIL",
+                    "Main::EMAIL"
+                ],
+                [
+                    "USER_PHONE",
+                    "Main::USER_PHONE"
+                ],
+                [
+                    "USER_NAME",
+                    "Main::USER_NAME"
+                ],
+                [
+                    "USER_ADDRESS",
+                    "Main::USER_ADDRESS"
+                ],
+                [
+                    "UserDTO",
+                    "Main::UserDTO"
+                ]
+            ]
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "AlgorithmOps",
+                    "AlgorithmOps"
+                ],
+                [
+                    "Algorithm",
+                    "Algorithm"
+                ],
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CCharBufferOps",
+                    "CCharBufferOps"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "UnicodeCharBufferOps",
+                    "UnicodeCharBufferOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "Option",
+                    "Option<Main::EMAIL>"
+                ],
+                [
+                    "Option",
+                    "Option<Main::USER_NAME>"
+                ],
+                [
+                    "Option",
+                    "Option<Main::USER_PHONE>"
+                ],
+                [
+                    "Option",
+                    "Option<Main::USER_ADDRESS>"
+                ],
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Some",
+                    "Some<Main::EMAIL>"
+                ],
+                [
+                    "Some",
+                    "Some<Main::USER_NAME>"
+                ],
+                [
+                    "Some",
+                    "Some<Main::USER_PHONE>"
+                ],
+                [
+                    "Some",
+                    "Some<Main::USER_ADDRESS>"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ],
+                [
+                    "CString",
+                    "CString"
+                ],
+                [
+                    "CRegex",
+                    "CRegex"
+                ]
+            ]
+        },
+        {
+            "istoplevel": false,
+            "imports": [],
+            "ns": "CStringOps",
+            "subns": [],
+            "types": []
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/ [a-zA-Z0-9]+/c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::ALPHANUMERIC",
+            "name": "ALPHANUMERIC"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/${Main::re_SAFEIDENTIFIERCHAR}+('.'${Main::re_SAFEIDENTIFIERCHAR})* '@' (${Main::re_SAFEIDENTIFIERCHAR}+ '.')+ [a-zA-Z]+ /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::EMAIL",
+            "name": "EMAIL"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/[+]? [1-9][0-9]?' '* '('? [0-9]{3} ')'? [ -]?[0-9]{3}[ -]?[0-9]{4} /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_PHONE",
+            "name": "USER_PHONE"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/ ${Main::re_USERNAME} /c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_NAME",
+            "name": "USER_NAME"
+        },
+        {
+            "tag": "TypeDecl",
+            "ofvalidators": [
+                "/[0-9a-zA-Z -,.#()]+/c",
+                "Main"
+            ],
+            "hasvalidations": false,
+            "valuetype": "CString",
+            "tkey": "Main::USER_ADDRESS",
+            "name": "USER_ADDRESS"
+        },
+        {
+            "tag": "StdEntity",
+            "fields": [
+                {
+                    "fname": "email",
+                    "ftype": "Option<Main::EMAIL>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "password",
+                    "ftype": "Main::ALPHANUMERIC",
+                    "isoptional": false
+                },
+                {
+                    "fname": "name",
+                    "ftype": "Option<Main::USER_NAME>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "phone",
+                    "ftype": "Option<Main::USER_PHONE>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "address",
+                    "ftype": "Option<Main::USER_ADDRESS>",
+                    "isoptional": false
+                },
+                {
+                    "fname": "id",
+                    "ftype": "Int",
+                    "isoptional": false
+                }
+            ],
+            "hasvalidations": true,
+            "tkey": "Main::UserDTO",
+            "name": "UserDTO"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::EMAIL>",
+            "name": "Option",
+            "oftype": "Main::EMAIL"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::USER_NAME>",
+            "name": "Option",
+            "oftype": "Main::USER_NAME"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::USER_PHONE>",
+            "name": "Option",
+            "oftype": "Main::USER_PHONE"
+        },
+        {
+            "tag": "Option",
+            "attributes": {
+                "docstring": "%** Type for representing the option value. **%"
+            },
+            "tkey": "Option<Main::USER_ADDRESS>",
+            "name": "Option",
+            "oftype": "Main::USER_ADDRESS"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::EMAIL>"
+            ],
+            "tkey": "Some<Main::EMAIL>",
+            "name": "Some",
+            "oftype": "Main::EMAIL"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::USER_NAME>"
+            ],
+            "tkey": "Some<Main::USER_NAME>",
+            "name": "Some",
+            "oftype": "Main::USER_NAME"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::USER_PHONE>"
+            ],
+            "tkey": "Some<Main::USER_PHONE>",
+            "name": "Some",
+            "oftype": "Main::USER_PHONE"
+        },
+        {
+            "tag": "Some",
+            "attributes": {
+                "docstring": "%** Type for representing the some option value. **%"
+            },
+            "supertypes": [
+                "Option<Main::USER_ADDRESS>"
+            ],
+            "tkey": "Some<Main::USER_ADDRESS>",
+            "name": "Some",
+            "oftype": "Main::USER_ADDRESS"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive string value. **%"
+            },
+            "tkey": "CString",
+            "name": "CString"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive unicode regex value. **%"
+            },
+            "tkey": "CRegex",
+            "name": "CRegex"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": [
+        {
+            "nsinfo": {
+                "inns": "Main",
+                "nsmappings": []
+            },
+            "reinfos": [
+                {
+                    "name": "re_SAFEIDENTIFIERCHAR",
+                    "restr": "/[a-zA-Z0-9-_]/c"
+                },
+                {
+                    "name": "re_USERNAME",
+                    "restr": "/ .{1, 50} /c"
+                }
+            ]
+        }
+    ]
+}

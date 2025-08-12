@@ -1,5 +1,4 @@
 #include "smt_extract.h"
-#include "smt_utils.h"
 #include <cstdio>
 #include <fstream>
 
@@ -56,53 +55,42 @@ int main(int argc, char** argv)
         badArgs("Incorrect .json file");
     }
 
-    std::map<std::string, bsqon::Type*> arg_refs;
-    json j_fn;
+    json fn_json;
     try {
         std::ifstream infile(fn_info_file);
-        infile >> j_fn;
+        infile >> fn_json;
     }
     catch(const std::exception& e) {
         printf("Error parsing JSON: %s\n", e.what());
         exit(1);
     }
 
-    for(const auto& arg : j_fn["args"]) {
+    std::map<std::string, bsqon::Type*> arg_refs;
+    for(const auto& arg : fn_json["args"]) {
         arg_refs[arg["name"]] = asm_info.lookupTypeKey(arg["type"]);
     }
 
     std::string mode(argv[4]);
 
     if(mode == "-e" || mode == "--extract") {
-        for(const auto& [id, type] : arg_refs) {
-            ValueExtractor extract(&asm_info, type, id, sol);
-        }
+        // for(const auto& [id, type] : arg_refs) {
+        //     z3::expr ex = getBsqTypeExpr(id, type, sol).value();
+        //
+        //     ValueExtractor extract(&asm_info, type, ex, sol);
+        //     bsqon::Value* v = extract.value;
+        //     printf("%s\n", (const char*)v->toString().c_str());
+        // }
     }
     else if(mode == "-g" || mode == "--generate") {
-        for(const auto& [id, type] : arg_refs) {
-            ValueExtractor extract(&asm_info, type, id, sol);
-            bsqon::Value* val = extract.value;
-
-            std::string key = id;
-            std::string sort_key = "";
-
-            // TODO: Make this better.
-            if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
-                sort_key = "@Term";
-            }
-            else {
-                sort_key = tKeyToSmtName(val->vtype->tkey, SMT_TYPE);
-            }
-
-            std::u8string val_sig = u8"(define-fun " + std::u8string(key.cbegin(), key.cend()) + u8" () " +
-                                    std::u8string(sort_key.cbegin(), sort_key.cend()) + u8" ";
-
-            std::u8string val_ex = val->toSMTLib();
-
-            std::u8string final = val_sig + val_ex + u8")";
-
-            printf("%s\n", (const char*) final.c_str());
-        }
+        // for(const auto& [id, type] : arg_refs) {
+        //     z3::expr ex = getBsqTypeExpr(id, type, sol).value();
+        //
+        //     ValueExtractor extract(&asm_info, type, ex, sol);
+        //     std::cout << extract.valueToSMTExpr() << "\n";
+        // }
+    }
+    else if(mode == "-m" || mode == "--mock") {
+        BsqMock mock(&asm_info, fn_json, sol);
     }
     else {
         std::string err = mode + " is not a valid <MODE>.";

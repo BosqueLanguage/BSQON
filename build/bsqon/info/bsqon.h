@@ -109,7 +109,6 @@ namespace bsqon
         virtual ~Value() = default;
 
         virtual std::u8string toString() const = 0;
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const = 0;
         virtual json toJSON() const = 0;
 
@@ -225,15 +224,15 @@ namespace bsqon
             return u8"error";
         }
 
+        virtual bool isErrorValue() const override
+        {
+            return true;
+        }
+
         // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
             return u8"error";
-        }
-
-        virtual bool isErrorValue() const override
-        {
-            return true;
         }
 
         virtual json toJSON() const override
@@ -266,7 +265,6 @@ namespace bsqon
             return u8"none";
         }
 
-        // NOTE: Requires Test
         virtual std::u8string toSMTLib() const override
         {
 
@@ -295,7 +293,7 @@ namespace bsqon
         {
             return this->tv ? u8"true" : u8"false";
         }
-        // NOTE: Needs to be tested.
+
         virtual std::u8string toSMTLib() const override
         {
             return this->tv ? u8"true" : u8"false";
@@ -343,7 +341,6 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"n";
         }
 
-        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
@@ -384,7 +381,11 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"i";
         }
 
-        // NOTE: Testing it...
+        virtual json toJSON() const override
+        {
+            return json(this->cnv);
+        }
+
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
@@ -393,11 +394,6 @@ namespace bsqon
             }
 
             return std::u8string(sstr.cbegin(), sstr.cend());
-        }
-
-        virtual json toJSON() const override
-        {
-            return json(this->cnv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -429,16 +425,14 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"N";
         }
 
-        // NOTE: Needs to be tested.
+        virtual json toJSON() const override
+        {
+            return json(this->cnv.str());
+        }
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
             return std::u8string(sstr.cbegin(), sstr.cend());
-        }
-
-        virtual json toJSON() const override
-        {
-            return json(this->cnv.str());
         }
 
         virtual bool isValidForTypedecl() const override
@@ -470,7 +464,6 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"I";
         }
 
-        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
@@ -515,16 +508,16 @@ namespace bsqon
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"f");
         }
 
-        // NOTE: Needs to be tested.
+        virtual json toJSON() const override
+        {
+            return json(this->cnv);
+        }
+
+        // TODO: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->cnv);
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"");
-        }
-
-        virtual json toJSON() const override
-        {
-            return json(this->cnv);
         }
 
         virtual bool isValidForTypedecl() const override
@@ -552,7 +545,7 @@ namespace bsqon
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"d");
         }
 
-        // NOTE: Needs to be tested.
+        // TODO: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
@@ -625,7 +618,7 @@ namespace bsqon
             return Value::tailingFloatZeroHelper(std::u8string(sstr.cbegin(), sstr.cend()), u8"dd");
         }
 
-        // NOTE: Needs to be tested.
+        // TODO: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = this->cnv.str();
@@ -672,7 +665,6 @@ namespace bsqon
             return latstr + longstr;
         }
 
-        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto llstr = this->latitude.str();
@@ -770,7 +762,6 @@ namespace bsqon
             return u8"\"" + std::u8string(ustr.begin(), ustr.end()) + u8"\"";
         }
 
-        // NOTE: Needs to be tested.
         virtual std::u8string toSMTLib() const override
         {
             auto ustr = brex::escapeUnicodeString(this->sv);
@@ -916,6 +907,7 @@ namespace bsqon
         {
             return u8"uuid4{" + std::u8string(this->uuidstr.cbegin(), this->uuidstr.cend()) + u8'}';
         }
+
         // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
@@ -955,6 +947,7 @@ namespace bsqon
         {
             return u8"uuid7{" + std::u8string(this->uuidstr.cbegin(), this->uuidstr.cend()) + u8'}';
         }
+
         // TODO: Needs to be translated.
         virtual std::u8string toSMTLib() const override
         {
@@ -1037,6 +1030,7 @@ namespace bsqon
 
             return std::u8string(buf, buf + ccount);
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1091,6 +1085,7 @@ namespace bsqon
 
             return std::u8string(buf, buf + ccount);
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1139,6 +1134,7 @@ namespace bsqon
 
             return std::u8string(buf, buf + ccount);
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1233,7 +1229,6 @@ namespace bsqon
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"l";
         }
 
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
             auto sstr = std::to_string(this->tv);
@@ -1276,6 +1271,7 @@ namespace bsqon
 
             return std::u8string(buf, buf + ccount);
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1327,6 +1323,7 @@ namespace bsqon
 
             return this->tv.sign + std::u8string(buf, buf + ccount);
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1376,6 +1373,7 @@ namespace bsqon
             }
             return std::u8string(sstr.cbegin(), sstr.cend()) + u8"ds";
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1514,6 +1512,7 @@ namespace bsqon
         {
             return this->normalizedre;
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1547,6 +1546,7 @@ namespace bsqon
         {
             return this->normalizedre;
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1580,6 +1580,7 @@ namespace bsqon
         {
             return this->normalizedre;
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1617,8 +1618,6 @@ namespace bsqon
                    u8'}';
         }
 
-        // TODO: Working on toSMTLib
-        // (@Term-Some<Main@EMAIL>-mk (Some<Main@EMAIL>-mk (Main@EMAIL-mk "jch270@uky.edu")))
         virtual std::u8string toSMTLib() const override
         {
             std::string term_some = tKeyToSmtName(this->vtype->tkey, STRUCT_TERM_CONSTRUCT);
@@ -1719,6 +1718,7 @@ namespace bsqon
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
                    u8'}';
         }
+
         // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
@@ -1749,7 +1749,7 @@ namespace bsqon
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
                    u8'}';
         }
-        // TODO: Working on toSMTLib
+
         virtual std::u8string toSMTLib() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
@@ -1780,7 +1780,6 @@ namespace bsqon
                    u8'}';
         }
 
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
@@ -1811,7 +1810,6 @@ namespace bsqon
                    u8'}';
         }
 
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +
@@ -1929,9 +1927,9 @@ namespace bsqon
         {
             return this->normalizedglob;
         }
+
         virtual std::u8string toSMTLib() const override
         {
-            // TODO: Working on toSMTLib
             return this->normalizedglob;
         }
 
@@ -1981,9 +1979,6 @@ namespace bsqon
             return ltype + u8'{' + lvalues + u8'}';
         }
 
-        // (define-fun f () List<Int>
-        //    (List<Int>-mk (@Term-ListOps@Vector2<Int>-mk (ListOps@Vector2<Int>-mk 8 7))))
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
             std::string l_v_type = tKeyToSmtName(this->vtype->tkey, STRUCT_PRIM);
@@ -2061,6 +2056,7 @@ namespace bsqon
 
             return stype + u8'{' + svalues + u8'}';
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib
@@ -2101,6 +2097,7 @@ namespace bsqon
 
             return qtype + u8'{' + qvalues + u8'}';
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib
@@ -2141,6 +2138,7 @@ namespace bsqon
 
             return stype + u8'{' + svalues + u8'}';
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib
@@ -2177,6 +2175,7 @@ namespace bsqon
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->key->toString() +
                    u8", " + this->val->toString() + u8'}';
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib
@@ -2213,6 +2212,7 @@ namespace bsqon
 
             return mtype + u8'{' + mvalues + u8'}';
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib
@@ -2250,6 +2250,7 @@ namespace bsqon
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8"#" +
                    std::u8string(this->evname.cbegin(), this->evname.cend());
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib
@@ -2291,7 +2292,6 @@ namespace bsqon
                    std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'>';
         }
 
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
             std::string td_smt = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
@@ -2349,7 +2349,6 @@ namespace bsqon
             return etype + u8'{' + efields + u8'}';
         }
 
-        // TODO: Working on toSMTLib
         virtual std::u8string toSMTLib() const override
         {
             std::string constructor = tKeyToSmtName(this->vtype->tkey, STRUCT_CONSTRUCT);
@@ -2407,6 +2406,7 @@ namespace bsqon
 
             return u8'<' + ttype + u8">(|" + tvalues + u8"|)";
         }
+
         virtual std::u8string toSMTLib() const override
         {
             // TODO: Working on toSMTLib

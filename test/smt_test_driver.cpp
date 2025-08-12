@@ -101,7 +101,6 @@ void smt_tround(std::string smt_in, std::string fn_in, std::string tref_in, std:
             std::string key = id;
             std::string sort_key = "";
 
-            // TODO: Make this better.
             if(val->vtype->tag == bsqon::TypeTag::TYPE_OPTION) {
                 sort_key = "@Term";
             }
