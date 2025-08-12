@@ -26,14 +26,17 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
     std::map<std::string, std::pair<z3::expr, bsqon::Type*>> arg_map = getArgMap(mock_fn);
     uint ith_arg = 0;
     for(const auto& [id, arg_sig] : arg_map) {
-        z3::expr ex = arg_sig.first;
 
+        z3::expr ex = arg_sig.first;
         this->s.add(ex == mock_ex.arg(ith_arg++));
 
         bsqon::Type* t = arg_sig.second;
-        ValueExtractor extract(asm_info, id, t, ex, sol);
-        arg_values.push_back(extract.ex);
-        arg_bsq_values.push_back(extract.value);
+
+        ValueExtractor extract(asm_info, sol);
+        bsqon::Value* extracted_val = extract.extractValue(t, ex);
+
+        arg_values.push_back(ex);
+        arg_bsq_values.push_back(extracted_val);
     }
 
     z3::expr mock_fn_result = mock_fn(arg_values);
@@ -47,17 +50,9 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
 
     bsqon::Type* return_type = this->asm_info->lookupTypeKey(mock_json["return"]);
 
-    ValueExtractor extract_return(asm_info, return_sym.str(), return_type, return_ex, sol);
-
-    std::cout << "Mocking " << mock_name << ":" << "\n";
-    std::cout << "Arguments:\n";
-    uint i = 0;
-    for(bsqon::Value* v : arg_bsq_values) {
-        const char* v_res = (const char*)v->toString().c_str();
-        std::cout << "ARG " << i << " : " << v_res << "\n";
-    }
-    std::cout << "Result: \n";
-    printf("%s\n", (const char*)extract_return.value->toString().c_str());
+    ValueExtractor extract_return(asm_info, sol);
+    bsqon::Value* return_value = extract_return.extractValue(return_type, return_ex);
+    printf("%s\n", (const char*)return_value->toString().c_str());
 }
 
 std::map<std::string, std::pair<z3::expr, bsqon::Type*>> BsqMock::getArgMap(z3::func_decl mock_fn)
@@ -91,6 +86,7 @@ std::optional<z3::expr> BsqMock::addArgsToMock(z3::func_decl mock)
         std::string arg_str = "mock_arg_" + std::to_string(i);
         z3::symbol arg_sym = this->s.ctx().str_symbol(arg_str.c_str());
 
+        // TODO: Add Validators for arguments.
         z3::expr arg_ex = this->s.ctx().constant(arg_sym, arg_sort);
         this->s.add(arg_ex == this->s.ctx().int_val(5));
         args.push_back(arg_ex);
