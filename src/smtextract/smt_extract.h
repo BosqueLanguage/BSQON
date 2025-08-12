@@ -72,9 +72,6 @@ class ValueExtractor
     bsqon::Value* extractSome(bsqon::SomeType* bsq_t, z3::expr ex);
     bsqon::Value* extractOption(bsqon::OptionType* bsq_t, z3::expr ex);
     bsqon::Value* extractConcept(bsqon::ConceptType* t, z3::expr ex);
-    bsqon::Value* extractError(bsqon::ErrorType* t, z3::expr ex);
-    bsqon::Value* extractOk(bsqon::OkType* t, z3::expr ex);
-    bsqon::Value* extractResult(bsqon::ResultType* t, z3::expr ex);
     bsqon::Value* extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex);
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);

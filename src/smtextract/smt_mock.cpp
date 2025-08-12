@@ -56,8 +56,8 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
         const char* v_res = (const char*)v->toString().c_str();
         std::cout << "ARG " << i << " : " << v_res << "\n";
     }
-    const char* result = (const char*)extract_return.value->toString().c_str();
-    std::cout << "Result: " << result << "\n";
+    std::cout << "Result: \n";
+    printf("%s\n", (const char*)extract_return.value->toString().c_str());
 }
 
 std::map<std::string, std::pair<z3::expr, bsqon::Type*>> BsqMock::getArgMap(z3::func_decl mock_fn)

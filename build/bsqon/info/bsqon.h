@@ -23,16 +23,6 @@ typedef enum SmtNameType
     TERM_SUBTYPE_FN_NAME,
 } SmtNameType;
 
-// SmtNameType Options:
-// SMT_TYPE					= '::' -> '@',
-// STRUCT_CONSTRUCT			= tk-mk,
-// STRUCT_TERM_CONSTRUCT	= @Term-tk-mk,
-// STRUCT_TERM_FIELD		= @Term-tk-value,
-// STRUCT_PRIM_CONSTRUCT	= Get T-mk from X<T>,
-// PRIM_CONSTRUCT	        = Get T from X<T>,
-// NAMESPACE_NAME			= //TODO,
-// TYPE_CONST_NAME			= //TODO,
-// TERM_SUBTYPE_FN_NAME		= @SubtypeOf-tk,
 std::string tKeyToSmtName(const std::string& tk, SmtNameType n);
 
 namespace bsqon

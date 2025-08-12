@@ -57,7 +57,7 @@ function userAddressNotEmpty(x: Option<USER_ADDRESS>): Bool {
     return !x.value.empty() && x.value.size() <= 100n;
 }
 
-function getCustomer(id: Int): Result<UserDTO, Bool>{ 
+function getCustomer(id: Int): UserDTO{
     let customer_found = UserDTO {
         some('jch270@uky.edu'<EMAIL>),
         '12345678'<ALPHANUMERIC>,
@@ -69,5 +69,9 @@ function getCustomer(id: Int): Result<UserDTO, Bool>{
 
 	assert customer_found.id == id;
 
-	return Result<UserDTO, Bool>::Ok{customer_found};
+	return customer_found;
+}
+
+public function main(): UserDTO{
+	return getCustomer(5i);
 }

@@ -447,8 +447,6 @@ bsqon::Value* ValueExtractor::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::
 bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
-    // TODO: TMP
-    std::cout << constructs << "\n";
     assert(constructs.size() == 1);
 
     z3::func_decl c = constructs[0];
@@ -506,6 +504,7 @@ bsqon::Value* ValueExtractor::extractOption(bsqon::OptionType* bsq_t, z3::expr e
     z3::func_decl opt_is = opt_term.value().rg;
     this->s.add(opt_is(ex));
 
+    // TODO: Find a way to return None via the solver and in a better informing way...
     //--------------------------------------------------------------------------
     std::string none_name = tKeyToSmtName("None", STRUCT_TERM_CONSTRUCT);
     if(none_name == opt_mk.name().str()) {
@@ -620,24 +619,11 @@ bsqon::Value* ValueExtractor::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::ex
     return new bsqon::TypedeclValue(bsq_t, FILLER_POS, val);
 }
 
-bsqon::Value* ValueExtractor::extractError(bsqon::ErrorType* t, z3::expr ex)
-{
-}
-bsqon::Value* ValueExtractor::extractOk(bsqon::OkType* t, z3::expr ex)
-{
-}
-bsqon::Value* ValueExtractor::extractResult(bsqon::ResultType* t, z3::expr ex)
-{
-}
-
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
     auto tg = bsq_t->tag;
     if(tg == bsqon::TypeTag::TYPE_STD_ENTITY) {
         return extractEntity(static_cast<bsqon::StdEntityType*>(bsq_t), ex);
-    }
-    else if(tg == bsqon::TypeTag::TYPE_RESULT) {
-        return extractResult(static_cast<bsqon::ResultType*>(bsq_t), ex);
     }
     else if(tg == bsqon::TypeTag::TYPE_PRIMITIVE) {
         return extractPrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
@@ -659,12 +645,45 @@ ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, std::string id, bs
                                z3::solver& solver)
     : asm_info(asm_info), id(id), t(t), ex(ex), s(solver)
 {
-    bsqon::Value* result = this->extractValue(this->t, this->ex);
-    if(result == NULL) {
-        printf("solveValue returned NULL \n");
-        exit(1);
+    // TODO: TMP make this use actual functions and find their meaning.
+    // Check for the (@Result <T>) if it is error or res then if res pass to extractor.
+
+    if(ex.get_sort().is_datatype()) {
+        z3::func_decl_vector at_res_constructs = ex.get_sort().constructors();
+
+        if(at_res_constructs.size() == 2) {
+
+            z3::func_decl_vector at_res_recogs = ex.get_sort().recognizers();
+            auto at_res = findConstruct(at_res_constructs, at_res_recogs, ex).value();
+
+            this->s.add(at_res.rg(ex));
+            z3::func_decl at_res_acc = at_res.mk.accessors()[0];
+            z3::expr at_res_val = at_res_acc(ex);
+
+            bsqon::Value* result = this->extractValue(this->t, at_res_val);
+            if(result == NULL) {
+                printf("solveValue returned NULL \n");
+                exit(1);
+            }
+            this->value = result;
+        }
+        else {
+            bsqon::Value* result = this->extractValue(this->t, this->ex);
+            if(result == NULL) {
+                printf("solveValue returned NULL \n");
+                exit(1);
+            }
+            this->value = result;
+        }
     }
-    this->value = result;
+    else {
+        bsqon::Value* result = this->extractValue(this->t, this->ex);
+        if(result == NULL) {
+            printf("solveValue returned NULL \n");
+            exit(1);
+        }
+        this->value = result;
+    }
 }
 
 bsqon::Value* ValueExtractor::checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex)
@@ -729,6 +748,7 @@ std::string ValueExtractor::valueToSMTStr()
 }
 
 // Look for the SAT constructor of the ex in @Terms.
+// TODO: Replace TermType with pair.
 std::optional<TermType> ValueExtractor::findConstruct(z3::func_decl_vector terms, z3::func_decl_vector recognizers,
                                                       z3::expr ex)
 {
