@@ -1,0 +1,12 @@
+{
+    "fname": "Main::testOpOnSample",
+    "args": [
+        {
+            "name": "op",
+            "type": "Main::DatabaseOperation"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "CString"
+}

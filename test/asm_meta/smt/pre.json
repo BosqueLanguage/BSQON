@@ -66,10 +66,6 @@
                     "Map"
                 ],
                 [
-                    "CCharBufferOps",
-                    "CCharBufferOps"
-                ],
-                [
                     "CStringOps",
                     "CStringOps"
                 ],
@@ -84,6 +80,10 @@
                 [
                     "NumericOps",
                     "NumericOps"
+                ],
+                [
+                    "CCharBufferOps",
+                    "CCharBufferOps"
                 ],
                 [
                     "UnicodeCharBufferOps",

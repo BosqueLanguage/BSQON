@@ -111,7 +111,6 @@ bsqon::Value* ValueExtractor::extractCString(const bsqon::PrimitiveType* bsq_t, 
 {
     if(this->s.check() != z3::sat) {
         std::cout << "GOT: " << this->s.check() << " solver for CString: " << ex.decl() << "\n";
-        exit(1);
     }
 
     // Check Z3 interpretation z3 expr
@@ -527,16 +526,6 @@ bsqon::Value* ValueExtractor::extractOption(bsqon::OptionType* bsq_t, z3::expr e
     return some_val;
 }
 
-bsqon::Value* ValueExtractor::extractConcept(bsqon::ConceptType* bsq_t, z3::expr ex)
-{
-    auto tg = bsq_t->tag;
-    if(tg == bsqon::TypeTag::TYPE_OPTION) {
-        return extractOption(static_cast<bsqon::OptionType*>(bsq_t), ex);
-    }
-
-    return nullptr;
-}
-
 bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 {
     z3::sort list_dt_sort = ex.get_sort();
@@ -619,7 +608,7 @@ bsqon::Value* ValueExtractor::extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::ex
     return new bsqon::TypedeclValue(bsq_t, FILLER_POS, val);
 }
 
-z3::expr ValueExtractor::extractAtResultExpr(z3::expr ex)
+z3::expr ValueExtractor::extractAtResultExpr(bsqon::Type* t, z3::expr ex)
 {
     z3::func_decl_vector at_res_constructs = ex.get_sort().constructors();
 
@@ -629,18 +618,26 @@ z3::expr ValueExtractor::extractAtResultExpr(z3::expr ex)
     z3::func_decl at_res_mk = at_res.first;
     z3::func_decl at_res_is = at_res.second;
 
+	//TODO: Handle @Result-err, only handles @Result-ok atm. So improve this.
+	if(at_res_mk.name().str().find("err") != std::string::npos){
+		bsqon::Value* err = new bsqon::ErrorValue(t,FILLER_POS);
+		printf("@Result-err: %s\n", (const char *)err->toString().c_str());
+	}
+
     this->s.add(at_res_is(ex));
 
     z3::func_decl at_res_acc = at_res_mk.accessors()[0];
     z3::expr at_res_val = at_res_acc(ex);
 
+
     return at_res_val;
 }
+
 
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
     if(ex.get_sort().to_string().find("@Result") != std::string::npos) {
-        z3::expr result_val_ex = extractAtResultExpr(ex);
+        z3::expr result_val_ex = extractAtResultExpr(bsq_t,ex);
         return extractValue(bsq_t, result_val_ex);
     }
 
@@ -651,17 +648,38 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     else if(tg == bsqon::TypeTag::TYPE_PRIMITIVE) {
         return extractPrimitive(static_cast<bsqon::PrimitiveType*>(bsq_t), ex);
     }
-    else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT || tg == bsqon::TypeTag::TYPE_OPTION) {
-        return extractConcept(static_cast<bsqon::ConceptType*>(bsq_t), ex);
-    }
     else if(tg == bsqon::TypeTag::TYPE_LIST) {
         return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
     }
     else if(tg == bsqon::TypeTag::TYPE_TYPE_DECL) {
         return extractTypeDecl(static_cast<bsqon::TypedeclType*>(bsq_t), ex);
     }
+	else if(tg == bsqon::TypeTag::TYPE_OPTION) {
+        return extractOption(static_cast<bsqon::OptionType*>(bsq_t), ex);
+    }
+	else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT) {
+	       return extractStdConcept(static_cast<bsqon::StdConceptType*>(bsq_t), ex);
+	   }
+	else if (tg == bsqon::TypeTag::TYPE_UNRESOLVED) {
+		printf("Got TYPE_UNRESOLVED tag from type %s\n",bsq_t->tkey.c_str());
+	}
+	else {
+		printf("ERROR -> Tag: %d, Type: %s has no extractor.\n", (int)tg, bsq_t->tkey.c_str());
+    }
 
-    return nullptr;
+	return new bsqon::ErrorValue(bsq_t, FILLER_POS);
+}
+
+//TODO: Implement extraction for StdConcept
+bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3::expr ex)
+{
+	z3::sort std_sort = ex.get_sort();
+	z3::func_decl_vector std_constructs = std_sort.constructors();
+	z3::func_decl_vector list_recogs = std_sort.recognizers();
+
+    auto at_res = findConstruct(std_constructs, list_recogs, ex).value();
+	std::cout << "Constructor: " << at_res.first << "\n";
+	return nullptr;
 }
 
 ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, z3::solver& solver) : asm_info(asm_info), s(solver)
