@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <optional>
 #include <string>
@@ -17,11 +18,15 @@
 BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
     : asm_info(asm_info), mock_json(mock_json), s(sol)
 {
-    auto fn_map = buildMockMap();
+	std::unordered_map<std::string, z3::func_decl> fn_map = buildMockMap();
     this->fn_map = fn_map;
 
     std::string mock_name = tKeyToSmtName(mock_json["fname"], SMT_TYPE);
-    z3::func_decl mock_fn = fn_map.find(mock_name)->second;
+    if(fn_map.find(mock_name) == fn_map.end()){
+		printf("%s, not present in .smt2 file.\n",mock_name.c_str());
+		exit(1);
+	}
+	z3::func_decl mock_fn = fn_map.at(mock_name);
 
     std::map<std::string, std::pair<z3::expr, bsqon::Type*>> arg_map = getArgMap(mock_fn);
 
@@ -31,6 +36,7 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
     std::vector<bsqon::Value*> arg_bsq_values;
 
     uint ith_arg = 0;
+	printf("| MOCK %s |\n",mock_name.c_str());
     printf("Arguments:\n");
     for(const auto& [id, arg_sig] : arg_map) {
         z3::expr arg_ex = mock_ex.arg(ith_arg++);
@@ -40,10 +46,11 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
         bsqon::Type* arg_type = arg_sig.second;
         bsqon::Value* extracted_val = extract.extractValue(arg_type, arg_ex);
         if(extracted_val == nullptr) {
-            printf("ERROR: NULL Extracted arg value");
+            printf("ERROR: NULL Extracted arg value | TYPE: %s \n",arg_type->tkey.c_str());
         }
         else {
-            printf("%s", (const char*)extracted_val->toString().c_str());
+            printf("Type: %s\nValue: %s\n", (const char*)extracted_val->vtype->tkey.c_str(),
+                   (const char*)extracted_val->toString().c_str());
         }
 
         arg_values.push_back(arg_ex);
@@ -64,10 +71,12 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
     ValueExtractor extract_return(asm_info, sol);
     bsqon::Value* return_value = extract_return.extractValue(return_type, return_ex);
     if(return_value == nullptr) {
-            printf("ERROR: NULL Extracted $return value");
+        printf("ERROR: NULL Extracted $return value");
     }
     else {
-        printf("%s\n", (const char*)return_value->toString().c_str());
+        printf("Return:\n");
+        printf("Type: %s\nValue: %s\n", (const char*)return_value->vtype->tkey.c_str(),
+               (const char*)return_value->toString().c_str());
     }
 }
 

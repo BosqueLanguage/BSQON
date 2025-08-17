@@ -5,7 +5,7 @@
 (declare-datatypes () ((@ErrTag @err-trgt @err-other)))
 
 (declare-datatype @Result (par (T) (
-    (@Result-err (@Result-etag @ErrTag)) 
+    (@Result-err (@Result-etag @ErrTag))
     (@Result-ok (@Result-value T))
 )))
 
@@ -21,7 +21,7 @@
 )
 
 ;;
-;; Primitive datatypes 
+;; Primitive datatypes
 ;;
 (declare-datatype None ((none)))
 ;;Bool is Bool
@@ -41,7 +41,7 @@
 (declare-datatype Main@USER_ADDRESS ( (Main@USER_ADDRESS-mk (Main@USER_ADDRESS-value CString)) ))
 
 ;;
-;; Entity datatypes 
+;; Entity datatypes
 ;;
 (declare-datatypes (
     (Some<Main@EMAIL> 0)

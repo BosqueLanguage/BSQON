@@ -1,6 +1,25 @@
 #include "smt_extract.h"
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
+#include <string>
+
+char *ReadFile(const char *filename) {
+  FILE *f = fopen(filename, "r");
+  if (!f) {
+    perror("fopen");
+  }
+  fseek(f, 0, SEEK_END);
+  long length = ftell(f);
+  rewind(f);
+  char *bfr = (char *)malloc(sizeof(char) * length);
+
+  fread(bfr, sizeof(char), length, f);
+
+  fclose(f);
+  return bfr;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -17,10 +36,17 @@ int main(int argc, char** argv)
     if(validPath(smt_file, "smt2") == false) {
         badArgs("Incorrect .smt2 file");
     }
+	//HACK: Fix to prevent z3 to optimize the functions that use define-fun.
+	char * smt_bfr = ReadFile(smt_file);
+	std::string smt_str(smt_bfr);
+	free(smt_bfr);
+
+	std::string helper_fn = ";;;;;;;;;;;;;;;\n (declare-fun MockTest (Int) Int) (assert (> (MockTest 5) 2))";
+	std::string smt_formula = smt_str + helper_fn;
 
     z3::context c;
     z3::solver sol(c);
-    sol.from_file(smt_file);
+	sol.from_string(smt_formula.c_str());
 
     z3::check_result chk_smt = sol.check();
     if(chk_smt == z3::unsat) {

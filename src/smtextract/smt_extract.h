@@ -77,7 +77,7 @@ class ValueExtractor
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
 
-    z3::expr extractAtResultExpr(bsqon::Type* t, z3::expr ex);
+	std::optional<z3::expr> extractAtResultExpr(bsqon::Type* t, z3::expr ex);
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);
     z3::expr extractSequenceLen(z3::expr ex);
     bsqon::Value* checkValidEval(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
