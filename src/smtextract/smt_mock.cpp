@@ -49,8 +49,9 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
             printf("ERROR: NULL Extracted arg value | TYPE: %s \n",arg_type->tkey.c_str());
         }
         else {
-            printf("Type: %s\nValue: %s\n", (const char*)extracted_val->vtype->tkey.c_str(),
-                   (const char*)extracted_val->toString().c_str());
+			//TODO: Find a way to print the type tree.
+			printf("Type: %s\n", (const char*)arg_type->tkey.c_str());
+			printf("Value: %s\n", (const char*)extracted_val->toString().c_str());
         }
 
         arg_values.push_back(arg_ex);

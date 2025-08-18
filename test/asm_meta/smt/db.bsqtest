@@ -16,3 +16,4 @@ chktest removeInvariant(db: Database): Bool {
 
     return db.entries.size() > rdb.entries.size();
 }
+

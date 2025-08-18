@@ -25,12 +25,6 @@
 
 #define FILLER_POS bsqon::SourcePos{0, 0, 0, 0}
 
-typedef struct TermType
-{
-    z3::func_decl mk;
-    z3::func_decl rg;
-} TermType;
-
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
 std::string valueToSMTStr(std::string id, bsqon::Value* val);

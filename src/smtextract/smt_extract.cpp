@@ -444,6 +444,7 @@ bsqon::Value* ValueExtractor::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::
     return nullptr;
 }
 
+//TODO: Handle case of concept better.
 bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
@@ -452,9 +453,10 @@ bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::exp
     z3::func_decl c = constructs[0];
     z3::func_decl_vector c_accs = c.accessors();
 
-    std::vector<bsqon::Value*> fieldvalues;
 
-    for(size_t j = 0; j < c_accs.size(); j++) {
+	std::vector<bsqon::Value*> fieldvalues;
+	uint acc_size = c_accs.size();
+    for(size_t j = 0; j < acc_size; j++) {
         bsqon::EntityTypeFieldEntry field_tk = bsq_t->fields[j];
         bsqon::Type* field_t = this->asm_info->lookupTypeKey(field_tk.ftype);
 
@@ -695,8 +697,14 @@ bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3
 
 	this->s.add(term_ex == term_ex_val);
 
-	//TODO: FInd how to progress with stdconcept?
-	return nullptr;
+	size_t pos = 0;
+	std::string s = term_ex_val.get_sort().to_string();
+	while ((pos = s.find("@", pos)) != std::string::npos) {
+		s.replace(pos, 1, "::");
+	}
+	bsqon::StdEntityType* t = static_cast<bsqon::StdEntityType*>(this->asm_info->lookupTypeKey(s));
+
+	return extractEntity(t, term_ex_val);
 }
 
 ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, z3::solver& solver) : asm_info(asm_info), s(solver)

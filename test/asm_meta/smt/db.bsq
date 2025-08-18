@@ -274,7 +274,8 @@ function getSampleDB(): Database {
 
 public function testOpOnSample(op: DatabaseOperation): CString {
     let db = getSampleDB();
-    let res, _ = db.processDatabaseOperation(op);
-    
-    return res;
+   let res, _ = db.processDatabaseOperation(op);
+
+ return res;
 }
+
