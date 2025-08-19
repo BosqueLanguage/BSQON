@@ -444,7 +444,6 @@ bsqon::Value* ValueExtractor::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::
     return nullptr;
 }
 
-//TODO: Handle case of concept better.
 bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
@@ -453,9 +452,8 @@ bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::exp
     z3::func_decl c = constructs[0];
     z3::func_decl_vector c_accs = c.accessors();
 
-
-	std::vector<bsqon::Value*> fieldvalues;
-	uint acc_size = c_accs.size();
+    std::vector<bsqon::Value*> fieldvalues;
+    uint acc_size = c_accs.size();
     for(size_t j = 0; j < acc_size; j++) {
         bsqon::EntityTypeFieldEntry field_tk = bsq_t->fields[j];
         bsqon::Type* field_t = this->asm_info->lookupTypeKey(field_tk.ftype);
@@ -554,6 +552,7 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 
     std::vector<bsqon::Value*> vals;
     size_t list_size = list_n_ops_construct.arity();
+	assert(list_size < 4);
     if(list_size == 0) {
         this->s.add(list_n_ops_construct() == list_n_ops);
         return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
@@ -639,7 +638,7 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
         auto result_val_ex = extractAtResultExpr(bsq_t, ex);
         if(!result_val_ex.has_value()) {
             bsqon::Value* err = new bsqon::ErrorValue(bsq_t, FILLER_POS);
-			return err;
+            return err;
         }
         else {
             return extractValue(bsq_t, result_val_ex.value());
@@ -656,6 +655,9 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     else if(tg == bsqon::TypeTag::TYPE_LIST) {
         return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
     }
+	else if(tg == bsqon::TypeTag::TYPE_ELIST) {
+		return extractEList(static_cast<bsqon::EListType*>(bsq_t), ex);
+	}
     else if(tg == bsqon::TypeTag::TYPE_TYPE_DECL) {
         return extractTypeDecl(static_cast<bsqon::TypedeclType*>(bsq_t), ex);
     }
@@ -675,7 +677,75 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     return new bsqon::ErrorValue(bsq_t, FILLER_POS);
 }
 
-// TODO: Implement extraction for StdConcept
+bsqon::Value* ValueExtractor::extractEList(bsqon::EListType* bsq_t, z3::expr ex)
+{
+    z3::sort list_dt_sort = ex.get_sort();
+    z3::func_decl list_dt_construct = list_dt_sort.constructors()[0];
+
+    z3::func_decl list_dt_accs = list_dt_construct.accessors()[0];
+
+    z3::expr list_term_ex = list_dt_accs(ex);
+    z3::sort terms = list_term_ex.get_sort();
+    z3::func_decl_vector list_mks = terms.constructors();
+    z3::func_decl_vector list_recogs = terms.recognizers();
+
+    auto n_list = findConstruct(list_mks, list_recogs, list_term_ex).value();
+    z3::func_decl list_n_mk_term = n_list.first;
+    z3::func_decl list_n_rg_term = n_list.second;
+
+    this->s.add(list_n_rg_term(list_term_ex));
+
+    z3::expr list_n_ops = list_n_mk_term.accessors()[0](list_term_ex);
+
+    z3::sort list_n_ops_sort = list_n_ops.get_sort();
+    z3::func_decl list_n_ops_construct = list_n_ops_sort.constructors()[0];
+    z3::func_decl_vector list_n_ops_accs = list_n_ops_construct.accessors();
+
+    std::vector<bsqon::Value*> vals;
+    size_t list_size = list_n_ops_construct.arity();
+	assert(list_size > 1);
+	assert(list_size < 5);
+    z3::sort list_of_type = list_n_ops_accs[0].range();
+    z3::expr list_n = this->s.ctx().constant("tmp", list_of_type);
+
+    if(list_size == 2) {
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        list_n = list_n_ops_construct(unin_1,unin_2);
+    }
+    else if(list_size == 3) {
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        z3::expr unin_3 = this->s.ctx().constant("unin_3", list_of_type);
+        list_n = list_n_ops_construct(unin_1, unin_2,unin_3);
+    }
+    else if(list_size == 4) {
+        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
+        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
+        z3::expr unin_3 = this->s.ctx().constant("unin_3", list_of_type);
+        z3::expr unin_4 = this->s.ctx().constant("unin_4", list_of_type);
+        list_n = list_n_ops_construct(unin_1, unin_2, unin_3,unin_4);
+    }
+
+    this->s.add(list_n == list_n_ops);
+
+    for(size_t i = 0; i < list_n.args().size(); ++i) {
+        bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->entries[i]);
+
+        z3::expr list_ith_val = list_n_ops_accs[i](list_n);
+        this->s.add(list_n.args()[i] == list_ith_val);
+        try {
+            bsqon::Value* ith_val = this->extractValue(list_t, list_ith_val);
+            vals.push_back(ith_val);
+        }
+        catch(const std::exception& e) {
+            std::cerr << "extractEntity ERR: " << e.what() << "\n";
+        }
+    }
+
+    return new bsqon::EListValue(bsq_t, FILLER_POS, std::move(vals));
+}
+
 bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3::expr ex)
 {
     z3::sort std_sort = ex.get_sort();
@@ -684,27 +754,27 @@ bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3
 
     auto std_term = findConstruct(std_constructs, std_recogs, ex).value();
 
-	z3::func_decl term_mk = std_term.first;
-	z3::func_decl term_is = std_term.second;
+    z3::func_decl term_mk = std_term.first;
+    z3::func_decl term_is = std_term.second;
 
-	this->s.add(term_is(ex));
+    this->s.add(term_is(ex));
 
-	z3::func_decl term_acc = term_mk.accessors()[0];
-	z3::expr term_ex = term_acc(ex);
+    z3::func_decl term_acc = term_mk.accessors()[0];
+    z3::expr term_ex = term_acc(ex);
 
-	z3::sort term_sort = term_ex.get_sort();
-	z3::expr term_ex_val = term_sort.constructors()[0]();
+    z3::sort term_sort = term_ex.get_sort();
+    z3::expr term_ex_val = term_sort.constructors()[0]();
 
-	this->s.add(term_ex == term_ex_val);
+    this->s.add(term_ex == term_ex_val);
 
-	size_t pos = 0;
-	std::string s = term_ex_val.get_sort().to_string();
-	while ((pos = s.find("@", pos)) != std::string::npos) {
-		s.replace(pos, 1, "::");
-	}
-	bsqon::StdEntityType* t = static_cast<bsqon::StdEntityType*>(this->asm_info->lookupTypeKey(s));
+    size_t pos = 0;
+    std::string type_sort = term_ex_val.get_sort().to_string();
+    while((pos = type_sort.find("@", pos)) != std::string::npos) {
+        type_sort.replace(pos, 1, "::");
+    }
 
-	return extractEntity(t, term_ex_val);
+    bsqon::Type* t = this->asm_info->lookupTypeKey(type_sort);
+    return extractValue(t, term_ex_val);
 }
 
 ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, z3::solver& solver) : asm_info(asm_info), s(solver)

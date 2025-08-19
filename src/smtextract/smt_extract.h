@@ -63,6 +63,7 @@ class ValueExtractor
     bsqon::Value* extractInt(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractCString(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
     bsqon::Value* extractBool(const bsqon::PrimitiveType* bsq_t, z3::expr ex);
+	bsqon::Value* extractEList(bsqon::EListType* bsq_t, z3::expr ex);
     bsqon::Value* extractList(bsqon::ListType* bsq_t, z3::expr ex);
     bsqon::Value* extractSome(bsqon::SomeType* bsq_t, z3::expr ex);
     bsqon::Value* extractOption(bsqon::OptionType* bsq_t, z3::expr ex);

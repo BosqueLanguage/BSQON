@@ -57,28 +57,6 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
         arg_values.push_back(arg_ex);
         arg_bsq_values.push_back(extracted_val);
     }
-
-    z3::expr mock_fn_result = mock_fn(arg_values);
-
-    z3::sort return_sort = mock_fn.range();
-    z3::symbol return_sym = this->s.ctx().str_symbol("$return");
-
-    // TODO: Add Validator
-    z3::expr return_ex = this->s.ctx().constant(return_sym, return_sort);
-    this->s.add(return_ex == mock_fn_result);
-
-    bsqon::Type* return_type = this->asm_info->lookupTypeKey(mock_json["return"]);
-
-    ValueExtractor extract_return(asm_info, sol);
-    bsqon::Value* return_value = extract_return.extractValue(return_type, return_ex);
-    if(return_value == nullptr) {
-        printf("ERROR: NULL Extracted $return value");
-    }
-    else {
-        printf("Return:\n");
-        printf("Type: %s\nValue: %s\n", (const char*)return_value->vtype->tkey.c_str(),
-               (const char*)return_value->toString().c_str());
-    }
 }
 
 std::map<std::string, std::pair<z3::expr, bsqon::Type*>> BsqMock::getArgMap(z3::func_decl mock_fn)
@@ -109,10 +87,16 @@ z3::expr BsqMock::addArgsToMock(z3::func_decl mock, std::map<std::string, std::p
         z3::expr arg_ex = arg_sig.first;
         bsqon::Type* arg_type = arg_sig.second;
 
-        z3::func_decl validate_fn = findValidator(arg_type).value();
-        this->s.add(validate_fn(arg_ex));
+        auto validate_fn_opt = findValidator(arg_type);
+		if (validate_fn_opt.has_value()) {
+			this->s.add(validate_fn_opt.value()(arg_ex));
 
-        args.push_back(arg_ex);
+			args.push_back(arg_ex);
+		}else{
+			printf("ERROR: %s type has not validator",arg_type->tkey.c_str());
+			exit(1);
+		}
+
     }
 
     return mock(args);
@@ -138,7 +122,6 @@ std::optional<z3::func_decl> BsqMock::findValidator(bsqon::Type* t)
     }
 
     return std::nullopt;
-    ;
 }
 
 std::unordered_map<std::string, z3::func_decl> BsqMock::buildMockMap()
