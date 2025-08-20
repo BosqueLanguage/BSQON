@@ -72,7 +72,7 @@
 ;;no content -- ;;--PRE_FUNCS--;;
 
 (define-fun Main@main ((x (@EList-2 Int Nat))) (@Result (@EList-2 Int Nat))
-    (ite (not (or (not (= (@EList-2-0 x) 3)) (not (= (@EList-2-1 x) 5)))) ((as @Result-err (@Result (@EList-2 Int Nat))) @err-other)
+    (ite (not (and (= (@EList-2-0 x) 3) (= (@EList-2-1 x) 20))) ((as @Result-err (@Result (@EList-2 Int Nat))) @err-other)
         (@Result-ok x)
     )
 )
@@ -104,3 +104,13 @@
 (define-fun @Validate-String ((v String)) Bool (<= (str.len v) SMV_STR_LENGTH))
 
 ;;no content -- ;;--VALIDATE_PREDICATES--;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+(declare-const x (@EList-2 Int Nat))
+(declare-const res (@Result (@EList-2 Int Nat)))
+(assert (= res (Main@main x)))
+(assert (= res ((as @Result-err (@Result (@EList-2 Int Nat))) @err-other)))
+
+(check-sat)
+(get-model) 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -3,7 +3,7 @@ declare namespace Main;
 
 public function main(x: (|Int,Nat|)): (|Int,Nat|) {
 
-	assert \/(x.0 !== 3i, x.1 !== 5n);
+	assert /\(x.0 == 3i, x.1 == 20n);
 
 	return x;
 }

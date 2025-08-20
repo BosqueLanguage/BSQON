@@ -1,5 +1,5 @@
 {
-    "fname": "Main::testOpOnSample",
+    "fname": "Main::singleOpFailure",
     "args": [
         {
             "name": "op",

@@ -18,25 +18,22 @@
 BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
     : asm_info(asm_info), mock_json(mock_json), s(sol)
 {
-	std::unordered_map<std::string, z3::func_decl> fn_map = buildMockMap();
+    std::unordered_map<std::string, z3::func_decl> fn_map = buildMockMap();
     this->fn_map = fn_map;
 
     std::string mock_name = tKeyToSmtName(mock_json["fname"], SMT_TYPE);
-    if(fn_map.find(mock_name) == fn_map.end()){
-		printf("%s, not present in .smt2 file.\n",mock_name.c_str());
-		exit(1);
-	}
-	z3::func_decl mock_fn = fn_map.at(mock_name);
+    if(fn_map.find(mock_name) == fn_map.end()) {
+        printf("%s, not present in .smt2 file.\n", mock_name.c_str());
+        exit(1);
+    }
+    z3::func_decl mock_fn = fn_map.at(mock_name);
 
     std::map<std::string, std::pair<z3::expr, bsqon::Type*>> arg_map = getArgMap(mock_fn);
 
     z3::expr mock_ex = addArgsToMock(mock_fn, arg_map);
 
-    z3::expr_vector arg_values(this->s.ctx());
-    std::vector<bsqon::Value*> arg_bsq_values;
-
     uint ith_arg = 0;
-	printf("| MOCK %s |\n",mock_name.c_str());
+    printf("| MOCK %s |\n", mock_name.c_str());
     printf("Arguments:\n");
     for(const auto& [id, arg_sig] : arg_map) {
         z3::expr arg_ex = mock_ex.arg(ith_arg++);
@@ -46,16 +43,12 @@ BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
         bsqon::Type* arg_type = arg_sig.second;
         bsqon::Value* extracted_val = extract.extractValue(arg_type, arg_ex);
         if(extracted_val == nullptr) {
-            printf("ERROR: NULL Extracted arg value | TYPE: %s \n",arg_type->tkey.c_str());
+            printf("ERROR: NULL Extracted arg value | TYPE: %s \n", arg_type->tkey.c_str());
         }
         else {
-			//TODO: Find a way to print the type tree.
-			printf("Type: %s\n", (const char*)arg_type->tkey.c_str());
-			printf("Value: %s\n", (const char*)extracted_val->toString().c_str());
+            printf("Type: %s\n", (const char*)arg_type->tkey.c_str());
+            printf("Value: %s\n", (const char*)extracted_val->toString().c_str());
         }
-
-        arg_values.push_back(arg_ex);
-        arg_bsq_values.push_back(extracted_val);
     }
 }
 
@@ -79,6 +72,7 @@ std::map<std::string, std::pair<z3::expr, bsqon::Type*>> BsqMock::getArgMap(z3::
     return arg_map;
 }
 
+// TODO: Handle recursive types better.
 z3::expr BsqMock::addArgsToMock(z3::func_decl mock, std::map<std::string, std::pair<z3::expr, bsqon::Type*>> arg_map)
 {
     z3::expr_vector args(this->s.ctx());
@@ -88,19 +82,23 @@ z3::expr BsqMock::addArgsToMock(z3::func_decl mock, std::map<std::string, std::p
         bsqon::Type* arg_type = arg_sig.second;
 
         auto validate_fn_opt = findValidator(arg_type);
-		if (validate_fn_opt.has_value()) {
-			this->s.add(validate_fn_opt.value()(arg_ex));
+        if(validate_fn_opt.has_value()) {
+            this->s.add(validate_fn_opt.value()(arg_ex));
 
-			args.push_back(arg_ex);
-		}else{
-			printf("ERROR: %s type has not validator",arg_type->tkey.c_str());
-			exit(1);
-		}
-
+            args.push_back(arg_ex);
+        }
+        else if(!validate_fn_opt.has_value() && arg_type->tag == bsqon::TypeTag::TYPE_ELIST){
+        	args.push_back(arg_ex);
+        }
+        else {
+            printf("ERROR: %s type has not validator", arg_type->tkey.c_str());
+            exit(1);
+        }
     }
 
     return mock(args);
 }
+
 
 std::optional<z3::func_decl> BsqMock::findValidator(bsqon::Type* t)
 {

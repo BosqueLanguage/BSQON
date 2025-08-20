@@ -1183,7 +1183,7 @@
     )
     (ite (is-@Term-Main@AddOp-mk op)
     (let (($op (@Term-Main@AddOp-value op)))
-        (let ((@tmp-2-1 (ite (not (Main@Database@processAdd_$_precond0 this $op)) ((as @Result-err (@Result Main@Database)) @err-other) (Main@Database@processAdd this $op)))) (ite (not (is-@Result-ok @tmp-2-1)) ((as @Result-err (@Result (@EList-2 CString Main@Database))) (@Result-etag @tmp-2-1)) (@Result-ok (@EList-2-mk "" (@Result-value @tmp-2-1)))))
+        (let ((@tmp-2-1 (ite (not (Main@Database@processAdd_$_precond0 this $op)) ((as @Result-err (@Result Main@Database)) @err-trgt) (Main@Database@processAdd this $op)))) (ite (not (is-@Result-ok @tmp-2-1)) ((as @Result-err (@Result (@EList-2 CString Main@Database))) (@Result-etag @tmp-2-1)) (@Result-ok (@EList-2-mk "" (@Result-value @tmp-2-1)))))
     )
     (ite (is-@Term-Main@ModifyOp-mk op)
     (let (($op (@Term-Main@ModifyOp-value op)))
@@ -1213,7 +1213,13 @@
     ))))
 )
 
-(define-fun Main@testOpOnSample ((op @Term)) (@Result CString)
+(define-fun Main@removeInvariant ((db Main@Database)) (@Result Bool)
+    (let ((@tmpe-rdb (Main@Database@processRemove db Main@RemoveOp-mk))) (ite (not (is-@Result-ok @tmpe-rdb))  ((as @Result-err (@Result Bool)) (@Result-etag @tmpe-rdb)) (let ((rdb (@Result-value @tmpe-rdb)))
+        (@Result-ok (> (List<Main@Entry>@size (Main@Database-entries db)) (List<Main@Entry>@size (Main@Database-entries rdb))))
+    )))
+)
+
+(define-fun Main@singleOpFailure ((op @Term)) (@Result CString)
     (let ((@tmpe-db Main@getSampleDB)) (ite (not (is-@Result-ok @tmpe-db))  ((as @Result-err (@Result CString)) (@Result-etag @tmpe-db)) (let ((db (@Result-value @tmpe-db)))
     (let ((@tmpe@mi (Main@Database@processDatabaseOperation db op))) (ite (not (is-@Result-ok @tmpe@mi))  ((as @Result-err (@Result CString)) (@Result-etag @tmpe@mi)) (let ((@mi@ (@Result-value @tmpe@mi)))
         (let ((res (@EList-2-0 @mi@))) (let ((@_ (@EList-2-1 @mi@))) 
@@ -1621,3 +1627,13 @@
     (@Validate-Main@RemoveOp (@Term-Main@RemoveOp-value v))
         false))))))))))
 )
+
+
+(declare-const @arg-op @Term) (assert (@ValidateRoot-Main@DatabaseOperation @arg-op))
+
+(declare-const @return (@Result CString))
+(assert (= @return (Main@singleOpFailure  @arg-op)))
+(assert (= @return ((as @Result-err (@Result CString)) @err-trgt)))
+
+(check-sat)
+

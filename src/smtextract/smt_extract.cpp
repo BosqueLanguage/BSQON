@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cstddef>
 #include <cstdio>
 #include <cerrno>
@@ -444,6 +445,35 @@ bsqon::Value* ValueExtractor::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::
     return nullptr;
 }
 
+bsqon::Value* ValueExtractor::extractEList(bsqon::EListType* bsq_t, z3::expr ex)
+{
+	z3::sort e_sort =  ex.get_sort(); 
+	z3::func_decl_vector e_constructs = e_sort.constructors();
+    assert(e_constructs.size() == 1);
+
+	z3::func_decl e_construct = e_constructs[0];
+	z3::func_decl_vector e_accessors = e_construct.accessors();
+
+    std::vector<bsqon::Value*> entry_values;
+
+	std::vector<bsqon::Value*> entries_values;
+	uint acc_size = e_accessors.size();
+	for(size_t i = 0; i < acc_size; ++i){
+		z3::expr entry_ex = e_accessors[i](ex); 
+		bsqon::Type* entry_t = this->asm_info->lookupTypeKey(bsq_t->entries[i]);
+
+        try {
+			bsqon::Value* entry_value = this->extractValue(entry_t, entry_ex);
+			entries_values.push_back(entry_value);
+        }
+        catch(const std::exception& e) {
+            std::cerr << "extractEntity ERR: " << e.what() << "\n";
+        }
+	}
+
+	return new bsqon::EListValue(bsq_t, FILLER_POS, std::move(entries_values));
+}
+
 bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
 {
     z3::func_decl_vector constructs = ex.get_sort().constructors();
@@ -452,23 +482,23 @@ bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::exp
     z3::func_decl c = constructs[0];
     z3::func_decl_vector c_accs = c.accessors();
 
-    std::vector<bsqon::Value*> fieldvalues;
+    std::vector<bsqon::Value*> field_values;
     uint acc_size = c_accs.size();
-    for(size_t j = 0; j < acc_size; j++) {
+    for(size_t j = 0; j < acc_size; ++j) {
         bsqon::EntityTypeFieldEntry field_tk = bsq_t->fields[j];
         bsqon::Type* field_t = this->asm_info->lookupTypeKey(field_tk.ftype);
 
         z3::expr field_acc = c_accs[j](ex);
         try {
             bsqon::Value* field_val = this->extractValue(field_t, field_acc);
-            fieldvalues.push_back(field_val);
+            field_values.push_back(field_val);
         }
         catch(const std::exception& e) {
             std::cerr << "extractEntity ERR: " << e.what() << "\n";
         }
     }
 
-    return new bsqon::EntityValue(bsq_t, FILLER_POS, std::move(fieldvalues));
+    return new bsqon::EntityValue(bsq_t, FILLER_POS, std::move(field_values));
 }
 
 bsqon::Value* ValueExtractor::extractSome(bsqon::SomeType* bsq_t, z3::expr ex)
@@ -589,7 +619,7 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
             vals.push_back(ith_val);
         }
         catch(const std::exception& e) {
-            std::cerr << "extractEntity ERR: " << e.what() << "\n";
+            std::cerr << "extractList ERR: " << e.what() << "\n";
         }
     }
 
@@ -677,74 +707,6 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     return new bsqon::ErrorValue(bsq_t, FILLER_POS);
 }
 
-bsqon::Value* ValueExtractor::extractEList(bsqon::EListType* bsq_t, z3::expr ex)
-{
-    z3::sort list_dt_sort = ex.get_sort();
-    z3::func_decl list_dt_construct = list_dt_sort.constructors()[0];
-
-    z3::func_decl list_dt_accs = list_dt_construct.accessors()[0];
-
-    z3::expr list_term_ex = list_dt_accs(ex);
-    z3::sort terms = list_term_ex.get_sort();
-    z3::func_decl_vector list_mks = terms.constructors();
-    z3::func_decl_vector list_recogs = terms.recognizers();
-
-    auto n_list = findConstruct(list_mks, list_recogs, list_term_ex).value();
-    z3::func_decl list_n_mk_term = n_list.first;
-    z3::func_decl list_n_rg_term = n_list.second;
-
-    this->s.add(list_n_rg_term(list_term_ex));
-
-    z3::expr list_n_ops = list_n_mk_term.accessors()[0](list_term_ex);
-
-    z3::sort list_n_ops_sort = list_n_ops.get_sort();
-    z3::func_decl list_n_ops_construct = list_n_ops_sort.constructors()[0];
-    z3::func_decl_vector list_n_ops_accs = list_n_ops_construct.accessors();
-
-    std::vector<bsqon::Value*> vals;
-    size_t list_size = list_n_ops_construct.arity();
-	assert(list_size > 1);
-	assert(list_size < 5);
-    z3::sort list_of_type = list_n_ops_accs[0].range();
-    z3::expr list_n = this->s.ctx().constant("tmp", list_of_type);
-
-    if(list_size == 2) {
-        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
-        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
-        list_n = list_n_ops_construct(unin_1,unin_2);
-    }
-    else if(list_size == 3) {
-        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
-        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
-        z3::expr unin_3 = this->s.ctx().constant("unin_3", list_of_type);
-        list_n = list_n_ops_construct(unin_1, unin_2,unin_3);
-    }
-    else if(list_size == 4) {
-        z3::expr unin_1 = this->s.ctx().constant("unin_1", list_of_type);
-        z3::expr unin_2 = this->s.ctx().constant("unin_2", list_of_type);
-        z3::expr unin_3 = this->s.ctx().constant("unin_3", list_of_type);
-        z3::expr unin_4 = this->s.ctx().constant("unin_4", list_of_type);
-        list_n = list_n_ops_construct(unin_1, unin_2, unin_3,unin_4);
-    }
-
-    this->s.add(list_n == list_n_ops);
-
-    for(size_t i = 0; i < list_n.args().size(); ++i) {
-        bsqon::Type* list_t = this->asm_info->lookupTypeKey(bsq_t->entries[i]);
-
-        z3::expr list_ith_val = list_n_ops_accs[i](list_n);
-        this->s.add(list_n.args()[i] == list_ith_val);
-        try {
-            bsqon::Value* ith_val = this->extractValue(list_t, list_ith_val);
-            vals.push_back(ith_val);
-        }
-        catch(const std::exception& e) {
-            std::cerr << "extractEntity ERR: " << e.what() << "\n";
-        }
-    }
-
-    return new bsqon::EListValue(bsq_t, FILLER_POS, std::move(vals));
-}
 
 bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3::expr ex)
 {

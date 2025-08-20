@@ -47,7 +47,7 @@ class BsqMock
     std::optional<z3::func_decl> findValidator(bsqon::Type* t);
 };
 
-class ValueExtractor
+class ValueExtractor 
 {
   public:
     bsqon::AssemblyInfo* asm_info;
