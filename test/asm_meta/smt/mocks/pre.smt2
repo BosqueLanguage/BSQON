@@ -5,7 +5,7 @@
 (declare-datatypes () ((@ErrTag @err-trgt @err-other)))
 
 (declare-datatype @Result (par (T) (
-    (@Result-err (@Result-etag @ErrTag)) 
+    (@Result-err (@Result-etag @ErrTag))
     (@Result-ok (@Result-value T))
 )))
 
@@ -21,7 +21,7 @@
 )
 
 ;;
-;; Primitive datatypes 
+;; Primitive datatypes
 ;;
 (declare-datatype None ((none)))
 ;;Bool is Bool
@@ -41,7 +41,7 @@
 (declare-datatype Main@USER_ADDRESS ( (Main@USER_ADDRESS-mk (Main@USER_ADDRESS-value CString)) ))
 
 ;;
-;; Entity datatypes 
+;; Entity datatypes
 ;;
 (declare-datatypes (
     (Some<Main@EMAIL> 0)
@@ -281,23 +281,3 @@
 (define-fun @ValidateRoot-Main@UserDTO ((v Main@UserDTO)) Bool
     (@Validate-Main@UserDTO v)
 )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;Find some way to make all of the functions visible in the API.
-
-;;Only used to expose Main@getCustomer to the extractor...
-
-(declare-const customer_id Int)
-(assert (> customer_id 0))
-(assert (@Validate-Int customer_id))
-(declare-const return_val (@Result Main@UserDTO))
-
-;;MockgetCustomer is required to expose the functions to the cpp API z3::model.
-(declare-fun MockTest (Int) (@Result Main@UserDTO))
-(assert (= (MockTest customer_id) (Main@getCustomer customer_id)))
-(assert (= return_val (MockTest customer_id)))
-
-
-(check-sat)
-(get-model)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,0 +1,12 @@
+{
+    "fname": "Main::main",
+    "args": [
+        {
+            "name": "x",
+            "type": "(|Int, Nat|)"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "(|Int, Nat|)"
+}

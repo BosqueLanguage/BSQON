@@ -1780,6 +1780,7 @@ namespace bsqon
                    u8'}';
         }
 
+		//TODO: Still needs conversion to SMTLIB.
         virtual std::u8string toSMTLib() const override
         {
             return std::u8string(this->vtype->tkey.cbegin(), this->vtype->tkey.cend()) + u8'{' + this->v->toString() +

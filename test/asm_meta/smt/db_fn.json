@@ -1,0 +1,12 @@
+{
+    "fname": "Main::singleOpFailure",
+    "args": [
+        {
+            "name": "op",
+            "type": "Main::DatabaseOperation"
+        }
+    ],
+    "precondition": [],
+    "postcondition": [],
+    "return": "CString"
+}
