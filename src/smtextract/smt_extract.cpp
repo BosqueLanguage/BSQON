@@ -807,6 +807,7 @@ std::optional<std::pair<z3::func_decl, z3::func_decl>> ValueExtractor::findConst
                                                                                      z3::expr ex)
 {
     std::optional<std::pair<z3::func_decl, z3::func_decl>> term;
+	//NOTE: Need the last sat recognizer. As ex is sat for all lists recognizer <= its size.
     for(size_t i = 0; i < recognizers.size(); ++i) {
         z3::func_decl recognize = recognizers[i];
         this->s.push();

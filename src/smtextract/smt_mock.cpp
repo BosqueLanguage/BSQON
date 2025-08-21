@@ -18,36 +18,32 @@
 BsqMock::BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
     : asm_info(asm_info), mock_json(mock_json), s(sol)
 {
-    std::unordered_map<std::string, z3::func_decl> fn_map = buildMockMap();
-    this->fn_map = fn_map;
+    for(auto& arg : mock_json["args"]) {
+        std::string arg_id = arg["name"];
+        std::string arg_type = arg["type"];
 
-    std::string mock_name = tKeyToSmtName(mock_json["fname"], SMT_TYPE);
-    if(fn_map.find(mock_name) == fn_map.end()) {
-        printf("%s, not present in .smt2 file.\n", mock_name.c_str());
-        exit(1);
-    }
-    z3::func_decl mock_fn = fn_map.at(mock_name);
-
-    std::map<std::string, std::pair<z3::expr, bsqon::Type*>> arg_map = getArgMap(mock_fn);
-
-    z3::expr mock_ex = addArgsToMock(mock_fn, arg_map);
-
-    uint ith_arg = 0;
-    printf("| MOCK %s |\n", mock_name.c_str());
-    printf("Arguments:\n");
-    for(const auto& [id, arg_sig] : arg_map) {
-        z3::expr arg_ex = mock_ex.arg(ith_arg++);
-
-        ValueExtractor extract(asm_info, sol);
-
-        bsqon::Type* arg_type = arg_sig.second;
-        bsqon::Value* extracted_val = extract.extractValue(arg_type, arg_ex);
-        if(extracted_val == nullptr) {
-            printf("ERROR: NULL Extracted arg value | TYPE: %s \n", arg_type->tkey.c_str());
+        if(this->s.check() != z3::sat) {
+            printf("Unsat .smt2 file\n");
+            exit(1);
         }
-        else {
-            printf("Type: %s\n", (const char*)arg_type->tkey.c_str());
-            printf("Value: %s\n", (const char*)extracted_val->toString().c_str());
+
+        z3::model m = this->s.get_model();
+        uint consts = m.num_consts();
+        assert(consts > 0);
+        for(uint i = 0; i < consts; ++i) {
+            z3::func_decl c = m.get_const_decl(i);
+			//TODO: Ask to use no "@arg", since without it we get -20s in runtime.
+            if(c.name().str() == ("@arg-" + arg_id)) {
+                z3::expr c_ex = c();
+                std::cout << c << "\n";
+                bsqon::Type* c_type = this->asm_info->lookupTypeKey(arg_type);
+
+                ValueExtractor extract(asm_info, sol);
+
+                bsqon::Value* c_val = extract.extractValue(c_type, c_ex);
+                printf("Type: %s\n", (const char*)c_type->tkey.c_str());
+                printf("Value: %s\n", (const char*)c_val->toString().c_str());
+            }
         }
     }
 }
@@ -87,8 +83,8 @@ z3::expr BsqMock::addArgsToMock(z3::func_decl mock, std::map<std::string, std::p
 
             args.push_back(arg_ex);
         }
-        else if(!validate_fn_opt.has_value() && arg_type->tag == bsqon::TypeTag::TYPE_ELIST){
-        	args.push_back(arg_ex);
+        else if(!validate_fn_opt.has_value() && arg_type->tag == bsqon::TypeTag::TYPE_ELIST) {
+            args.push_back(arg_ex);
         }
         else {
             printf("ERROR: %s type has not validator", arg_type->tkey.c_str());
@@ -98,7 +94,6 @@ z3::expr BsqMock::addArgsToMock(z3::func_decl mock, std::map<std::string, std::p
 
     return mock(args);
 }
-
 
 std::optional<z3::func_decl> BsqMock::findValidator(bsqon::Type* t)
 {
@@ -122,6 +117,7 @@ std::optional<z3::func_decl> BsqMock::findValidator(bsqon::Type* t)
     return std::nullopt;
 }
 
+// Return functions and it func_decl and arguments used.
 std::unordered_map<std::string, z3::func_decl> BsqMock::buildMockMap()
 {
     std::unordered_map<std::string, z3::func_decl> fn_map;
