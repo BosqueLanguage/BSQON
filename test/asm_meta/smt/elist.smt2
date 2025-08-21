@@ -105,12 +105,13 @@
 
 ;;no content -- ;;--VALIDATE_PREDICATES--;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
-(declare-const x (@EList-2 Int Nat))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare-const @arg-x (@EList-2 Int Nat))
 (declare-const res (@Result (@EList-2 Int Nat)))
-(assert (= res (Main@main x)))
+
+(assert (= res (Main@main @arg-x)))
 (assert (= res ((as @Result-err (@Result (@EList-2 Int Nat))) @err-other)))
 
 (check-sat)
-(get-model) 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(get-model)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

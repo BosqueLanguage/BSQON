@@ -467,7 +467,7 @@ bsqon::Value* ValueExtractor::extractEList(bsqon::EListType* bsq_t, z3::expr ex)
 			entries_values.push_back(entry_value);
         }
         catch(const std::exception& e) {
-            std::cerr << "extractEntity ERR: " << e.what() << "\n";
+            std::cerr << "extractEList ERR: " << e.what() << "\n";
         }
 	}
 
@@ -724,19 +724,14 @@ bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3
     z3::func_decl term_acc = term_mk.accessors()[0];
     z3::expr term_ex = term_acc(ex);
 
-    z3::sort term_sort = term_ex.get_sort();
-    z3::expr term_ex_val = term_sort.constructors()[0]();
-
-    this->s.add(term_ex == term_ex_val);
-
     size_t pos = 0;
-    std::string type_sort = term_ex_val.get_sort().to_string();
+    std::string type_sort = term_ex.get_sort().to_string();
     while((pos = type_sort.find("@", pos)) != std::string::npos) {
         type_sort.replace(pos, 1, "::");
     }
 
     bsqon::Type* t = this->asm_info->lookupTypeKey(type_sort);
-    return extractValue(t, term_ex_val);
+    return extractValue(t, term_ex);
 }
 
 ValueExtractor::ValueExtractor(bsqon::AssemblyInfo* asm_info, z3::solver& solver) : asm_info(asm_info), s(solver)
@@ -807,6 +802,7 @@ std::optional<std::pair<z3::func_decl, z3::func_decl>> ValueExtractor::findConst
                                                                                      z3::expr ex)
 {
     std::optional<std::pair<z3::func_decl, z3::func_decl>> term;
+	//NOTE: Need the last sat recognizer. As ex is sat for all lists recognizer <= its size.
     for(size_t i = 0; i < recognizers.size(); ++i) {
         z3::func_decl recognize = recognizers[i];
         this->s.push();

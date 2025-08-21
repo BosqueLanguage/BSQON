@@ -1636,4 +1636,3 @@
 (assert (= @return ((as @Result-err (@Result CString)) @err-trgt)))
 
 (check-sat)
-
