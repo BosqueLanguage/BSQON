@@ -116,7 +116,7 @@ int main(int argc, char** argv)
         // }
     }
     else if(mode == "-m" || mode == "--mock") {
-        BsqMock mock(&asm_info, fn_json, sol);
+        runMock(&asm_info, fn_json, sol);
     }
     else {
         std::string err = mode + " is not a valid <MODE>.";
@@ -125,4 +125,34 @@ int main(int argc, char** argv)
 
     Z3_finalize_memory();
     return 0;
+}
+
+void runMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol)
+{
+    for(auto& arg : mock_json["args"]) {
+        std::string arg_id = arg["name"];
+        std::string arg_type = arg["type"];
+
+        if(sol.check() != z3::sat) {
+            printf("Unsat .smt2 file\n");
+            exit(1);
+        }
+
+        z3::model m = sol.get_model();
+        uint consts = m.num_consts();
+        assert(consts > 0);
+        for(uint i = 0; i < consts; ++i) {
+            z3::func_decl c = m.get_const_decl(i);
+            if(c.name().str() == ("@arg-" + arg_id)) {
+				ValueExtractor extract(asm_info, sol);
+
+				bsqon::Type* c_type = asm_info->lookupTypeKey(arg_type);
+				z3::expr c_ex = c();
+				
+				bsqon::Value* c_val = extract.extractValue(c_type, c_ex);
+				printf("Type: %s\n", (const char*)c_type->tkey.c_str());
+				printf("Value: %s\n", (const char*)c_val->toString().c_str());
+            }
+        }
+    }
 }

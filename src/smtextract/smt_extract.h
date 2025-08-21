@@ -28,24 +28,7 @@
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
 std::string valueToSMTStr(std::string id, bsqon::Value* val);
-
-class BsqMock
-{
-  public:
-    bsqon::AssemblyInfo* asm_info;
-    json mock_json;
-    z3::solver& s;
-    bsqon::Value* mock_val;
-    z3::expr* mock_fn;
-    std::unordered_map<std::string, z3::func_decl> fn_map;
-
-    BsqMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol);
-
-    std::map<std::string, std::pair<z3::expr, bsqon::Type*>> getArgMap(z3::func_decl mock_fn);
-    std::unordered_map<std::string, z3::func_decl> buildMockMap();
-    z3::expr addArgsToMock(z3::func_decl mock, std::map<std::string, std::pair<z3::expr, bsqon::Type*>> arg_map);
-    std::optional<z3::func_decl> findValidator(bsqon::Type* t);
-};
+void runMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol);
 
 class ValueExtractor 
 {

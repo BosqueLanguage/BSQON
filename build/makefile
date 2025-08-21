@@ -66,8 +66,8 @@ GEN_SOURCES=$(GEN_DIR)component.cpp $(GEN_DIR)generator_rnd.cpp $(GEN_DIR)/gener
 GEN_OBJS=$(OUT_OBJ)component.o $(OUT_OBJ)generator_rnd.o $(OUT_OBJ)generator_ai.o
 
 SMT_HEADERS=$(SMT_DIR)smt_extract.h
-SMT_SOURCES=$(SMT_DIR)smt_extract.cpp $(SMT_DIR)smt_mock.cpp
-SMT_OBJS=$(OUT_OBJ)smt_extract.o $(OUT_OBJ)smt_mock.o
+SMT_SOURCES=$(SMT_DIR)smt_extract.cpp
+SMT_OBJS=$(OUT_OBJ)smt_extract.o
 
 SMT_TEST_SOURCES= $(BSQON_TEST_DIR)smt_test_driver.cpp $(SMT_TEST_SRC_DIR)extract_prim.cpp $(SMT_TEST_SRC_DIR)extract_dt.cpp $(SMT_TEST_SRC_DIR)extract_concepts.cpp $(SMT_TEST_SRC_DIR)main.cpp $(SMT_TEST_SRC_DIR)generate_prim.cpp $(SMT_TEST_SRC_DIR)generate_concepts.cpp
 BSQON_TEST_SOURCES=$(BSQON_TEST_DIR)test_driver.cpp $(BSQON_TEST_SRC_DIR)main.cpp $(BSQON_TEST_SRC_DIR)primitives.cpp $(BSQON_TEST_SRC_DIR)strings.cpp $(BSQON_TEST_SRC_DIR)typealias.cpp $(BSQON_TEST_SRC_DIR)specials.cpp $(BSQON_TEST_SRC_DIR)entity.cpp $(BSQON_TEST_SRC_DIR)datatype.cpp $(BSQON_TEST_SRC_DIR)collections.cpp $(BSQON_TEST_SRC_DIR)mixed.cpp
@@ -154,10 +154,6 @@ $(OUT_OBJ)lex.yy.c: $(CFG_HEADERS) $(CFG_SOURCES)
 $(OUT_EXE)smtextract: $(SMT_HEADERS) $(OUT_EXE)libbsqon.a $(SMT_DIR)smt_main.cpp $(SMT_OBJS)
 	@mkdir -p $(OUT_EXE)
 	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -L$(Z3_PATH) -L$(BREX_PATH) -L$(LIB_PATH) -o $(OUT_EXE)smtextract $(SMT_OBJS) $(SMT_DIR)smt_main.cpp -lbsqon -lbrex -lgmp -lcurl -lz3 #-lfl, caused build err.
-
-$(OUT_OBJ)smt_mock.o: $(SMT_HEADERS) $(SMT_SOURCES)
-	@mkdir -p $(OUT_OBJ)
-	$(CPP) $(CPPFLAGS) $(JSON_INCLUDES) $(BREX_INCLUDES) $(Z3_INCLUDES) -o $(OUT_OBJ)smt_mock.o -c $(SMT_DIR)smt_mock.cpp
 
 $(OUT_OBJ)smt_extract.o: $(SMT_HEADERS) $(SMT_SOURCES)
 	@mkdir -p $(OUT_OBJ)
