@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.bosque</groupId>
-	<artifactId>forecast</artifactId>
+	<artifactId>rental</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>forecast</name>
+	<name>rental</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -40,15 +40,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependencies>
 		<!-- Your other dependencies -->
 
 		<!-- Mockito Dependency -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.12.0</version>
-			<scope>test</scope>
+			<version>5.19.0</version>
 		</dependency>
 	</dependencies>
 

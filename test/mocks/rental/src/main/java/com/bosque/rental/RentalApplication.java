@@ -1,15 +1,14 @@
+package com.bosque.rental;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 enum Reason {
 	approved,
 	insufficientAvailability,
 	closedDueToConditions,
 }
 
-enum WindCategory {
-    calm,
-    windy,
-    high,
-    dangerous
-}
 
 class Decision {
 	public final int val;
@@ -19,86 +18,18 @@ class Decision {
 		this.val = val;
 		this.reason = reason;
 	}
-}
 
-class TempRange{
-	int high;
-	int low;
+	public int getVal(){
+		return this.val;
+	}
 
-	public TempRange(int high, int low){
-		this.high = high;
-		this.low = low;
-
-		assert this.low <= this.high : "Low temp must not be higher than high temp";
+	public Reason getReason(){
+		return this.reason;
 	}
 }
 
-enum WindDirection{
-	north,
-    south,
-    east,
-    west
-}
-
-class WindSpeedInfo{
-	int min;
-	int max;
-
-	WindDirection winddirection;
-
-	public WindSpeedInfo(int min, int max, WindDirection winddirection){
-		this.min = min;
-		this.max = max;
-		this.winddirection = winddirection;
-
-		assert this.min <= this.max : "Min wind speed must not be higher than max wind speed";
-	}
-}
-
-enum ForecastDetail {
-    sun,
-    showers,
-    thunderstorms,
-    snow,
-    fog
-}
-
-class Forecast{
-	TempRange temp;
-	WindSpeedInfo winds;
-	ForecastDetail info;
-
-	public Forecast(TempRange temp, WindSpeedInfo winds, ForecastDetail info){
-		this.temp = temp;
-		this.winds = winds;
-		this.info = info;
-	}
-}
-
-class RentalAvailabilityInfo {
-    int inventory;
-    int reservations;
-    int returns;
-
-
-	public RentalAvailabilityInfo(int inventory, int reservations, int returns){
-		this.inventory = inventory;
-		this.reservations = reservations;
-		this.returns = returns;
-
-		assert (this.inventory + this.returns) >= this.reservations : "Total inventory must be larger than the number of reservations.";
-	}
-}
-
-public class RentalDecision{
-
-	public static Forecast getForecast(){
-		//TODO: Implement
-	}
-
-	public static RentalAvailabilityInfo getRentalAvailabilityInfo(){
-		//TODO: Implement
-	}
+@SpringBootApplication
+public class RentalApplication {
 
 	public static WindCategory categorizeWinds(int windSpeed){
 		if(windSpeed < 10) {
@@ -140,11 +71,10 @@ public class RentalDecision{
 	}
 
 	public static void main(String[] args){
-		int requestedQuantity = 0; 
+		SpringApplication.run(RentalApplication.class, args);
+
+		int requestedQuantity = 3; 
 		boolean allowPartials = false;
-		
-		Forecast forecast = getForecast();
-		RentalAvailabilityInfo rentalinfo = getRentalAvailabilityInfo();
 
 		Decision decision = decideRental(forecast,rentalinfo,requestedQuantity,allowPartials);
 
