@@ -94,5 +94,5 @@ class Forecast{
 }
 
 public abstract class ForecastService {
-	abstract Forecast getForecast();
+	abstract Forecast getForecast(String iatacode);
 }
