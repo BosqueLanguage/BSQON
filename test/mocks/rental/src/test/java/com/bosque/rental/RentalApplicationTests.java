@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import net.bytebuddy.agent.ByteBuddyAgent.AttachmentProvider.ForEmulatedAttachment;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
@@ -13,133 +15,132 @@ import java.util.Map;
 @SpringBootTest
 class RentalApplicationTests extends RentalApplication {
 
+	Map<String, Forecast> forecasts = Map.of(
+			"XPL", new Forecast(
+					new TempRange(87, 65),
+					new WindSpeedInfo(40, 70, WindDirection.east),
+					ForecastDetail.thunderstorms),
+			"JFK", new Forecast(
+					new TempRange(82, 76),
+					new WindSpeedInfo(12, 30, WindDirection.west),
+					ForecastDetail.snow),
+			"FRA", new Forecast(
+					new TempRange(61, 50),
+					new WindSpeedInfo(22, 80, WindDirection.south),
+					ForecastDetail.fog),
+			"AOR", new Forecast(
+					new TempRange(71, 60),
+					new WindSpeedInfo(11, 20, WindDirection.north),
+					ForecastDetail.sun),
+			"AID", new Forecast(
+					new TempRange(80, 78),
+					new WindSpeedInfo(15, 20, WindDirection.east),
+					ForecastDetail.showers));
+
 	@Test
-	void testRentalDecisionFailure(){
+	void testRentalDecisionFailure() {
 		RentalInfoService rentalinfoservice = mock();
 		when(rentalinfoservice.getRentalAvailabilityInfo())
-			.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
+				.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
 
 		RentalAvailabilityInfo rentalinfo = rentalinfoservice.getRentalAvailabilityInfo();
 		verify(rentalinfoservice).getRentalAvailabilityInfo();
 
+		String iata = "JFK";
 		ForecastService forecastservice = mock();
-		when(forecastservice.getForecast("JFK"))
-			.thenReturn( new Forecast(
-				new TempRange(82, 76),
-				new WindSpeedInfo(12, 30, WindDirection.west),
-				ForecastDetail.snow));
 
-		Forecast forecast = forecastservice.getForecast("JFK");
-		verify(forecastservice).getForecast("JFK");
+		when(forecastservice.getForecast(iata))
+				.thenReturn(forecasts.get(iata));
 
+		Forecast forecast = forecastservice.getForecast(iata);
+		verify(forecastservice).getForecast(iata);
 
-		int requestedQuantity = 500;
+		int requestedQuantity = 22;
 		boolean allowPartials = true;
 
-		Decision decision = decideRental(forecast,rentalinfo,requestedQuantity,allowPartials);
+		Decision decision = decideRental(forecast, rentalinfo, requestedQuantity, allowPartials);
 
-		if(decision.reason == Reason.approved){
+		if (decision.reason == Reason.approved) {
 			assert decision.val <= (rentalinfo.inventory + rentalinfo.returns) - rentalinfo.reservations;
 		}
 
-		if(decision.reason == Reason.approved && !allowPartials){
+		if (decision.reason == Reason.approved && !allowPartials) {
 			assert decision.val == requestedQuantity;
 		}
+
+		assertEquals(Reason.closedDueToConditions, decision.reason);
 	}
 
 	@Test
-	void testRentalDecisionSuccess(){
+	void testRentalDecisionSuccess() {
 		RentalInfoService rentalinfoservice = mock();
 		when(rentalinfoservice.getRentalAvailabilityInfo())
-			.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
+				.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
 
 		RentalAvailabilityInfo rentalinfo = rentalinfoservice.getRentalAvailabilityInfo();
 		verify(rentalinfoservice).getRentalAvailabilityInfo();
 
+		String iata = "AOR";
+
 		ForecastService forecastservice = mock();
-		when(forecastservice.getForecast("JFK"))
-			.thenReturn( new Forecast(
-				new TempRange(82, 76),
-				new WindSpeedInfo(12, 30, WindDirection.west),
-				ForecastDetail.snow));
+		when(forecastservice.getForecast(iata))
+				.thenReturn(forecasts.get(iata));
 
-		Forecast forecast = forecastservice.getForecast("JFK");
-		verify(forecastservice).getForecast("JFK");
-
+		Forecast forecast = forecastservice.getForecast(iata);
+		verify(forecastservice).getForecast(iata);
 
 		int requestedQuantity = 20;
 		boolean allowPartials = true;
 
-		Decision decision = decideRental(forecast,rentalinfo,requestedQuantity,allowPartials);
+		Decision decision = decideRental(forecast, rentalinfo, requestedQuantity, allowPartials);
 
-		if(decision.reason == Reason.approved){
+		if (decision.reason == Reason.approved) {
 			assert decision.val <= (rentalinfo.inventory + rentalinfo.returns) - rentalinfo.reservations;
 		}
 
-		if(decision.reason == Reason.approved && !allowPartials){
+		if (decision.reason == Reason.approved && !allowPartials) {
 			assert decision.val == requestedQuantity;
 		}
+
+		assertEquals(Reason.approved, decision.reason);
 	}
 
 	@Test
-	void testGetForecastService(){
-		Map<String, Forecast> forecasts = Map.of(
-			"XPL", new Forecast(
-				new TempRange(87, 65),
-				new WindSpeedInfo(40, 70, WindDirection.east),
-				ForecastDetail.thunderstorms),
-			"JFK", new Forecast(
-				new TempRange(82, 76),
-				new WindSpeedInfo(12, 30, WindDirection.west),
-				ForecastDetail.snow),
-			"FRA", new Forecast(
-				new TempRange(61, 50),
-				new WindSpeedInfo(22, 80, WindDirection.south),
-				ForecastDetail.fog),
-			"AOR", new Forecast(
-				new TempRange(71, 60),
-				new WindSpeedInfo(31, 70, WindDirection.north),
-				ForecastDetail.sun),
-			"AID", new Forecast(
-				new TempRange(80, 78),
-				new WindSpeedInfo(15, 20, WindDirection.east),
-				ForecastDetail.showers)
-		);
+	void testGetForecastService() {
 
 		ForecastService forecastservice = mock();
 
-		forecasts.forEach((iata,forecast) -> 
-			{
-				when(forecastservice.getForecast(iata))
+		forecasts.forEach((iata, forecast) -> {
+			when(forecastservice.getForecast(iata))
 					.thenReturn(forecast);
 
-				Forecast mckforecast = forecastservice.getForecast(iata);
-				assert mckforecast.temp.high == forecast.temp.high;
-				assert mckforecast.temp.low == forecast.temp.low;
+			Forecast mckforecast = forecastservice.getForecast(iata);
+			assert mckforecast.temp.high == forecast.temp.high;
+			assert mckforecast.temp.low == forecast.temp.low;
 
-				assert mckforecast.winds.min == forecast.winds.min;
-				assert mckforecast.winds.max == forecast.winds.max;
-				assert mckforecast.winds.winddirection == forecast.winds.winddirection;
+			assert mckforecast.winds.min == forecast.winds.min;
+			assert mckforecast.winds.max == forecast.winds.max;
+			assert mckforecast.winds.winddirection == forecast.winds.winddirection;
 
-				assert mckforecast.info == forecast.info;
+			assert mckforecast.info == forecast.info;
 
-				verify(forecastservice).getForecast(iata);
-			});
+			verify(forecastservice).getForecast(iata);
+		});
 	}
 
-	@Test 
-	void testGetRentalInfoService(){
+	@Test
+	void testGetRentalInfoService() {
 		RentalInfoService rentalservice = mock();
 
-        when(rentalservice.getRentalAvailabilityInfo())
-            .thenReturn(new RentalAvailabilityInfo(30, 20, 2));
+		when(rentalservice.getRentalAvailabilityInfo())
+				.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
 
-        RentalAvailabilityInfo info = rentalservice.getRentalAvailabilityInfo();
+		RentalAvailabilityInfo info = rentalservice.getRentalAvailabilityInfo();
 
-        assert info.inventory == 30;
-        assert info.reservations == 20;
-        assert info.returns == 2;
+		assert info.inventory == 30;
+		assert info.reservations == 20;
+		assert info.returns == 2;
 
-        verify(rentalservice).getRentalAvailabilityInfo();
+		verify(rentalservice).getRentalAvailabilityInfo();
 	}
 }
