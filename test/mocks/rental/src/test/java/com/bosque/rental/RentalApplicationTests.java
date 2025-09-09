@@ -1,19 +1,24 @@
 package com.bosque.rental;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import net.bytebuddy.agent.ByteBuddyAgent.AttachmentProvider.ForEmulatedAttachment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.mockito.Mock;
 import static org.mockito.Mockito.*;
+
 
 import java.util.Map;
 
 @SpringBootTest
 class RentalApplicationTests extends RentalApplication {
+
+	@Mock
+	RentalInfoService rentalinfoservice;
+
+	@Mock
+	ForecastService forecastservice;
 
 	Map<String, Forecast> forecasts = Map.of(
 			"XPL", new Forecast(
@@ -39,7 +44,6 @@ class RentalApplicationTests extends RentalApplication {
 
 	@Test
 	void testRentalDecisionFailure() {
-		RentalInfoService rentalinfoservice = mock();
 		when(rentalinfoservice.getRentalAvailabilityInfo())
 				.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
 
@@ -47,7 +51,6 @@ class RentalApplicationTests extends RentalApplication {
 		verify(rentalinfoservice).getRentalAvailabilityInfo();
 
 		String iata = "JFK";
-		ForecastService forecastservice = mock();
 
 		when(forecastservice.getForecast(iata))
 				.thenReturn(forecasts.get(iata));
@@ -73,7 +76,6 @@ class RentalApplicationTests extends RentalApplication {
 
 	@Test
 	void testRentalDecisionSuccess() {
-		RentalInfoService rentalinfoservice = mock();
 		when(rentalinfoservice.getRentalAvailabilityInfo())
 				.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
 
@@ -82,7 +84,6 @@ class RentalApplicationTests extends RentalApplication {
 
 		String iata = "AOR";
 
-		ForecastService forecastservice = mock();
 		when(forecastservice.getForecast(iata))
 				.thenReturn(forecasts.get(iata));
 
@@ -108,7 +109,6 @@ class RentalApplicationTests extends RentalApplication {
 	@Test
 	void testGetForecastService() {
 
-		ForecastService forecastservice = mock();
 
 		forecasts.forEach((iata, forecast) -> {
 			when(forecastservice.getForecast(iata))
@@ -130,17 +130,16 @@ class RentalApplicationTests extends RentalApplication {
 
 	@Test
 	void testGetRentalInfoService() {
-		RentalInfoService rentalservice = mock();
 
-		when(rentalservice.getRentalAvailabilityInfo())
+		when(rentalinfoservice.getRentalAvailabilityInfo())
 				.thenReturn(new RentalAvailabilityInfo(30, 20, 2));
 
-		RentalAvailabilityInfo info = rentalservice.getRentalAvailabilityInfo();
+		RentalAvailabilityInfo info = rentalinfoservice.getRentalAvailabilityInfo();
 
 		assert info.inventory == 30;
 		assert info.reservations == 20;
 		assert info.returns == 2;
 
-		verify(rentalservice).getRentalAvailabilityInfo();
+		verify(rentalinfoservice).getRentalAvailabilityInfo();
 	}
 }
