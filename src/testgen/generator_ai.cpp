@@ -380,28 +380,33 @@ json callAPIWithPrompt(std::string prompt)
     //TODO: Temp debugging output
     std::cout << "---- Prompting with ----" << std::endl << prompt << std::endl;
 
-    std::string OPENAI_KEY = getenv("OPENAI_CHATGPT_API_KEY") ? getenv("OPENAI_CHATGPT_API_KEY") : "";
-    std::string DEEPSEEK_API_KEY = getenv("DEEPSEEK_API_KEY") ? getenv("DEEPSEEK_API_KEY") : "";
+    static const std::string OPENAI_URL   = "https://api.openai.com/v1/chat/completions";
+    static const std::string OPENAI_MODEL = "gpt-5";
 
-    std::string OPENAI_URL = "https://api.openai.com/v1/chat/completions";
-    std::string DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
+    static const std::string DEEPSEEK_URL   = "https://api.deepseek.com/chat/completions";
+    static const std::string DEEPSEEK_MODEL = "deepseek-chat";
 
-    //std::string OPENAI_MODEL = "gpt-4o";
-    std::string OPENAI_MODEL = "gpt-5";
-    
-    std::string DEEPSEEK_MODEL = "deepseek-chat";
+    static const std::string LMSTUDIO_API_KEY = "lm-studio";
+    static const std::string LMSTUDIO_URL     = "http://127.0.0.1:1234/v1/chat/completions";
+    static const std::string LMSTUDIO_MODEL   = "openai-community_-_gpt2-medium";
 
-    // std::string apiKey = DEEPSEEK_API_KEY;
-    // std::string url = DEEPSEEK_URL;
-    // std::string model = DEEPSEEK_MODEL;
+    std::string provider = "openai"; // "openai" | "deepseek" | "lmstudio"
 
-    // std::string apiKey = "lm-studio";
-    // std::string url = "http://127.0.0.1:1234/v1/chat/completions";
-    // std::string model = "openai-community_-_gpt2-medium";
+    std::string apiKey, url, model;
 
-     std::string apiKey = OPENAI_KEY;
-     std::string url = OPENAI_URL;
-     std::string model = OPENAI_MODEL;
+    if (provider == "deepseek") {
+        apiKey = std::getenv("DEEPSEEK_API_KEY") ? std::getenv("DEEPSEEK_API_KEY") : "";
+        url    = DEEPSEEK_URL;
+        model  = DEEPSEEK_MODEL;
+    } else if (provider == "lmstudio") {
+        apiKey = LMSTUDIO_API_KEY; 
+        url    = LMSTUDIO_URL;
+        model  = LMSTUDIO_MODEL;
+    } else { // "openai"
+        apiKey = std::getenv("OPENAI_CHATGPT_API_KEY") ? std::getenv("OPENAI_CHATGPT_API_KEY") : "";
+        url    = OPENAI_URL;
+        model  = OPENAI_MODEL;
+    }
    
     json requestJson = {
         {"model", model},
@@ -411,7 +416,7 @@ json callAPIWithPrompt(std::string prompt)
     };
 
     //std::string response = makeAPIRequest("DEEPSEEK", apiKey, url, requestJson);
-    std::string response = makeAPIRequest("OPENAI", apiKey, url, requestJson);
+    std::string response = makeAPIRequest(provider, apiKey, url, requestJson);
     json responseJson = json::parse(response);
     std::cout << "---- Raw Response ----" << std::endl << responseJson.dump(8) << std::endl;
 
