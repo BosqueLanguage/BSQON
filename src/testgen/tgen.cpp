@@ -74,6 +74,7 @@ std::vector<std::vector<bsqon::Value*>> generateRandomTestSuite(const bsqon::Ass
 std::vector<std::vector<bsqon::Value*>> generateAgentTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const APISignature& testsig, size_t count)
 {
     AIValueGenerator generator(AIModelOption::DEEP_SEEK, &testsig);
+    //AIValueGenerator generator(AIModelOption::GEMINI, &testsig);
     for(size_t i = 0; i < vspartition.components.size(); ++i) {
         auto genv = ValueSetGeneratorEnvironment{vspartition.components[i]->path, vspartition.components[i]->constraints, vspartition.components[i]->context};
         generator.generateType(vspartition.components[i]->context.valuetype, genv, vspartition.components[i]);
@@ -91,8 +92,10 @@ std::vector<std::vector<bsqon::Value*>> generateAgentTestSuite(const bsqon::Asse
 
 std::vector<std::vector<bsqon::Value*>> generateCombinatorialTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const APISignature& testsig)
 {
-    AIValueGenerator generator(AIModelOption::DEEP_SEEK, &testsig);
+     AIValueGenerator generator(AIModelOption::DEEP_SEEK, &testsig);
+    //AIValueGenerator generator(AIModelOption::GEMINI, &testsig);
     for(size_t i = 0; i < vspartition.components.size(); ++i) {
+        std::cout << "Processing component " << (i+1) << "/" << vspartition.components.size() << std::endl;
         auto genv = ValueSetGeneratorEnvironment{vspartition.components[i]->path, vspartition.components[i]->constraints, vspartition.components[i]->context};
         generator.generateType(vspartition.components[i]->context.valuetype, genv, vspartition.components[i]);
     }
@@ -220,13 +223,16 @@ int main(int argc, char** argv, char **envp)
         }
         std::cout << "[";
         for(size_t j = 0; j < tests[i].size(); ++j) {
-            std::u8string rstr = tests[i][j]->toString();
+            // std::string rstr = tests[i][j]->toString();
+            auto str = tests[i][j]->toString();
+            std::string rstr(str.begin(), str.end());
+
             if(j != 0) {
                 std::cout << ",";
             }
             std::cout << std::endl;
 
-            std::cout << "    " << std::string(rstr.cbegin(), rstr.cend());
+            std::cout << "    " << rstr;
         }
         std::cout << std::endl << "]";
     }

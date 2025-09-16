@@ -1,10 +1,14 @@
 #include "generator_ai.h"
 #include <curl/curl.h>
 #include "json.hpp"
-
+#include <fstream>
+#include <filesystem>
 using json = nlohmann::json;
 
 static bsqon::SourcePos g_spos = {0, 0, 0, 0};
+std::string mock_data;
+bool mock_loaded = false;
+bool isDevMode = false;
 
 static std::string g_std_prompt_instructions = R"(
     Additional Context:
@@ -46,6 +50,7 @@ static std::string g_prompt_naked_arg = R"(
 
     Given a variable named "{{name}}" with data type "{{type}}" with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
     {{one_shot}}
+    {{mock_generate}}
     {{std_reqs}}
     )";
 
@@ -54,7 +59,7 @@ static std::string g_prompt_naked_arg_index = R"(
     
     Given a variable named "{{name}}" that is an array of type "{{type}}" elements with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified array element type and format, and within acceptable ranges.
     {{one_shot}}
-
+    {{mock_generate}}
     {{std_reqs}}
     )";
 
@@ -63,7 +68,7 @@ static std::string g_prompt_member_field = R"(
     
     Given a field, named "{{fname}}" in a type named "{{tname}}", with data type "{{type}}" and format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified data type and format, and within acceptable ranges.
     {{one_shot}}
-
+    {{mock_generate}}
     {{std_reqs}}
     )";
 
@@ -72,6 +77,7 @@ static std::string g_prompt_member_field_index = R"(
         
     Given a field, named "{{fname}}" in a type named "{{tname}}", that is an array of type "{{type}}" elements with format "{{format}}", generate a JSON array containing ONLY test values strictly matching the specified array element type and format, and within acceptable ranges.
     {{one_shot}}
+    {{mock_generate}}
     {{std_reqs}}
     )";
 
@@ -99,6 +105,31 @@ All of these:
 - Show semantic + structural variety
 
 So the answer is: ["A1B2C3D4E", "123456789", "ABCDEFGHI", "Z9Z9Z9Z9Z", "9X8Y7Z6W5"])";
+
+static std::string mock_generate = R"(
+    Act as an expert in data analysis and synthetic data generation.
+    
+    You will be given a field named "{{fname}}" in a type named "{{tname}}", with data type "{{type}}" and format "{{format}}", found in a larger input text or file content. Your job is to:
+    1. Extract the value of that field from the provided data.
+    2. Analyze the format, pattern, and characteristics of that value.
+    3. Generate some values by repeating a few of the extracted ones, along with additional values that are syntactically and structurally similar to them.
+    4. test values strictly matching the specified data type and format
+    
+    Be careful to preserve:
+    - Character type (letters, digits, symbols)
+    - Pattern (e.g., alternating characters, fixed prefix/suffix, etc.)
+    - Length
+    - Casing (uppercase/lowercase)
+    
+    --- START DATA SAMPLE ---
+    {{mock_data}}
+    --- END DATA SAMPLE ---
+    
+    The field name to extract is: "{{fname}}"
+    
+    Now generate similar values in this format:
+    ["value1", "value2", "value3"]
+    )";
 
 static std::string g_api_json = R"(
     {
@@ -208,6 +239,58 @@ std::string makeAPIRequest(std::string model, const std::string& apiKey, const s
     return responseString;
 }
 
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+    size_t pos = 0;
+    while ((pos = str.find(from, pos)) != std::string::npos) {
+        str.replace(pos, from.length(), to);
+        pos += to.length();
+    }
+}
+
+void loadMockSection(std::string& prompt, const ValueSetGeneratorEnvironment& env) {
+    namespace fs = std::filesystem;
+    if (!mock_loaded) {
+        const std::string filename = "mock.text";
+        std::ifstream file(filename);
+
+        if (fs::exists(filename) && fs::file_size(filename) > 0) {
+            if (file.is_open()) {
+                std::getline(file, mock_data, '\0');
+                std::cout << "✅ mock.text loaded successfully.\n";
+                mock_loaded = true;
+            } else {
+                std::cerr << "❌ Failed to open mock.text.\n";
+                return;
+            }
+        } else {
+            std::cerr << "⚠️ mock.text does not exist or is empty.\n";
+            return;
+        }
+    }
+
+    std::string resolved_mock_generate = mock_generate;
+
+    size_t md_pos = resolved_mock_generate.find("{{mock_data}}");
+    if (md_pos != std::string::npos) {
+        resolved_mock_generate.replace(md_pos, 13, mock_data);
+    } else {
+        std::cerr << "⚠️ {{mock_data}} not found in mock_generate.\n";
+    }
+
+    if (env.context.forfield.has_value()) {
+        replaceAll(resolved_mock_generate, "{{fname}}", env.context.forfield.value().fname);
+    } else {
+        replaceAll(resolved_mock_generate, "{{fname}}", env.path);
+    }
+
+    size_t mg_pos = prompt.find("{{mock_generate}}");
+    if (mg_pos != std::string::npos) {
+        prompt.replace(mg_pos, 17, resolved_mock_generate);
+    } else {
+        std::cerr << "⚠️ {{mock_generate}} not found in prompt.\n";
+    }
+}
+
 std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
 {
     std::string prompt;
@@ -225,6 +308,8 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
     }
     prompt.replace(prompt.find("{{one_shot}}"), 12, one_shot);
 
+    loadMockSection(prompt, env);  // Inject mock_data into mock_generate and into prompt
+
     prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
     
     prompt.replace(prompt.find("{{path}}"), 8, env.path);
@@ -234,6 +319,19 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
 
     prompt.replace(prompt.find("{{format}}"), 10, formatinstructions);
 
+    if (prompt.find("{{path}}") != std::string::npos) prompt.replace(prompt.find("{{path}}"), 8, env.path);
+    if (prompt.find("{{signature}}") != std::string::npos) prompt.replace(prompt.find("{{signature}}"), 13, signature);
+    if (prompt.find("{{path}}") != std::string::npos) prompt.replace(prompt.find("{{path}}"), 8, env.path);
+    if (prompt.find("{{signature}}") != std::string::npos) prompt.replace(prompt.find("{{signature}}"), 13, signature);
+
+    if (prompt.find("{{format}}") != std::string::npos) prompt.replace(prompt.find("{{format}}"), 10, formatinstructions);
+
+    // Add dev mode instruction to generate fewer values
+    if (isDevMode) {
+        prompt += "\nIMPORTANT: Since this is in development mode, please generate exactly 2 test values.";
+        //prompt += "\nCRITICAL: You must respond with ONLY a valid JSON array - no other text, no explanations.";
+        //prompt += "\n📂 Current Working Directory: " + std::filesystem::current_path().string();
+    }
     if(!env.context.oftype.has_value()) {
         prompt.replace(prompt.find("{{type}}"), 8, t->tkey);
     }
@@ -272,7 +370,7 @@ json callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
     json responseJson = json::parse(response);
 
     //TODO: Temp debugging output
-    //std::cout << "---- Responded with ----" << std::endl << responseJson.dump(8) << std::endl;
+    std::cout << "---- Responded with ----" << std::endl << responseJson.dump(8) << std::endl;
 
     return json::parse(responseJson["candidates"][0]["content"]["parts"][0]["text"].get<std::string>());
 }
@@ -288,12 +386,22 @@ json callAPIWithPrompt(std::string prompt)
     std::string OPENAI_URL = "https://api.openai.com/v1/chat/completions";
     std::string DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 
-    std::string OPENAI_MODEL = "gpt-4o";
+    //std::string OPENAI_MODEL = "gpt-4o";
+    std::string OPENAI_MODEL = "gpt-5";
+    
     std::string DEEPSEEK_MODEL = "deepseek-chat";
 
-    std::string apiKey = DEEPSEEK_API_KEY;
-    std::string url = DEEPSEEK_URL;
-    std::string model = DEEPSEEK_MODEL;
+    // std::string apiKey = DEEPSEEK_API_KEY;
+    // std::string url = DEEPSEEK_URL;
+    // std::string model = DEEPSEEK_MODEL;
+
+    // std::string apiKey = "lm-studio";
+    // std::string url = "http://127.0.0.1:1234/v1/chat/completions";
+    // std::string model = "openai-community_-_gpt2-medium";
+
+     std::string apiKey = OPENAI_KEY;
+     std::string url = OPENAI_URL;
+     std::string model = OPENAI_MODEL;
    
     json requestJson = {
         {"model", model},
@@ -302,9 +410,11 @@ json callAPIWithPrompt(std::string prompt)
         }}
     };
 
-    std::string response = makeAPIRequest("DEEPSEEK", apiKey, url, requestJson);
+    //std::string response = makeAPIRequest("DEEPSEEK", apiKey, url, requestJson);
+    std::string response = makeAPIRequest("OPENAI", apiKey, url, requestJson);
     json responseJson = json::parse(response);
-   
+    std::cout << "---- Raw Response ----" << std::endl << responseJson.dump(8) << std::endl;
+
     std::string contentString = responseJson["choices"][0]["message"]["content"];
     size_t start = contentString.find("[");
     size_t end = contentString.rfind("]");
@@ -338,9 +448,11 @@ std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGenerat
 
     json res;
     if(aigen->model == AIModelOption::GEMINI) {
+        std::cout << "---- gemini with ----------------------\n";
         res = callGeminiAPIWithPrompt(prompt, jfmt);
     }
     else {
+        std::cout << "---- deepseek with ----------------------\n";
         res = callAPIWithPrompt(prompt);
     }
 

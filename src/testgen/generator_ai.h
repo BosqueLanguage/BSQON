@@ -23,7 +23,7 @@ public:
 
     const APISignature* sig;
     const std::string sigstr;
-
+    
     AIValueGenerator(AIModelOption model, const APISignature* sig) : rng(std::random_device{}()), model(model), sig(sig), sigstr(sig->toString()) { ; }
     ~AIValueGenerator() { ; }
 
