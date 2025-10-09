@@ -1,0 +1,7 @@
+errtest function ForecastError(rentalinfo: RentalAvailabilityInfo, requestedQuantity: Nat, allowPartials: Bool) : (|Nat, Reason|){
+	let forest: Forecast = getForecast("JFK");
+
+    let decision = decide(forecast, rentalinfo, requestedQuantity, allowPartials);
+
+	return decision;
+}

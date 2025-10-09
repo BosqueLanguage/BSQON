@@ -649,11 +649,6 @@ std::optional<z3::expr> ValueExtractor::extractAtResultExpr(bsqon::Type* t, z3::
     z3::func_decl at_res_mk = at_res.first;
     z3::func_decl at_res_is = at_res.second;
 
-    // TODO: Handle @Result-err, only handles @Result-ok atm. So improve this.
-    if(at_res_mk.name().str().find("err") != std::string::npos) {
-        return std::nullopt;
-    }
-
     this->s.add(at_res_is(ex));
 
     z3::func_decl at_res_acc = at_res_mk.accessors()[0];
@@ -664,7 +659,7 @@ std::optional<z3::expr> ValueExtractor::extractAtResultExpr(bsqon::Type* t, z3::
 
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
-    if(ex.get_sort().to_string().find("@Result") != std::string::npos) {
+    if(ex.get_sort().to_string().find("@Result-ok") != std::string::npos) {
         auto result_val_ex = extractAtResultExpr(bsq_t, ex);
         if(!result_val_ex.has_value()) {
             bsqon::Value* err = new bsqon::ErrorValue(bsq_t, FILLER_POS);
@@ -826,9 +821,8 @@ std::optional<std::pair<z3::func_decl, z3::func_decl>> ValueExtractor::findConst
 void badArgs(const char* msg)
 {
     const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
-                        "\t-e|--extract   - Extract Err Values from SMT\n"
-                        "\t-g|--generate  - Generate Test Values from SMT\n"
-                        "\t-m|--mock      - Run Mock Tests";
+                        "\t-t|--test      - Use extractor for tests.\n"
+                        "\t-m|--mock      - Use extractor at runtime.";
 
     printf("%s\n", usage);
     printf("%s\n", msg);
