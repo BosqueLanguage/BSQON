@@ -152,7 +152,7 @@ void runMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol, std
         std::string ret_id = "";
         bsqon::TypeKey tkey = mock_json["return"];
         bsqon::Type* ret_t = asm_info->lookupTypeKey(tkey);
-        ret_id = "@ret" + tKeyToSmtName(tkey, SMT_TYPE);
+        ret_id = "@retMock-" + tKeyToSmtName(tkey, SMT_TYPE);
 
         z3::check_result cr = sol.check();
         if(cr != z3::sat) {
@@ -161,17 +161,17 @@ void runMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol, std
         }
 
         z3::model m = sol.get_model();
-        z3::expr ret_ex(sol.ctx());
-        ExtractSig sig = {
-            .type = ret_t,
-            .ex = ret_ex,
-        };
 
         auto const_ex = FindConstantInModel(m, ret_id);
         if(!const_ex.has_value()) {
             std::cout << "Unable to find " << ret_id << " in z3 model.\n";
             exit(1);
         }
+
+        ExtractSig sig = {
+            .type = ret_t,
+            .ex = const_ex.value(),
+        };
 
         extractReturnValue(asm_info, sig, sol);
     }
