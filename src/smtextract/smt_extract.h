@@ -28,7 +28,12 @@
 void badArgs(const char* msg);
 bool validPath(const char* filepath, const char* extension);
 std::string valueToSMTStr(std::string id, bsqon::Value* val);
-void runMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol);
+void runMock(bsqon::AssemblyInfo* asm_info, json mock_json, z3::solver& sol, std::string mode);
+
+typedef struct _ExtractSig{
+	bsqon::Type* type;
+	z3::expr ex;
+} ExtractSig;
 
 class ValueExtractor 
 {
@@ -54,6 +59,7 @@ class ValueExtractor
     bsqon::Value* extractTypeDecl(bsqon::TypedeclType* bsq_t, z3::expr ex);
     bsqon::Value* extractPrimitive(bsqon::PrimitiveType* t, z3::expr ex);
     bsqon::Value* extractEntity(bsqon::StdEntityType* t, z3::expr ex);
+	bsqon::Value* extractEnum(bsqon::Type* bsq_t, z3::expr ex);
 
 	std::optional<z3::expr> extractAtResultExpr(bsqon::Type* t, z3::expr ex);
     std::optional<char> BinSearchChar(z3::expr str_exp, z3::expr index, int min, int max);

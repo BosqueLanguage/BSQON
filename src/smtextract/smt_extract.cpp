@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <cerrno>
 #include <cstdlib>
@@ -447,31 +448,31 @@ bsqon::Value* ValueExtractor::extractPrimitive(bsqon::PrimitiveType* bsq_t, z3::
 
 bsqon::Value* ValueExtractor::extractEList(bsqon::EListType* bsq_t, z3::expr ex)
 {
-	z3::sort e_sort =  ex.get_sort(); 
-	z3::func_decl_vector e_constructs = e_sort.constructors();
+    z3::sort e_sort = ex.get_sort();
+    z3::func_decl_vector e_constructs = e_sort.constructors();
     assert(e_constructs.size() == 1);
 
-	z3::func_decl e_construct = e_constructs[0];
-	z3::func_decl_vector e_accessors = e_construct.accessors();
+    z3::func_decl e_construct = e_constructs[0];
+    z3::func_decl_vector e_accessors = e_construct.accessors();
 
     std::vector<bsqon::Value*> entry_values;
 
-	std::vector<bsqon::Value*> entries_values;
-	uint acc_size = e_accessors.size();
-	for(size_t i = 0; i < acc_size; ++i){
-		z3::expr entry_ex = e_accessors[i](ex); 
-		bsqon::Type* entry_t = this->asm_info->lookupTypeKey(bsq_t->entries[i]);
+    std::vector<bsqon::Value*> entries_values;
+    uint acc_size = e_accessors.size();
+    for(size_t i = 0; i < acc_size; ++i) {
+        z3::expr entry_ex = e_accessors[i](ex);
+        bsqon::Type* entry_t = this->asm_info->lookupTypeKey(bsq_t->entries[i]);
 
         try {
-			bsqon::Value* entry_value = this->extractValue(entry_t, entry_ex);
-			entries_values.push_back(entry_value);
+            bsqon::Value* entry_value = this->extractValue(entry_t, entry_ex);
+            entries_values.push_back(entry_value);
         }
         catch(const std::exception& e) {
             std::cerr << "extractEList ERR: " << e.what() << "\n";
         }
-	}
+    }
 
-	return new bsqon::EListValue(bsq_t, FILLER_POS, std::move(entries_values));
+    return new bsqon::EListValue(bsq_t, FILLER_POS, std::move(entries_values));
 }
 
 bsqon::Value* ValueExtractor::extractEntity(bsqon::StdEntityType* bsq_t, z3::expr ex)
@@ -582,7 +583,7 @@ bsqon::Value* ValueExtractor::extractList(bsqon::ListType* bsq_t, z3::expr ex)
 
     std::vector<bsqon::Value*> vals;
     size_t list_size = list_n_ops_construct.arity();
-	assert(list_size < 4);
+    assert(list_size < 4);
     if(list_size == 0) {
         this->s.add(list_n_ops_construct() == list_n_ops);
         return new bsqon::ListValue(bsq_t, FILLER_POS, std::move(vals));
@@ -649,11 +650,6 @@ std::optional<z3::expr> ValueExtractor::extractAtResultExpr(bsqon::Type* t, z3::
     z3::func_decl at_res_mk = at_res.first;
     z3::func_decl at_res_is = at_res.second;
 
-    // TODO: Handle @Result-err, only handles @Result-ok atm. So improve this.
-    if(at_res_mk.name().str().find("err") != std::string::npos) {
-        return std::nullopt;
-    }
-
     this->s.add(at_res_is(ex));
 
     z3::func_decl at_res_acc = at_res_mk.accessors()[0];
@@ -662,9 +658,37 @@ std::optional<z3::expr> ValueExtractor::extractAtResultExpr(bsqon::Type* t, z3::
     return at_res_val;
 }
 
+bsqon::Value* ValueExtractor::extractEnum(bsqon::Type* bsq_t, z3::expr ex)
+{
+
+    z3::sort enum_sort = ex.get_sort();
+    z3::func_decl_vector constructs = enum_sort.constructors();
+    z3::func_decl_vector recognizers = enum_sort.recognizers();
+    std::optional<std::pair<z3::func_decl, z3::func_decl>> found = findConstruct(constructs, recognizers, ex);
+	std::pair<z3::func_decl, z3::func_decl> is_construct = found.value();
+
+    if(!found.has_value()) {
+        bsqon::Value* err = new bsqon::ErrorValue(bsq_t, FILLER_POS);
+        return err;
+    }
+
+    z3::func_decl enum_mk = is_construct.first;
+    z3::func_decl enum_is = is_construct.second;
+
+	this->s.add(enum_is(ex));
+	this->s.add(ex == enum_mk());
+
+    std::string enum_name = enum_mk.name().str();
+	size_t $_pos = enum_name.find('$',0) + 1;
+	
+	std::string enum_value_name = enum_name.substr($_pos,enum_name.size());
+
+    return new bsqon::EnumValue(bsq_t, FILLER_POS, enum_value_name, 0);
+}
+
 bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 {
-    if(ex.get_sort().to_string().find("@Result") != std::string::npos) {
+    if(ex.get_sort().to_string().find("@Result-ok") != std::string::npos) {
         auto result_val_ex = extractAtResultExpr(bsq_t, ex);
         if(!result_val_ex.has_value()) {
             bsqon::Value* err = new bsqon::ErrorValue(bsq_t, FILLER_POS);
@@ -685,9 +709,9 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     else if(tg == bsqon::TypeTag::TYPE_LIST) {
         return extractList(static_cast<bsqon::ListType*>(bsq_t), ex);
     }
-	else if(tg == bsqon::TypeTag::TYPE_ELIST) {
-		return extractEList(static_cast<bsqon::EListType*>(bsq_t), ex);
-	}
+    else if(tg == bsqon::TypeTag::TYPE_ELIST) {
+        return extractEList(static_cast<bsqon::EListType*>(bsq_t), ex);
+    }
     else if(tg == bsqon::TypeTag::TYPE_TYPE_DECL) {
         return extractTypeDecl(static_cast<bsqon::TypedeclType*>(bsq_t), ex);
     }
@@ -696,6 +720,9 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
     }
     else if(tg == bsqon::TypeTag::TYPE_STD_CONCEPT) {
         return extractStdConcept(static_cast<bsqon::StdConceptType*>(bsq_t), ex);
+    }
+    else if(tg == bsqon::TypeTag::TYPE_ENUM) {
+        return extractEnum(static_cast<bsqon::EnumType*>(bsq_t), ex);
     }
     else if(tg == bsqon::TypeTag::TYPE_UNRESOLVED) {
         printf("Got TYPE_UNRESOLVED tag from type %s\n", bsq_t->tkey.c_str());
@@ -706,7 +733,6 @@ bsqon::Value* ValueExtractor::extractValue(bsqon::Type* bsq_t, z3::expr ex)
 
     return new bsqon::ErrorValue(bsq_t, FILLER_POS);
 }
-
 
 bsqon::Value* ValueExtractor::extractStdConcept(bsqon::StdConceptType* bsq_t, z3::expr ex)
 {
@@ -802,7 +828,7 @@ std::optional<std::pair<z3::func_decl, z3::func_decl>> ValueExtractor::findConst
                                                                                      z3::expr ex)
 {
     std::optional<std::pair<z3::func_decl, z3::func_decl>> term;
-	//NOTE: Need the last sat recognizer. As ex is sat for all lists recognizer <= its size.
+    // NOTE: Need the last sat recognizer. As ex is sat for all lists recognizer <= its size.
     for(size_t i = 0; i < recognizers.size(); ++i) {
         z3::func_decl recognize = recognizers[i];
         this->s.push();
@@ -818,17 +844,15 @@ std::optional<std::pair<z3::func_decl, z3::func_decl>> ValueExtractor::findConst
     if(term.has_value()) {
         return term;
     }
-    else {
-        return std::nullopt;
-    }
+
+    return std::nullopt;
 };
 
 void badArgs(const char* msg)
 {
     const char* usage = "USAGE: smtextract <formula.smt2> <fn_signature.json> <assembly.json> --<MODE>\nMODES:\n"
-                        "\t-e|--extract   - Extract Err Values from SMT\n"
-                        "\t-g|--generate  - Generate Test Values from SMT\n"
-                        "\t-m|--mock      - Run Mock Tests";
+                        "\t-t|--test      - Use extractor for tests.\n"
+                        "\t-m|--mock      - Use extractor at runtime.";
 
     printf("%s\n", usage);
     printf("%s\n", msg);
