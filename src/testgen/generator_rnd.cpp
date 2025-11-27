@@ -88,19 +88,80 @@ void RandomValueGenerator::generateBigInt(const bsqon::PrimitiveType* t, ValueCo
 void RandomValueGenerator::generateFloat(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     //TODO: not implemented yet
-    assert(false);
+    //assert(false);
+    std::uniform_real_distribution<double> fv(-1000.0, 1000.0);
+
+    vc->options.push_back(new bsqon::FloatNumberValue(t, g_spos, -3.14));
+    vc->options.push_back(new bsqon::FloatNumberValue(t, g_spos, -1.0));
+    vc->options.push_back(new bsqon::FloatNumberValue(t, g_spos, 0.0));
+    vc->options.push_back(new bsqon::FloatNumberValue(t, g_spos, 1.0));
+    vc->options.push_back(new bsqon::FloatNumberValue(t, g_spos, 2.718));
+
+    for (size_t i = 0; i < 3; ++i) {
+        vc->options.push_back(new bsqon::FloatNumberValue(t, g_spos, fv(rng)));
+    }
 }
 
 void RandomValueGenerator::generateCString(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     //TODO: not implemented yet
-    assert(false);
+    //assert(false);
+    static const std::string charset =
+    "0123456789"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz";
+
+    std::uniform_int_distribution<> len_dist(1, 12); // string length range
+    std::uniform_int_distribution<> char_dist(0, charset.size() - 1);
+
+    // Add fixed edge-case strings using factory method
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, ""));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "a"));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "test"));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "123"));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "Test123"));
+
+    // Generate random strings
+    for (size_t i = 0; i < 3; ++i) {
+        size_t len = len_dist(rng);
+        std::string s;
+        s.reserve(len);
+        for (size_t j = 0; j < len; ++j) {
+            s += charset[char_dist(rng)];
+        }
+        vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, s));
+    }
 }
 
 void RandomValueGenerator::generateString(const bsqon::PrimitiveType* t, ValueComponent* vc)
 {
     //TODO: not implemented yet
-    assert(false);
+    //assert(false);
+    static const std::string charset =
+    "0123456789"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz";
+
+    std::uniform_int_distribution<> len_dist(1, 12); // string length range
+    std::uniform_int_distribution<> char_dist(0, charset.size() - 1);
+
+    // Add fixed edge-case strings using factory method
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, ""));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "a"));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "test"));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "123"));
+    vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, "Test123"));
+
+    // Generate random strings
+    for (size_t i = 0; i < 3; ++i) {
+        size_t len = len_dist(rng);
+        std::string s;
+        s.reserve(len);
+        for (size_t j = 0; j < len; ++j) {
+            s += charset[char_dist(rng)];
+        }
+        vc->options.push_back(bsqon::StringValue::createFromGenerator(t, g_spos, s));
+    }
 }
 
 void RandomValueGenerator::generatePrimitive(const bsqon::PrimitiveType* t, ValueComponent* vc)
