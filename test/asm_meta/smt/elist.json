@@ -1,0 +1,137 @@
+{
+    "namespaces": [
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Main",
+            "subns": [],
+            "types": []
+        },
+        {
+            "istoplevel": true,
+            "imports": [],
+            "ns": "Core",
+            "subns": [
+                [
+                    "AlgorithmOps",
+                    "AlgorithmOps"
+                ],
+                [
+                    "Algorithm",
+                    "Algorithm"
+                ],
+                [
+                    "KeyComparator",
+                    "KeyComparator"
+                ],
+                [
+                    "Interpolate",
+                    "Interpolate"
+                ],
+                [
+                    "XCore",
+                    "XCore"
+                ],
+                [
+                    "List",
+                    "List"
+                ],
+                [
+                    "Map",
+                    "Map"
+                ],
+                [
+                    "CStringOps",
+                    "CStringOps"
+                ],
+                [
+                    "ListOps",
+                    "ListOps"
+                ],
+                [
+                    "MapOps",
+                    "MapOps"
+                ],
+                [
+                    "NumericOps",
+                    "NumericOps"
+                ],
+                [
+                    "CCharBufferOps",
+                    "CCharBufferOps"
+                ],
+                [
+                    "UnicodeCharBufferOps",
+                    "UnicodeCharBufferOps"
+                ],
+                [
+                    "StringOps",
+                    "StringOps"
+                ]
+            ],
+            "types": [
+                [
+                    "None",
+                    "None"
+                ],
+                [
+                    "Bool",
+                    "Bool"
+                ],
+                [
+                    "Nat",
+                    "Nat"
+                ],
+                [
+                    "Int",
+                    "Int"
+                ]
+            ]
+        }
+    ],
+    "typerefs": [
+        {
+            "tag": "(|...|)",
+            "entries": [
+                "Int",
+                "Nat"
+            ],
+            "name": "(|Int, Nat|)",
+            "tkey": "(|Int, Nat|)"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Type for representing the none option value. **%"
+            },
+            "tkey": "None",
+            "name": "None"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive boolean value. **%"
+            },
+            "tkey": "Bool",
+            "name": "Bool"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive natural number value. **%"
+            },
+            "tkey": "Nat",
+            "name": "Nat"
+        },
+        {
+            "tag": "PrimitiveEntity",
+            "attributes": {
+                "docstring": "%** Primitive integer value. **%"
+            },
+            "tkey": "Int",
+            "name": "Int"
+        }
+    ],
+    "recursiveSets": [],
+    "resystem": []
+}

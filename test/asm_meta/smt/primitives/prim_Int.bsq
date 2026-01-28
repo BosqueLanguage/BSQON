@@ -1,6 +1,6 @@
 declare namespace Main;
 
 public function main(digit: Int, big_digit: BigInt ): Int { 
-	assert \/(digit !== 33i, big_digit !== 457I);
+	assert \/(digit !== 31i, big_digit !== 13I);
     return digit;
 }

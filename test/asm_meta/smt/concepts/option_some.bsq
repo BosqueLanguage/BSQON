@@ -1,0 +1,8 @@
+declare namespace Main;
+
+public function main(f: Option<Int>): Option<Int> { 
+
+	assert(f !== 3i);
+
+	return f;
+}
