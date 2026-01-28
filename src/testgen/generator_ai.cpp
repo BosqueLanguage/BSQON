@@ -390,11 +390,7 @@ json callAPIWithPrompt(std::string prompt)
     static const std::string LMSTUDIO_URL     = "http://127.0.0.1:1234/v1/chat/completions";
     static const std::string LMSTUDIO_MODEL   = "openai-community_-_gpt2-medium";
 
-<<<<<<< HEAD
     std::string provider = "deepseek"; // "openai" | "deepseek" | "lmstudio"
-=======
-    std::string provider = "openai"; // "openai" | "deepseek" | "lmstudio"
->>>>>>> origin/main
 
     std::string apiKey, url, model;
 
@@ -462,10 +458,7 @@ std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGenerat
     }
     else {
         std::cout << "---- deepseek with ----------------------\n";
-<<<<<<< HEAD
         //std::cout << prompt << "\n";
-=======
->>>>>>> origin/main
         res = callAPIWithPrompt(prompt);
     }
 

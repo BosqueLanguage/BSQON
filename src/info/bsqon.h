@@ -8,11 +8,8 @@
 using json = nlohmann::json;
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-<<<<<<< HEAD
 #include <random>
-=======
 #include <regex>
-
 typedef enum SmtNameType
 {
     SMT_TYPE,
@@ -27,7 +24,6 @@ typedef enum SmtNameType
 } SmtNameType;
 
 std::string tKeyToSmtName(const std::string& tk, SmtNameType n);
->>>>>>> origin/main
 
 namespace bsqon
 {
@@ -2375,7 +2371,6 @@ namespace bsqon
 
             for(size_t i = 0; i < this->fieldvalues.size(); ++i) {
                 const auto& fieldName = fields[i].fname;
-<<<<<<< HEAD
                 const auto* fval = this->fieldvalues[i];
                 const auto* ftype = fval->vtype;
                 // Handle for languagetool:
@@ -2397,10 +2392,6 @@ namespace bsqon
 
                 json itemJson = fval->toJSON();
                 if (ftype->isAbstractType()) {
-=======
-                json itemJson = this->fieldvalues[i]->toJSON();
-                if(this->fieldvalues[i]->vtype->isAbstractType()) {
->>>>>>> origin/main
                     jsonVals[fieldName] = itemJson["value"];
                 }
                 else {
