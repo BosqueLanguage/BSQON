@@ -433,6 +433,17 @@ namespace bsqon
                 }
             }
         }
+
+        // Add None to the concreteSubtypesMap for all Option types-languagetool
+        auto noneIt = g_assembly.typerefs.find("None");
+        if (noneIt != g_assembly.typerefs.end()) {
+            for (auto iter = g_assembly.typerefs.cbegin(); iter != g_assembly.typerefs.cend(); ++iter) {
+                auto opt = dynamic_cast<OptionType*>(iter->second);
+                if (opt != nullptr) {
+                    g_assembly.concreteSubtypesMap[opt->tkey].push_back(noneIt->second->tkey);
+                }
+            }
+        }
     }
 
     bool isSubtype(TypeKey tkey, TypeKey oftype)

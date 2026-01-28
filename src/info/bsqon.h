@@ -6,6 +6,7 @@
 using json = nlohmann::json;
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <random>
 
 namespace bsqon
 {
@@ -1664,13 +1665,31 @@ namespace bsqon
             for (size_t i = 0; i < this->fieldvalues.size(); ++i)
             {
                 const auto& fieldName = fields[i].fname;
-                json itemJson = this->fieldvalues[i]->toJSON();
-                if (this->fieldvalues[i]->vtype->isAbstractType()) {
+                const auto* fval = this->fieldvalues[i];
+                const auto* ftype = fval->vtype;
+                // Handle for languagetool:
+                // If this field's runtime type is the None primitive, we treat it as Option<T> = None.
+                // To cover both case 1 (key absent) and case 3 (key present with {}), we randomly:
+                //   - omit the field entirely (key absent), or
+                //   - include it with {} via NoneValue::toJSON().
+                if (ftype->tag == TypeTag::TYPE_PRIMITIVE && ftype->tkey == "None") {
+                    static thread_local std::mt19937_64 rng{std::random_device{}()};
+                    std::uniform_int_distribution<int> dist(0, 1);
+                    bool emitField = (dist(rng) == 1);
+                    if (!emitField) {
+                        // Case 1: omit this key from the serialized object
+                        continue;
+                    }
+                    // Else fall through: Case 3, keep the field and serialize as {}.
+                    //case 2 unchanged as some type
+                }
+
+                json itemJson = fval->toJSON();
+                if (ftype->isAbstractType()) {
                     jsonVals[fieldName] = itemJson["value"];
                 } else {
                     jsonVals[fieldName] = itemJson;
                 }
-                
             }
             resultJson["kind"] = this->vtype->tag;
             resultJson["value"] = jsonVals;
