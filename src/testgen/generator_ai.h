@@ -15,6 +15,12 @@ enum class AIModelOption
     GEMINI
 };
 
+void setFailureAwareMockFlowEnabled(bool enabled);
+void setFailureAwareInputGenerationEnabled(bool enabled);
+void clearFailurePromptContext();
+void setFailurePromptContext(const json& context);
+json generateFailureMockEntries(const std::string& signature);
+
 class AIValueGenerator
 {
 public:

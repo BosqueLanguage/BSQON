@@ -2271,7 +2271,9 @@ namespace bsqon
 
         virtual json toJSON() const override
         {
-            return json({});
+            //return json({});
+            return json(this->evname);
+
         }
     };
 

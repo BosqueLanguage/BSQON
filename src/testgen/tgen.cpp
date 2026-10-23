@@ -36,8 +36,22 @@ void loadTestSignatureExplicit(const char* filename, json& jv)
 
 void usage()
 {
-    printf("Usage: generator <assembly.json> <api.json> <--rnd|--agent|--combinatorial|--smt|--all> <outdir>\n");
+    printf("Usage: generator <assembly.json> <api.json> <--rnd|--agent|--combinatorial|--onewise|--smt|--all> <outdir> [--failure-aware-input-generation] [--failure-aware-mock-flow --failure-context <file>]\n");
     exit(1);
+}
+
+void loadFailureContextExplicit(const char* filename, json& jv)
+{
+    try
+    {
+        std::ifstream infile(filename);
+        infile >> jv;
+    }
+    catch(const std::exception& e)
+    {
+        printf("Error parsing failure context JSON: %s\n", e.what());
+        exit(1);
+    }
 }
 
 std::vector<bsqon::Value*> generateArgValues(TestGenerator& tgen, const APISignature& testsig)
@@ -153,6 +167,35 @@ std::vector<std::vector<bsqon::Value*>> generateCombinatorialTestSuite(const bsq
     return tests;
 }
 
+/** 1-wise: for each partition, enumerate all its options; other partitions use random selection. */
+std::vector<std::vector<bsqon::Value*>> generateOneWiseTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const APISignature& testsig)
+{
+    AIValueGenerator generator(AIModelOption::DEEP_SEEK, &testsig);
+    for(size_t i = 0; i < vspartition.components.size(); ++i) {
+        std::cout << "Processing component " << (i+1) << "/" << vspartition.components.size() << " (1-wise)" << std::endl;
+        auto genv = ValueSetGeneratorEnvironment{vspartition.components[i]->path, vspartition.components[i]->constraints, vspartition.components[i]->context};
+        generator.generateType(vspartition.components[i]->context.valuetype, genv, vspartition.components[i]);
+    }
+
+    std::vector<std::vector<bsqon::Value*>> tests;
+    for(size_t i = 0; i < vspartition.components.size(); ++i) {
+        auto pi = vspartition.components[i];
+        std::vector<const ValueConstraint*> base_constraints(pi->constraints.cbegin(), pi->constraints.cend());
+
+        for(size_t m = 0; m < pi->options.size(); ++m) {
+            std::vector<const ValueConstraint*> fconstraints(base_constraints.cbegin(), base_constraints.cend());
+            fconstraints.push_back(new FixedValueConstraint(pi->path, pi->options[m]));
+
+            if(TestGenerator::checkConstraintSatisfiability(fconstraints)) {
+                TestGenerator tgen(assembly, &vspartition, fconstraints);
+                tests.emplace_back(generateArgValues(tgen, testsig));
+            }
+        }
+    }
+
+    return tests;
+}
+
 std::vector<std::vector<bsqon::Value*>> generateTestSuite(const bsqon::AssemblyInfo* assembly, ValueSetPartition& vspartition, const APISignature& testsig)
 {
     printf("Full test suite generation not yet implemented\n");
@@ -161,9 +204,52 @@ std::vector<std::vector<bsqon::Value*>> generateTestSuite(const bsqon::AssemblyI
 
 int main(int argc, char** argv, char **envp)
 {
-    if(argc != 5) {
+    if(argc < 5) {
         usage();
         exit(1);
+    }
+
+    bool failureAwareMockFlowEnabled = false;
+    bool failureAwareInputGenerationEnabled = false;
+    std::optional<std::string> failureContextPath = std::nullopt;
+    for (int i = 5; i < argc; ++i) {
+        std::string opt = std::string(argv[i]);
+        if (opt == "--failure-aware-mock-flow") {
+            failureAwareMockFlowEnabled = true;
+        }
+        else if (opt == "--failure-aware-input-generation") {
+            failureAwareInputGenerationEnabled = true;
+        }
+        else if (opt == "--failure-context") {
+            if (i + 1 >= argc) {
+                usage();
+                exit(1);
+            }
+            failureContextPath = std::string(argv[++i]);
+        }
+        else {
+            usage();
+            exit(1);
+        }
+    }
+    if (failureAwareMockFlowEnabled && !failureContextPath.has_value()) {
+        printf("Error: --failure-context <file> is required when --failure-aware-mock-flow is enabled.\n");
+        usage();
+        exit(1);
+    }
+    if (!failureAwareMockFlowEnabled && failureContextPath.has_value()) {
+        printf("Error: --failure-context requires --failure-aware-mock-flow.\n");
+        usage();
+        exit(1);
+    }
+
+    setFailureAwareMockFlowEnabled(failureAwareMockFlowEnabled);
+    setFailureAwareInputGenerationEnabled(failureAwareInputGenerationEnabled);
+    clearFailurePromptContext();
+    if (failureAwareMockFlowEnabled) {
+        json failureContext = nullptr;
+        loadFailureContextExplicit(failureContextPath.value().c_str(), failureContext);
+        setFailurePromptContext(failureContext);
     }
 
     std::string metadata, type;
@@ -182,6 +268,28 @@ int main(int argc, char** argv, char **envp)
     loadTestSignatureExplicit(argv[2], jssig);
 
     APISignature testsig = APISignature::parse(assembly, jssig);
+
+    if (failureAwareMockFlowEnabled) {
+        json failureEntries = generateFailureMockEntries(testsig.toString());
+
+        auto trgtdir = std::string(argv[4]);
+        if (std::filesystem::exists(trgtdir)) {
+            std::filesystem::remove_all(trgtdir);
+        }
+        std::filesystem::create_directories(trgtdir);
+
+        std::cout << "---- Failure Mocks ----" << std::endl;
+        std::cout << failureEntries.dump(2) << std::endl;
+
+        for (size_t i = 0; i < failureEntries.size(); ++i) {
+            std::string fname = trgtdir + "/test_" + std::to_string(i) + ".json";
+            std::ofstream outfile(fname);
+            outfile << failureEntries[i].dump(4);
+        }
+
+        fflush(stdout);
+        exit(0);
+    }
 
     std::vector<ValueSetPartition> argpartitions;
     for(size_t i = 0; i < testsig.args.size(); ++i) {
@@ -206,6 +314,9 @@ int main(int argc, char** argv, char **envp)
         }
         else if(modestr == "--combinatorial") {
             tests = generateCombinatorialTestSuite(&assembly, vspartition, testsig);
+        }
+        else if(modestr == "--onewise") {
+            tests = generateOneWiseTestSuite(&assembly, vspartition, testsig);
         }
         else if(modestr == "--all") {
             tests = generateTestSuite(&assembly, vspartition, testsig);

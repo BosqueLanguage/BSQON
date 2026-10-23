@@ -3,12 +3,128 @@
 #include "json.hpp"
 #include <fstream>
 #include <filesystem>
+#include <algorithm>
+#include <cstdlib>
+#include <cctype>
+#include <type_traits>
 using json = nlohmann::json;
 
 static bsqon::SourcePos g_spos = {0, 0, 0, 0};
 std::string mock_data;
 bool mock_loaded = false;
 bool isDevMode = false;
+bool final_prompt_logged = false;
+static int g_llm_prompt_log_call_count = 0;
+static bool g_llm_prompt_log_file_started = false;
+static bool g_llm_prompt_log_file_announced = false;
+static bool g_failure_aware_mock_flow_enabled = false;
+static bool g_failure_aware_input_generation_enabled = false;
+static json g_failure_prompt_context = json::object();
+
+static bool isEnvFlagEnabled(const char* name)
+{
+    const char* rawValue = std::getenv(name);
+    if (rawValue == nullptr) {
+        return false;
+    }
+
+    std::string value(rawValue);
+    std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+
+    return !value.empty() && value != "0" && value != "false" && value != "off" && value != "no";
+}
+
+static std::string getEnvValueOrEmpty(const char* name)
+{
+    const char* rawValue = std::getenv(name);
+    return rawValue == nullptr ? "" : std::string(rawValue);
+}
+
+static std::string getLLMPromptLogFilePath()
+{
+    std::string configuredPath = getEnvValueOrEmpty("LLM_PROMPT_LOG_FILE");
+    if (!configuredPath.empty()) {
+        return configuredPath;
+    }
+
+    return "build/tgen-llm-prompts.log";
+}
+
+static void writeLLMPromptLogFile(const std::string& logFilePath, const std::string& header, const std::string& prompt)
+{
+    try {
+        std::filesystem::path path(logFilePath);
+        auto parent = path.parent_path();
+        if (!parent.empty()) {
+            std::filesystem::create_directories(parent);
+        }
+
+        std::ofstream file(
+            logFilePath,
+            std::ios::out | (g_llm_prompt_log_file_started ? std::ios::app : std::ios::trunc)
+        );
+        if (!file.is_open()) {
+            std::cerr << "Failed to open LLM prompt log file: " << logFilePath << std::endl;
+            return;
+        }
+
+        file << header << std::endl << prompt << std::endl << std::endl;
+        g_llm_prompt_log_file_started = true;
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "Failed to write LLM prompt log file: " << ex.what() << std::endl;
+    }
+}
+
+static void logLLMPrompt(const std::string& provider, const std::string& prompt)
+{
+    const bool logToStdout = isEnvFlagEnabled("LLM_LOG_PROMPTS");
+    const std::string logFilePath = getLLMPromptLogFilePath();
+
+    ++g_llm_prompt_log_call_count;
+    const std::string callHeader = "---- Final Prompt (call " + std::to_string(g_llm_prompt_log_call_count) + ", " + provider + ") ----";
+
+    if (logToStdout) {
+        std::cout << callHeader << std::endl << prompt << std::endl;
+    }
+    else if (!final_prompt_logged) {
+        std::cout << "---- Final Prompt (one-time) ----" << std::endl << prompt << std::endl;
+        final_prompt_logged = true;
+    }
+
+    if (!g_llm_prompt_log_file_announced) {
+        std::cout << "---- LLM prompt log file: " << logFilePath << " ----" << std::endl;
+        g_llm_prompt_log_file_announced = true;
+    }
+    writeLLMPromptLogFile(logFilePath, callHeader, prompt);
+}
+
+void setFailureAwareMockFlowEnabled(bool enabled)
+{
+    g_failure_aware_mock_flow_enabled = enabled;
+}
+
+void setFailureAwareInputGenerationEnabled(bool enabled)
+{
+    g_failure_aware_input_generation_enabled = enabled;
+}
+
+void clearFailurePromptContext()
+{
+    g_failure_prompt_context = json::object();
+}
+
+void setFailurePromptContext(const json& context)
+{
+    if (context.is_object()) {
+        g_failure_prompt_context = context;
+    }
+    else {
+        g_failure_prompt_context = json::object();
+    }
+}
 
 static std::string g_std_prompt_instructions = R"(
     Additional Context:
@@ -44,6 +160,195 @@ static std::string g_std_prompt_instructions = R"(
     - NEVER include invalid or malformed test values.
     - NEVER include commentary, explanations, or additional text outside of this JSON.
 )";
+
+static std::string g_mockgen_db_query_prompt = R"(
+    Now also act as a database query expert. You must generate values(must maintain the data type and format) that are valid for the database query with the input values.
+    - Raw DB query for this endpoint (with runtime input values): {{sql_hint}}
+    - If the query contains a concrete literal value for the current field/argument, include that exact value in the generated JSON array, preferably first.
+    - If the query has no concrete literal value, or the literal does not correspond to the current field/argument, do not force any query-derived value.
+)";
+
+static std::string g_failure_path_prompt = R"(
+    Act as an expert in database failure simulation for repository-level mock replay.
+
+    You must generate ONLY DB failure mock entries for this repository call context.
+    Return ONLY valid JSON array (no markdown, no explanation, no extra text).
+
+    Context:
+    - repository: {{repository}}
+    - method: {{method}}
+    - args_json: {{args_json}}
+    - arg_types_json: {{arg_types_json}}
+    - signature: {{signature}}
+    - path: {{path}}
+    - value_type: {{value_type}}
+    - sql_hint: {{sql_hint}}
+    - allowed_error_types_json: {{allowed_error_types_json}}
+    - context_summary:
+    {{context_summary}}
+
+    Generate exactly {{count}} DB failure mock entries as a JSON array.
+
+    Output schema (array of objects):
+    [
+      {
+        "mockflow": {
+          "version": "1.0",
+          "mode": "error"
+        },
+        "match": {
+          "repository": "{{repository}}",
+          "method": "{{method}}"
+        },
+        "error": {
+          "type": "DB_TIMEOUT",
+          "message": "Simulated DB timeout during {{repository}}.{{method}}"
+        }
+      }
+    ]
+
+    Strict rules:
+    - match.repository must equal {{repository}} exactly
+    - match.method must equal {{method}} exactly
+    - Never invent repository/method names outside provided context
+    - error.type must be one value from allowed_error_types_json
+    - Do NOT output exceptionClass or errorType
+    - Do NOT output success payloads
+    - Keep message concise and realistic
+)";
+
+static std::string g_generic_failure_path_prompt = R"(
+    Act as an expert in generic failure-aware mock replay.
+
+    You must generate failure mock entries for this repository/dependency call context.
+    Include database/storage failures as one category, but do not limit the scenarios to database failures.
+    Return ONLY valid JSON array (no markdown, no explanation, no extra text).
+
+    Context:
+    - failure_role: {{failure_role}}
+    - repository: {{repository}}
+    - method: {{method}}
+    - args_json: {{args_json}}
+    - arg_types_json: {{arg_types_json}}
+    - signature: {{signature}}
+    - path: {{path}}
+    - value_type: {{value_type}}
+    - sql_hint: {{sql_hint}}
+    - allowed_error_types_json: {{allowed_error_types_json}}
+    - context_summary:
+    {{context_summary}}
+
+    Generate exactly {{count}} failure mock entries as a JSON array.
+
+    Diversify scenarios across realistic failure styles when possible:
+    - database/storage failures: timeout, unavailable storage, permission denied, invalid query, deadlock, constraint violation
+    - missing-data failures: absent record, empty result, stale reference, unresolved identifier
+    - external dependency failures: downstream timeout, downstream unavailable, downstream 404, downstream 500, rate limit
+    - data-shape failures: malformed dependency response, schema mismatch, missing required field, unsupported enum/value
+    - transformation failures: parse failure, serialization failure, incompatible nested structure
+    - consistency failures: duplicate/conflict, stale data, transaction conflict, partial data
+
+    Output schema (array of objects):
+    [
+      {
+        "mockflow": {
+          "version": "1.0",
+          "mode": "error"
+        },
+        "match": {
+          "repository": "{{repository}}",
+          "method": "{{method}}"
+        },
+        "error": {
+          "role": "{{failure_role}}",
+          "style": "timeout",
+          "type": "DB_TIMEOUT",
+          "message": "Simulated timeout during {{repository}}.{{method}}"
+        }
+      }
+    ]
+
+    Strict rules:
+    - match.repository must equal {{repository}} exactly
+    - match.method must equal {{method}} exactly
+    - Never invent repository/method names outside provided context
+    - error.role must equal {{failure_role}} exactly
+    - error.style must describe the generic failure behavior, such as timeout, unavailable, not_found, empty_result, http_404, http_500, malformed_response, schema_mismatch, permission_denied, conflict, or parse_failure
+    - error.type must be one value from allowed_error_types_json
+    - If allowed_error_types_json is narrow or database-oriented, choose the closest allowed type and express the specific failure style in error.message
+    - Do NOT output exceptionClass or errorType
+    - Do NOT output success payloads
+    - Do NOT add extra top-level keys beyond mockflow, match, and error
+    - Keep message concise, realistic, and specific to the selected failure style
+)";
+
+static std::string resolveDbQueryContext()
+{
+    const char* sqlHint = std::getenv("MOCKGEN_HINT_QUERY");
+
+    if (sqlHint == nullptr || std::string(sqlHint).empty()) {
+        return "";
+    }
+
+    std::string section = g_mockgen_db_query_prompt;
+    const std::string placeholder = "{{sql_hint}}";
+    size_t pos = section.find(placeholder);
+    if (pos != std::string::npos) {
+        section.replace(pos, placeholder.size(), std::string(sqlHint));
+    }
+    return section;
+}
+
+static std::string contextStringOr(const std::string& key, const std::string& fallback)
+{
+    if (!g_failure_prompt_context.is_object()) {
+        return fallback;
+    }
+
+    auto it = g_failure_prompt_context.find(key);
+    if (it == g_failure_prompt_context.end() || !it->is_string()) {
+        return fallback;
+    }
+
+    auto v = it->get<std::string>();
+    return v.empty() ? fallback : v;
+}
+
+static std::string contextArrayDumpOr(const std::string& key, const std::string& fallback)
+{
+    if (!g_failure_prompt_context.is_object()) {
+        return fallback;
+    }
+
+    auto it = g_failure_prompt_context.find(key);
+    if (it == g_failure_prompt_context.end() || !it->is_array()) {
+        return fallback;
+    }
+
+    try {
+        return it->dump();
+    } catch (...) {
+        return fallback;
+    }
+}
+
+static int contextIntOr(const std::string& key, int fallback)
+{
+    if (!g_failure_prompt_context.is_object()) {
+        return fallback;
+    }
+
+    auto it = g_failure_prompt_context.find(key);
+    if (it == g_failure_prompt_context.end() || !it->is_number_integer()) {
+        return fallback;
+    }
+
+    try {
+        return it->get<int>();
+    } catch (...) {
+        return fallback;
+    }
+}
 
 static std::string g_prompt_naked_arg = R"(
     Act as an expert in API input space analysis for black-box test generation.
@@ -131,6 +436,44 @@ static std::string mock_generate = R"(
     ["value1", "value2", "value3"]
     )";
 
+
+
+static std::string failure_aware_input_partition = R"(
+    --- FAILURE-AWARE INPUT PARTITIONING ---
+
+    You must ensure generated values cover scenarios that can trigger different categories of failures during application–database interaction:
+
+    1. Input/Validation Errors:
+    - Boundary-valid values (e.g., minimum, maximum, near-empty but valid)
+    - Values that are syntactically valid but may challenge validation logic
+
+    2. Application/Query Errors:
+    - Values that are valid but may expose parameter binding or query assumptions
+    - Edge-length, uncommon but valid formats
+
+    3. Business Logic Errors:
+    - Valid values that may or may not exist in the dataset (e.g., existing vs non-existing IDs)
+    - Values that exercise different logical states (found vs not found)
+
+    4. Database Interaction Errors (Input-Triggerable):
+    - Values that may interact with constraints or lookup behavior:
+    - Existing values (possible duplicates)
+    - Valid but non-existing values
+    - Boundary numeric values within type limits
+    - Values that differentiate indexed vs non-indexed lookup behavior
+
+    5. System-Level Fault Awareness:
+    - Select values that remain useful when executed under fault-injected conditions such as:
+    - timeout, temporary unavailability, retry, rollback, replica lag, connection exhaustion
+    - Do NOT encode faults as invalid values
+    - Focus on values that help distinguish environment-level failures from input, query, database, and business logic failures
+
+    IMPORTANT:
+    - All values MUST strictly conform to the required data type and format
+    - Do NOT generate syntactically invalid values
+    - Trigger failures through semantic and domain variation, not malformed input
+    )";
+
 static std::string g_api_json = R"(
     {
     "contents": 
@@ -148,6 +491,8 @@ static std::string g_api_json = R"(
         }
     }
     )";
+
+json callAPIWithPrompt(std::string prompt);
 
 static std::unordered_map<std::string, std::string> g_typeFormatInstructions = {
     {"None","null"},
@@ -247,6 +592,99 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
     }
 }
 
+std::string buildPromptForFailurePath(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, const std::string& signature)
+{
+    std::string prompt = g_generic_failure_path_prompt;
+
+    const std::string repository = contextStringOr("repository", "UnknownRepository");
+    const std::string method = contextStringOr(
+        "method_name",
+        contextStringOr("method", "unknownMethod")
+    );
+    const std::string argsJson = contextArrayDumpOr("args", "[]");
+    const std::string argTypesJson = contextArrayDumpOr("arg_types", "[]");
+    const std::string allowedErrorTypesJson = contextArrayDumpOr(
+        "allowed_error_types",
+        contextArrayDumpOr("allowed_exception_classes", "[]")
+    );
+    const std::string contextSummary = contextStringOr(
+        "context_summary",
+        contextStringOr("schema_summary", "<none>")
+    );
+    const std::string failureRole = contextStringOr("failure_role", "storage");
+    const int countValue = std::max(1, contextIntOr("count", 50));
+    const std::string count = std::to_string(countValue);
+    const std::string sqlHint = contextStringOr("sql_hint", "");
+
+    replaceAll(prompt, "{{failure_role}}", failureRole);
+    replaceAll(prompt, "{{repository}}", repository);
+    replaceAll(prompt, "{{method}}", method);
+    replaceAll(prompt, "{{args_json}}", argsJson);
+    replaceAll(prompt, "{{arg_types_json}}", argTypesJson);
+    replaceAll(prompt, "{{signature}}", signature);
+    replaceAll(prompt, "{{path}}", env.path);
+    replaceAll(prompt, "{{value_type}}", t == nullptr ? "UnknownType" : t->tkey);
+    replaceAll(prompt, "{{sql_hint}}", sqlHint.empty() ? "<none>" : sqlHint);
+    replaceAll(prompt, "{{allowed_error_types_json}}", allowedErrorTypesJson);
+    replaceAll(prompt, "{{context_summary}}", contextSummary);
+    replaceAll(prompt, "{{count}}", count);
+
+    return prompt;
+}
+
+static bool isValidFailureMockEntry(const json& item)
+{
+    if (!item.is_object()) {
+        return false;
+    }
+    if (!item.contains("mockflow") || !item["mockflow"].is_object()) {
+        return false;
+    }
+    if (!item["mockflow"].contains("mode") || !item["mockflow"]["mode"].is_string()) {
+        return false;
+    }
+    if (item["mockflow"]["mode"].get<std::string>() != "error") {
+        return false;
+    }
+    if (!item.contains("match") || !item["match"].is_object()) {
+        return false;
+    }
+    if (!item.contains("error") || !item["error"].is_object()) {
+        return false;
+    }
+    if (!item["error"].contains("type") || !item["error"]["type"].is_string()) {
+        return false;
+    }
+    if (!item["error"].contains("message") || !item["error"]["message"].is_string()) {
+        return false;
+    }
+    return true;
+}
+
+json generateFailureMockEntries(const std::string& signature)
+{
+    ValueSetGeneratorEnvironment env{"failure.entry", {}, GenerateContext{}};
+    auto prompt = buildPromptForFailurePath(nullptr, env, signature);
+
+    json raw = callAPIWithPrompt(prompt);
+    if (!raw.is_array()) {
+        throw std::runtime_error("Failure mock generation must return a JSON array");
+    }
+
+    json filtered = json::array();
+    for (const auto& item : raw) {
+        if (isValidFailureMockEntry(item)) {
+            filtered.push_back(item);
+        }
+    }
+
+    if (filtered.empty()) {
+        throw std::runtime_error("No valid failure mock entries were returned by LLM");
+    }
+
+    return filtered;
+}
+
 void loadMockSection(std::string& prompt, const ValueSetGeneratorEnvironment& env) {
     namespace fs = std::filesystem;
     if (!mock_loaded) {
@@ -293,7 +731,15 @@ void loadMockSection(std::string& prompt, const ValueSetGeneratorEnvironment& en
 
 std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGeneratorEnvironment& env, std::string formatinstructions, std::string signature) 
 {
+    if (g_failure_aware_mock_flow_enabled) {
+        return buildPromptForFailurePath(t, env, signature);
+    }
+
     std::string prompt;
+    std::string resolvedFname = env.context.forfield.has_value() ? env.context.forfield.value().fname : env.path;
+    std::string resolvedTname = env.context.intype.has_value() ? env.context.intype.value()->tkey : "UnknownType";
+    std::string resolvedType = t == nullptr ? "UnknownType" : t->tkey;
+    std::string resolvedReexpression = "";
 
     if(env.context.forfield.has_value()) {
         prompt = env.context.forindex.has_value() ? g_prompt_member_field_index : g_prompt_member_field;
@@ -311,6 +757,11 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
     loadMockSection(prompt, env);  // Inject mock_data into mock_generate and into prompt
 
     prompt.replace(prompt.find("{{std_reqs}}"), 12, g_std_prompt_instructions);
+    std::string dbQueryContext = resolveDbQueryContext();
+    if (!dbQueryContext.empty()) {
+        prompt += "\n";
+        prompt += dbQueryContext;
+    }
     
     prompt.replace(prompt.find("{{path}}"), 8, env.path);
     prompt.replace(prompt.find("{{signature}}"), 13, signature);
@@ -347,15 +798,34 @@ std::string buildPromptFor(const bsqon::PrimitiveType* t, const ValueSetGenerato
             reexpression = "- Test values must match the following regular expression: " + std::string(vinfo.cbegin(), vinfo.cend());
         }
 
+        resolvedType = ttinfo;
+        resolvedReexpression = reexpression;
+
         prompt.replace(prompt.find("{{type}}"), 8, ttinfo);
         prompt.replace(prompt.find("{{reexpression}}"), 16, reexpression);
     }
+
+    if (g_failure_aware_input_generation_enabled) {
+        prompt += "\n";
+        prompt += failure_aware_input_partition;
+    }
+
+    // Final template pass: resolve tokens that may appear multiple times (including injected mock_generate section).
+    replaceAll(prompt, "{{fname}}", resolvedFname);
+    replaceAll(prompt, "{{tname}}", resolvedTname);
+    replaceAll(prompt, "{{type}}", resolvedType);
+    replaceAll(prompt, "{{format}}", formatinstructions);
+    replaceAll(prompt, "{{path}}", env.path);
+    replaceAll(prompt, "{{signature}}", signature);
+    replaceAll(prompt, "{{reexpression}}", resolvedReexpression);
 
     return prompt;
 }
 
 json callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
 {
+    logLLMPrompt("Gemini", prompt);
+
     std::string apiKey = std::string(getenv("GEMINI_API_KEY"));
     std::string url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
@@ -364,22 +834,19 @@ json callGeminiAPIWithPrompt(std::string prompt, std::string jsontype)
     requestJson["generationConfig"]["response_schema"]["items"] = json::parse(jsontype);
 
     //TODO: Temp debugging output
-    std::cout << "---- Requesting with ----" << std::endl << requestJson.dump(8) << std::endl;
+    //std::cout << "---- Requesting with ----" << std::endl << requestJson.dump(8) << std::endl;
 
     std::string response = makeAPIRequest("Gemini", apiKey, url, requestJson);
     json responseJson = json::parse(response);
 
     //TODO: Temp debugging output
-    std::cout << "---- Responded with ----" << std::endl << responseJson.dump(8) << std::endl;
+    //std::cout << "---- Responded with ----" << std::endl << responseJson.dump(8) << std::endl;
 
     return json::parse(responseJson["candidates"][0]["content"]["parts"][0]["text"].get<std::string>());
 }
 
 json callAPIWithPrompt(std::string prompt)
 {
-    //TODO: Temp debugging output
-    std::cout << "---- Prompting with ----" << std::endl << prompt << std::endl;
-
     static const std::string OPENAI_URL   = "https://api.openai.com/v1/chat/completions";
     static const std::string OPENAI_MODEL = "gpt-5";
 
@@ -407,6 +874,8 @@ json callAPIWithPrompt(std::string prompt)
         url    = OPENAI_URL;
         model  = OPENAI_MODEL;
     }
+
+    logLLMPrompt(provider, prompt);
    
     json requestJson = {
         {"model", model},
@@ -418,7 +887,7 @@ json callAPIWithPrompt(std::string prompt)
     //std::string response = makeAPIRequest("DEEPSEEK", apiKey, url, requestJson);
     std::string response = makeAPIRequest(provider, apiKey, url, requestJson);
     json responseJson = json::parse(response);
-    std::cout << "---- Raw Response ----" << std::endl << responseJson.dump(8) << std::endl;
+    //std::cout << "---- Raw Response ----" << std::endl << responseJson.dump(8) << std::endl;
 
     std::string contentString = responseJson["choices"][0]["message"]["content"];
     size_t start = contentString.find("[");
@@ -437,12 +906,63 @@ json callAPIWithPrompt(std::string prompt)
 }
 
 template <typename T>
+static T parseNumericFromString(const std::string& rawValue) {
+    auto begin = std::find_if_not(rawValue.begin(), rawValue.end(), [](unsigned char c) { return std::isspace(c) != 0; });
+    auto end = std::find_if_not(rawValue.rbegin(), rawValue.rend(), [](unsigned char c) { return std::isspace(c) != 0; }).base();
+    if (begin >= end) {
+        throw std::runtime_error("Numeric string is empty");
+    }
+
+    std::string value(begin, end);
+    size_t idx = 0;
+
+    if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) {
+        long long parsed = std::stoll(value, &idx, 10);
+        if (idx != value.size()) {
+            throw std::runtime_error("Invalid signed integer token: " + value);
+        }
+        return static_cast<T>(parsed);
+    } else if constexpr (std::is_integral_v<T> && !std::is_signed_v<T>) {
+        if (!value.empty() && value[0] == '-') {
+            throw std::runtime_error("Invalid unsigned integer token: " + value);
+        }
+        unsigned long long parsed = std::stoull(value, &idx, 10);
+        if (idx != value.size()) {
+            throw std::runtime_error("Invalid unsigned integer token: " + value);
+        }
+        return static_cast<T>(parsed);
+    } else if constexpr (std::is_floating_point_v<T>) {
+        long double parsed = std::stold(value, &idx);
+        if (idx != value.size()) {
+            throw std::runtime_error("Invalid floating-point token: " + value);
+        }
+        return static_cast<T>(parsed);
+    } else {
+        static_assert(!sizeof(T*), "parseNumericFromString only supports numeric types");
+    }
+}
+
+template <typename T>
 std::vector<T> getValuesFromJson(const json& extractedData) {
     std::vector<T> values;
-    std::transform(extractedData.begin(), extractedData.end(), std::back_inserter(values), [](const json& jv) { 
-        return jv.get<T>(); 
-    });
-
+    for (const auto& jv : extractedData) {
+        if (jv.is_null())
+            continue;  // skip nulls to avoid type_error.302 (e.g. AI returning null in string/date array)
+        if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
+            if (jv.is_number()) {
+                values.push_back(jv.get<T>());
+            }
+            else if (jv.is_string()) {
+                values.push_back(parseNumericFromString<T>(jv.get<std::string>()));
+            }
+            else {
+                throw std::runtime_error("Expected numeric JSON value or numeric string");
+            }
+        }
+        else {
+            values.push_back(jv.get<T>());
+        }
+    }
     return values;
 }
 
@@ -453,7 +973,7 @@ std::vector<T> runAIGenCall(const AIValueGenerator* aigen, const ValueSetGenerat
 
     json res;
     if(aigen->model == AIModelOption::GEMINI) {
-        std::cout << "---- gemini with ----------------------\n";
+        //std::cout << "---- gemini with ----------------------\n";
         res = callGeminiAPIWithPrompt(prompt, jfmt);
     }
     else {
